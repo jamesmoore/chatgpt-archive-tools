@@ -48,7 +48,7 @@ You can provide multiple sources. For bare metal, pass `-s`/`--source` multiple 
 
   1. Run the server (use `-s`/`--source` to point at your export folder):
   ```sh
-  dotnet run --project ./chatgpt.archive.api -- -s ~/chatgpt-export
+  dotnet run --project ./ChatGpt.Archive.Api/ChatGpt.Archive.Api.csproj -- -s ~/chatgpt-export
   ```
   If your filesystem is case-sensitive, use the exact project folder casing.
   2. Open the URL printed in the console (typically `http://localhost:5104`).
