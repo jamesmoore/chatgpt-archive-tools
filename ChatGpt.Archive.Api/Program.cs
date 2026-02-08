@@ -2,7 +2,6 @@
 using ChatGpt.Archive.Api.Services;
 using ChatGPTExport;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.Extensions.Options;
 using System.CommandLine;
 using System.IO.Abstractions;
 
@@ -30,22 +29,14 @@ var selectedSources = (cliSources is { Length: > 0 })
     ? cliSources
     : envSources;
 
-if (selectedSources is { Length: > 0 })
+// Create ArchiveSourcesOptions directly from command line/env vars
+var archiveSourcesOptions = new ArchiveSourcesOptions
 {
-    var overrides = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase);
-    for (int i = 0; i < selectedSources.Length; i++)
-    {
-        overrides[$"ArchiveSources:SourceDirectories:{i}"] = selectedSources[i];
-    }
-    builder.Configuration.AddInMemoryCollection(overrides);
-}
+    SourceDirectories = selectedSources?.ToList() ?? []
+};
 
 // Add services to the container.
-builder.Services
-    .AddOptions<ArchiveSourcesOptions>()
-    .Bind(builder.Configuration.GetSection("ArchiveSources"))
-    .Validate(options => options.SourceDirectories.Count > 0,
-              "At least one source directory must be configured");
+builder.Services.AddSingleton(archiveSourcesOptions);
 
 builder.Services.AddControllers();
 builder.Services.AddSingleton<IFileSystem, FileSystem>();
@@ -58,27 +49,26 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-try
+// Validate that at least one source directory is configured
+var options = app.Services.GetRequiredService<ArchiveSourcesOptions>();
+if (options.SourceDirectories.Count == 0)
 {
-    var optionsValue = app.Services.GetRequiredService<IOptions<ArchiveSourcesOptions>>().Value;
-    Console.WriteLine("Using source directories: ");
-    var fileSystem = app.Services.GetRequiredService<IFileSystem>();
-    var directories = optionsValue.SourceDirectories.Select(p => new { Directory = p, Exists = fileSystem.Directory.Exists(p) }).ToList();
-
-    foreach (var sd in directories)
-    {
-        Console.WriteLine("\t" + sd.Directory + "\t" + (sd.Exists ? "Exists" : "Missing"));
-    }
-
-    if (directories.All(p => p.Exists == false))
-    {
-        Console.Error.WriteLine("No source directories exist.");
-        return;
-    }
+    Console.Error.WriteLine("At least one source directory must be configured");
+    return;
 }
-catch (OptionsValidationException ove)
+
+Console.WriteLine("Using source directories: ");
+var fileSystem = app.Services.GetRequiredService<IFileSystem>();
+var directories = options.SourceDirectories.Select(p => new { Directory = p, Exists = fileSystem.Directory.Exists(p) }).ToList();
+
+foreach (var sd in directories)
 {
-    Console.Error.WriteLine(ove.Message);
+    Console.WriteLine("\t" + sd.Directory + "\t" + (sd.Exists ? "Exists" : "Missing"));
+}
+
+if (directories.All(p => p.Exists == false))
+{
+    Console.Error.WriteLine("No source directories exist.");
     return;
 }
 
