@@ -182,7 +182,7 @@ You can export from multiple sources. For bare metal, pass `-s`/`--source` multi
 ## How it works
 The source folder must contain a file named conversations.json, which holds all your conversations in JSON format. The conversations.json can be in a subfolder, and you can have multiple subfolders (eg, one for each export if you have created many).
 
-Each conversation is converted into one of more files in the destination folder. Depending on the parameters passed in, json, markdown and html files may be created.
+Each conversation is converted into one or more files in the destination folder. Depending on the parameters passed in, json, markdown and html files may be created.
 
 The files will be named with a timestamp and the conversation title (eg, `<YYYY-MM-DDTHH-MM-SS> - <chat title>.md`). The timestamp is the creation date of the conversation.
 
