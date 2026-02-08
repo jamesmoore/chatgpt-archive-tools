@@ -41,7 +41,7 @@ unzip ~/Downloads/chatgpt_export.zip -d ~/chatgpt-export
 
 The archive server hosts a web UI for browsing your exported conversations. It reads one or more source directories that contain `conversations.json`.
 
-You can provide multiple sources. For bare metal, pass `-s`/`--source` multiple times (for example: `-s dir1 -s dir2`). For Docker, set `SOURCE` to a semicolon-separated list (for example: `SOURCE=/source1;/source2`) and mount each directory.
+You can provide multiple sources. For bare metal, pass `-s`/`--source` multiple times (for example: `-s dir1 -s dir2`). For Docker, set `SOURCE` to a semicolon-separated list (for example: `SOURCE="/source1;/source2"`) and mount each directory.
 
 <details>
   <summary>Archive Server - Bare metal</summary>
