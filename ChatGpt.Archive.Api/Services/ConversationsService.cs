@@ -1,14 +1,13 @@
 ﻿using ChatGPTExport;
 using ChatGPTExport.Assets;
 using ChatGPTExport.Models;
-using Microsoft.Extensions.Options;
 using System.IO.Abstractions;
 
 namespace ChatGpt.Archive.Api.Services
 {
     public class ConversationsService : IConversationsService
     {
-        private readonly IOptions<ArchiveSourcesOptions> _options;
+        private readonly ArchiveSourcesOptions _options;
         private readonly IFileSystem _fileSystem;
         private readonly IConversationAssetsCache _directoryCache;
         private readonly Lazy<IEnumerable<Conversation>> _storedConversations;
@@ -16,7 +15,7 @@ namespace ChatGpt.Archive.Api.Services
         public ConversationsService(
             IFileSystem fileSystem,
             IConversationAssetsCache directoryCache,
-            IOptions<ArchiveSourcesOptions> options)
+            ArchiveSourcesOptions options)
         {
             _fileSystem = fileSystem;
             _directoryCache = directoryCache;
@@ -37,7 +36,7 @@ namespace ChatGpt.Archive.Api.Services
 
         private IEnumerable<Conversation> GetConversations()
         {
-            var directories = _options.Value.SourceDirectories.Select(p => _fileSystem.DirectoryInfo.New(p));
+            var directories = _options.SourceDirectories.Select(p => _fileSystem.DirectoryInfo.New(p));
             var conversationFinder = new ConversationFinder();
             var conversationFiles = conversationFinder.GetConversationFiles(directories);
             var conversationsParser = new ConversationsParser([]);
