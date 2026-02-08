@@ -22,14 +22,16 @@ export function TopBar() {
     window.dispatchEvent(new Event('storage'));
   };
 
+  const buttonsDisabled = !id || !format;
+
   return (
     <div className="flex items-center gap-2">
       <SidebarTrigger />
 
       <ButtonGroup className="ml-auto">
-        <Button variant={format === 'html' ? 'default' : 'outline'} onClick={() => navigate(`/conversation/${id}/html`)}>Html</Button>
-        <Button variant={format === 'markdown' ? 'default' : 'outline'} onClick={() => navigate(`/conversation/${id}/markdown`)}>Markdown</Button>
-        <Button variant={format === 'json' ? 'default' : 'outline'} onClick={() => navigate(`/conversation/${id}/json`)}>JSON</Button>
+        <Button variant={format === 'html' ? 'default' : 'outline'} onClick={() => navigate(`/conversation/${id}/html`)} disabled={buttonsDisabled}>Html</Button>
+        <Button variant={format === 'markdown' ? 'default' : 'outline'} onClick={() => navigate(`/conversation/${id}/markdown`)} disabled={buttonsDisabled}>Markdown</Button>
+        <Button variant={format === 'json' ? 'default' : 'outline'} onClick={() => navigate(`/conversation/${id}/json`)} disabled={buttonsDisabled}>JSON</Button>
       </ButtonGroup>
 
       <Button
@@ -38,6 +40,7 @@ export function TopBar() {
         onClick={toggleWrap}
         title="Toggle word wrap"
         disabled={!isTextFormat}
+        aria-label="Toggle word wrap"
       >
         <WrapText className="h-4 w-4" />
       </Button>

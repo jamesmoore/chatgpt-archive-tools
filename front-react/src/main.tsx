@@ -17,7 +17,7 @@ createRoot(document.getElementById('root')!).render(
       <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
         <Router>
           <Routes>
-            <Route path="/" element={<Layout />} />
+            <Route path="/" element={<Layout topBarChildren={<TopBar />}/>} />
             <Route path="/conversation/:id/:format" element={<Layout topBarChildren={<TopBar />}><ConversationPanel /></Layout>} />
           </Routes>
         </Router>
