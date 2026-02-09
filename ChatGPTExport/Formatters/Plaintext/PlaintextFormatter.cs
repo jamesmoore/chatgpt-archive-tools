@@ -49,9 +49,7 @@ namespace ChatGPTExport.Formatters.Plaintext
 
                         var authorname = string.IsNullOrWhiteSpace(message.author.name) ? "" : $" ({message.author.name})";
                         strings.Add($"{message.author.role}{authorname}{visitResult.Suffix}:");
-                        strings.Add("");
                         strings.Add(plaintext);
-                        strings.Add("");
                         strings.Add("-" + new string('-', 78));
                         strings.Add("");
                     }
