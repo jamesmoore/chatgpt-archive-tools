@@ -88,6 +88,13 @@ var htmlOption = new Option<bool>("--html")
     DefaultValueFactory = (ArgumentResult ar) => true,
 };
 
+var textOption = new Option<bool>("--text")
+{
+    Description = "Export to plaintext files.",
+    Required = false,
+    DefaultValueFactory = (ArgumentResult ar) => false,
+};
+
 var htmlFormatOption = new Option<HtmlFormat>("-hf", "--htmlformat")
 {
     Description = "Specify format for html exports.",
@@ -117,6 +124,7 @@ var rootCommand = new RootCommand("ChatGPT export reformatter")
     jsonOption,
     markdownOption,
     htmlOption,
+    textOption,
     htmlFormatOption,
     validateOption,
     showHiddenOption,
@@ -140,6 +148,7 @@ rootCommand.SetAction(parseResult =>
         var json = parseResult.GetRequiredValue(jsonOption);
         var markdown = parseResult.GetRequiredValue(markdownOption);
         var html = parseResult.GetRequiredValue(htmlOption);
+        var text = parseResult.GetRequiredValue(textOption);
         var htmlFormat = parseResult.GetRequiredValue(htmlFormatOption);
         var showHidden = parseResult.GetRequiredValue(showHiddenOption);
 
@@ -162,6 +171,7 @@ rootCommand.SetAction(parseResult =>
         if (html) exportTypes.Add(ExportType.Html);
         if (json) exportTypes.Add(ExportType.Json);
         if (markdown) exportTypes.Add(ExportType.Markdown);
+        if (text) exportTypes.Add(ExportType.Text);
 
         ExportArgs exportArgs = new(
             sources,
