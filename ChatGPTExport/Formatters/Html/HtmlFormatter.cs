@@ -11,6 +11,7 @@ namespace ChatGPTExport.Exporters.Html
     internal partial class HtmlFormatter(IHtmlFormatter formatter, bool showHidden) : IConversationFormatter
     {
         private readonly string LineBreak = Environment.NewLine;
+        private readonly MarkdownPipeline MarkdownPipeline = CreatePipeline(formatter);
 
         public IEnumerable<string> Format(IAssetLocator assetLocator, Conversation conversation)
         {
@@ -37,8 +38,7 @@ namespace ChatGPTExport.Exporters.Html
                 }
             }
 
-            var markdownPipeline = GetPipeline();
-            var bodyHtml = strings.Select(p => GetHtmlFragment(p.Author, p.Content, p.HasImage, markdownPipeline));
+            var bodyHtml = strings.Select(p => GetHtmlFragment(p.Author, p.Content, p.HasImage, MarkdownPipeline));
 
             var titleString = WebUtility.HtmlEncode(conversation.title ?? "No title");
 
@@ -105,7 +105,7 @@ namespace ChatGPTExport.Exporters.Html
             return fragment;
         }
 
-        private MarkdownPipeline GetPipeline()
+        private static MarkdownPipeline CreatePipeline(IHtmlFormatter formatter)
         {
             var pipelineBuilder = new MarkdownPipelineBuilder()
                 //.UseAlertBlocks()
