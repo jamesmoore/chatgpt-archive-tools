@@ -175,6 +175,7 @@ You can export from multiple sources. For bare metal, pass `-s`/`--source` multi
 |`-j`<br>`--json`||Export to json files (`true` or `false`).|`false`|
 |`-m`<br>`--markdown`||Export to markdown files (`true` or `false`).|`true`|
 |`--html`||Export to html files (`true` or `false`).|`true`|
+|`--text`||Export to plaintext files (`true` or `false`).|`false`|
 |`-hf`<br>`--htmlformat`||Specify format for html exports (`bootstrap` or `tailwind`).|`tailwind`|
 |`--showhidden`||Includes hidden content in markdown and html exports.<br>Enabling this will include thinking, web searches, image prompts in the export.|`false`|
 |`--validate`||Validate the json against the known and expected schema.|`false`|
