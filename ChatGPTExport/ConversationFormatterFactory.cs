@@ -5,6 +5,7 @@ using ChatGPTExport.Formatters.Html.Headers;
 using ChatGPTExport.Formatters.Html.Template;
 using ChatGPTExport.Formatters.Json;
 using ChatGPTExport.Formatters.Markdown;
+using ChatGPTExport.Formatters.Plaintext;
 
 namespace ChatGPTExport
 {
@@ -38,6 +39,10 @@ namespace ChatGPTExport
 
                 var formatter = htmlFormat == HtmlFormat.Bootstrap ? new BootstrapHtmlFormatter(headerProvider) as IHtmlFormatter : new TailwindHtmlFormatter(headerProvider);
                 exporters.Add(new HtmlFormatter(formatter, showHidden));
+            }
+            if (exportTypes.Contains(ExportType.Text))
+            {
+                exporters.Add(new PlaintextFormatter(showHidden));
             }
 
             return exporters;
