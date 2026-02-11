@@ -24,6 +24,12 @@ namespace ChatGpt.Archive.Api.Services
             _fileSystem = fileSystem;
             _directoryCache = directoryCache;
             _options = options;
+            
+            if (string.IsNullOrWhiteSpace(options.DataDirectory))
+            {
+                throw new ArgumentException("DataDirectory must be configured", nameof(options));
+            }
+            
             _connectionString = $"Data Source={Path.Combine(options.DataDirectory, "archive.db")}";
         }
 

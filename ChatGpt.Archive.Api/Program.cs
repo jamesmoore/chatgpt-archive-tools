@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.HttpOverrides;
 using System.CommandLine;
 using System.IO.Abstractions;
 
+const string DefaultDataDirectory = "chatgpt-archive";
+
 var builder = WebApplication.CreateBuilder(args);
 
 var sourceOption = new Option<string[]>("--source", "-s")
@@ -18,7 +20,7 @@ var dataDirectoryOption = new Option<string>("--data-directory", "-d")
 {
     Arity = ArgumentArity.ZeroOrOne,
     Description = "Data directory for SQLite database",
-    DefaultValueFactory = (argumentResult) => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "chatgpt-archive")
+    DefaultValueFactory = (argumentResult) => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), DefaultDataDirectory)
 };
 
 var rootCommand = new RootCommand
@@ -44,7 +46,7 @@ var selectedDataDirectory = !string.IsNullOrWhiteSpace(cliDataDirectory)
     ? cliDataDirectory
     : (!string.IsNullOrWhiteSpace(envDataDirectory)
         ? envDataDirectory
-        : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "chatgpt-archive"));
+        : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), DefaultDataDirectory));
 
 // Create ArchiveSourcesOptions directly from command line/env vars
 var archiveSourcesOptions = new ArchiveSourcesOptions
