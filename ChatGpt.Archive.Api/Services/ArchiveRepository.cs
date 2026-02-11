@@ -7,6 +7,7 @@ namespace ChatGpt.Archive.Api.Services
 {
     public class ArchiveRepository : IArchiveRepository
     {
+        private const string DatabaseFileName = "archive.db";
         private readonly string _connectionString;
         private readonly IFileSystem _fileSystem;
         private readonly ArchiveSourcesOptions _options;
@@ -21,12 +22,12 @@ namespace ChatGpt.Archive.Api.Services
                 throw new ArgumentException("DataDirectory must be configured", nameof(options));
             }
 
-            _connectionString = $"Data Source={Path.Combine(options.DataDirectory, "archive.db")}";
+            _connectionString = $"Data Source={Path.Combine(options.DataDirectory, DatabaseFileName)}";
         }
 
         public void EnsureSchema()
         {
-            var dbPath = Path.Combine(_options.DataDirectory, "archive.db");
+            var dbPath = Path.Combine(_options.DataDirectory, DatabaseFileName);
             
             // Ensure data directory exists
             if (!_fileSystem.Directory.Exists(_options.DataDirectory))
@@ -51,7 +52,7 @@ namespace ChatGpt.Archive.Api.Services
 
         public bool HasConversations()
         {
-            var dbPath = Path.Combine(_options.DataDirectory, "archive.db");
+            var dbPath = Path.Combine(_options.DataDirectory, DatabaseFileName);
             if (!_fileSystem.File.Exists(dbPath))
             {
                 return false;
@@ -72,21 +73,42 @@ namespace ChatGpt.Archive.Api.Services
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
 
+            using var transaction = connection.BeginTransaction();
+            using var insertCommand = connection.CreateCommand();
+            insertCommand.CommandText = @"
+                INSERT OR REPLACE INTO conversations (id, title, update_time, raw_json)
+                VALUES (@id, @title, @update_time, @raw_json);";
+
+            var idParam = insertCommand.CreateParameter();
+            idParam.ParameterName = "@id";
+            insertCommand.Parameters.Add(idParam);
+
+            var titleParam = insertCommand.CreateParameter();
+            titleParam.ParameterName = "@title";
+            insertCommand.Parameters.Add(titleParam);
+
+            var updateTimeParam = insertCommand.CreateParameter();
+            updateTimeParam.ParameterName = "@update_time";
+            insertCommand.Parameters.Add(updateTimeParam);
+
+            var rawJsonParam = insertCommand.CreateParameter();
+            rawJsonParam.ParameterName = "@raw_json";
+            insertCommand.Parameters.Add(rawJsonParam);
+
             foreach (var conversation in conversations)
             {
                 var json = JsonSerializer.Serialize(conversation);
                 var updateTime = (long)conversation.update_time;
 
-                using var insertCommand = connection.CreateCommand();
-                insertCommand.CommandText = @"
-                    INSERT OR REPLACE INTO conversations (id, title, update_time, raw_json)
-                    VALUES (@id, @title, @update_time, @raw_json);";
-                insertCommand.Parameters.AddWithValue("@id", conversation.id ?? string.Empty);
-                insertCommand.Parameters.AddWithValue("@title", conversation.title ?? string.Empty);
-                insertCommand.Parameters.AddWithValue("@update_time", updateTime);
-                insertCommand.Parameters.AddWithValue("@raw_json", json);
+                idParam.Value = conversation.id ?? string.Empty;
+                titleParam.Value = conversation.title ?? string.Empty;
+                updateTimeParam.Value = updateTime;
+                rawJsonParam.Value = json;
+
                 insertCommand.ExecuteNonQuery();
             }
+
+            transaction.Commit();
         }
 
         public IEnumerable<Conversation> GetAll()
