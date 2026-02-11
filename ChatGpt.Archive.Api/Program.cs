@@ -60,6 +60,7 @@ builder.Services.AddSingleton(archiveSourcesOptions);
 
 builder.Services.AddControllers();
 builder.Services.AddSingleton<IFileSystem, FileSystem>();
+builder.Services.AddSingleton<IArchiveRepository, ArchiveRepository>();
 builder.Services.AddSingleton<IConversationsService, ConversationsService>();
 builder.Services.AddSingleton<IConversationAssetsCache, ConversationAssetsCache>();
 builder.Services.AddSingleton<ApiAssetLocator>();
