@@ -14,25 +14,43 @@ var sourceOption = new Option<string[]>("--source", "-s")
     DefaultValueFactory = (argumentResult) => []
 };
 
+var dataDirectoryOption = new Option<string>("--data-directory", "-d")
+{
+    Arity = ArgumentArity.ZeroOrOne,
+    Description = "Data directory for SQLite database",
+    DefaultValueFactory = (argumentResult) => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "chatgpt-archive")
+};
+
 var rootCommand = new RootCommand
 {
-    sourceOption
+    sourceOption,
+    dataDirectoryOption
 };
 
 var parseResult = rootCommand.Parse(args);
 var cliSources = parseResult.GetValue(sourceOption);
+var cliDataDirectory = parseResult.GetValue(dataDirectoryOption);
 
 var envSources = Environment.GetEnvironmentVariable("SOURCE")
     ?.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+var envDataDirectory = Environment.GetEnvironmentVariable("DATA_DIRECTORY");
 
 var selectedSources = (cliSources is { Length: > 0 })
     ? cliSources
     : envSources;
 
+var selectedDataDirectory = !string.IsNullOrWhiteSpace(cliDataDirectory)
+    ? cliDataDirectory
+    : (!string.IsNullOrWhiteSpace(envDataDirectory)
+        ? envDataDirectory
+        : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "chatgpt-archive"));
+
 // Create ArchiveSourcesOptions directly from command line/env vars
 var archiveSourcesOptions = new ArchiveSourcesOptions
 {
-    SourceDirectories = selectedSources?.ToList() ?? []
+    SourceDirectories = selectedSources?.ToList() ?? [],
+    DataDirectory = selectedDataDirectory
 };
 
 // Add services to the container.
@@ -57,6 +75,7 @@ if (options.SourceDirectories.Count == 0)
     return;
 }
 
+Console.WriteLine("Using data directory: " + options.DataDirectory);
 Console.WriteLine("Using source directories: ");
 var fileSystem = app.Services.GetRequiredService<IFileSystem>();
 var directories = options.SourceDirectories.Select(p => new { Directory = p, Exists = fileSystem.Directory.Exists(p) }).ToList();
