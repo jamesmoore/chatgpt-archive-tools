@@ -5,26 +5,16 @@ using System.IO.Abstractions;
 
 namespace ChatGpt.Archive.Api.Services
 {
-    public class ConversationsService : IConversationsService
+    public class ConversationsService(
+        IFileSystem fileSystem,
+        IConversationAssetsCache directoryCache,
+        IArchiveRepository archiveRepository,
+        ArchiveSourcesOptions options) : IConversationsService
     {
-        private readonly ArchiveSourcesOptions _options;
-        private readonly IFileSystem _fileSystem;
-        private readonly IConversationAssetsCache _directoryCache;
-        private readonly IArchiveRepository _archiveRepository;
+        private readonly ArchiveSourcesOptions _options = options;
+        private readonly IFileSystem _fileSystem = fileSystem;
         private bool _databaseInitialized = false;
         private readonly object _initLock = new object();
-
-        public ConversationsService(
-            IFileSystem fileSystem,
-            IConversationAssetsCache directoryCache,
-            IArchiveRepository archiveRepository,
-            ArchiveSourcesOptions options)
-        {
-            _fileSystem = fileSystem;
-            _directoryCache = directoryCache;
-            _archiveRepository = archiveRepository;
-            _options = options;
-        }
 
         private void EnsureDatabaseInitialized()
         {
@@ -37,14 +27,14 @@ namespace ChatGpt.Archive.Api.Services
                     return;
 
                 // Ensure schema exists
-                _archiveRepository.EnsureSchema();
+                archiveRepository.EnsureSchema();
 
                 // Check if we need to import conversations
-                if (!_archiveRepository.HasConversations())
+                if (!archiveRepository.HasConversations())
                 {
                     // Import conversations from source
                     var conversations = GetConversationsFromSource();
-                    _archiveRepository.InsertConversations(conversations);
+                    archiveRepository.InsertConversations(conversations);
                 }
 
                 _databaseInitialized = true;
@@ -54,7 +44,7 @@ namespace ChatGpt.Archive.Api.Services
         public IEnumerable<Conversation> GetLatestConversations()
         {
             EnsureDatabaseInitialized();
-            return _archiveRepository.GetAll();
+            return archiveRepository.GetAll();
         }
 
         private IEnumerable<Conversation> GetConversationsFromSource()
@@ -70,7 +60,7 @@ namespace ChatGpt.Archive.Api.Services
             var successfulConversations = conversations.Where(p => p.ParsedConversations.Status == ConversationParseResult.Success && p.ParsedConversations.Conversations != null).ToList();
 
             var parentDirectories = successfulConversations.OrderByDescending(p => p.ParsedConversations.Conversations!.GetUpdateTime()).Select(p => p.ParentDirectory!).ToList();
-            _directoryCache.SetConversationAssets(parentDirectories.Select(ConversationAssets.FromDirectory).ToList());
+            directoryCache.SetConversationAssets(parentDirectories.Select(ConversationAssets.FromDirectory).ToList());
             var latestConversations = successfulConversations.Select(p => p.ParsedConversations.Conversations!).GetLatestConversations();
             return latestConversations;
         }
@@ -78,7 +68,7 @@ namespace ChatGpt.Archive.Api.Services
         public Conversation? GetConversation(string conversationId)
         {
             EnsureDatabaseInitialized();
-            return _archiveRepository.GetById(conversationId);
+            return archiveRepository.GetById(conversationId);
         }
     }
 }

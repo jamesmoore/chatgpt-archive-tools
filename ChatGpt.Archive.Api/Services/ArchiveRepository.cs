@@ -22,12 +22,14 @@ namespace ChatGpt.Archive.Api.Services
                 throw new ArgumentException("DataDirectory must be configured", nameof(options));
             }
 
-            _connectionString = $"Data Source={Path.Combine(options.DataDirectory, DatabaseFileName)}";
+            _connectionString = $"Data Source={GetDatabasePath()}";
         }
+
+        private string GetDatabasePath() => Path.Combine(_options.DataDirectory, DatabaseFileName);
 
         public void EnsureSchema()
         {
-            var dbPath = Path.Combine(_options.DataDirectory, DatabaseFileName);
+            var dbPath = GetDatabasePath();
             
             // Ensure data directory exists
             if (!_fileSystem.Directory.Exists(_options.DataDirectory))
@@ -52,7 +54,7 @@ namespace ChatGpt.Archive.Api.Services
 
         public bool HasConversations()
         {
-            var dbPath = Path.Combine(_options.DataDirectory, DatabaseFileName);
+            var dbPath = GetDatabasePath();
             if (!_fileSystem.File.Exists(dbPath))
             {
                 return false;
