@@ -46,7 +46,9 @@ namespace ChatGpt.Archive.Api.Services
                 CREATE TABLE IF NOT EXISTS conversations (
                     id TEXT PRIMARY KEY,
                     title TEXT,
+                    create_time INTEGER,
                     update_time INTEGER,
+                    gizmo_id TEXT,
                     raw_json TEXT NOT NULL
                 );";
             createCommand.ExecuteNonQuery();
@@ -78,8 +80,8 @@ namespace ChatGpt.Archive.Api.Services
             using var transaction = connection.BeginTransaction();
             using var insertCommand = connection.CreateCommand();
             insertCommand.CommandText = @"
-                INSERT OR REPLACE INTO conversations (id, title, update_time, raw_json)
-                VALUES (@id, @title, @update_time, @raw_json);";
+                INSERT OR REPLACE INTO conversations (id, title, create_time, update_time, gizmo_id, raw_json)
+                VALUES (@id, @title, @create_time, @update_time, @gizmo_id, @raw_json);";
 
             var idParam = insertCommand.CreateParameter();
             idParam.ParameterName = "@id";
@@ -89,9 +91,17 @@ namespace ChatGpt.Archive.Api.Services
             titleParam.ParameterName = "@title";
             insertCommand.Parameters.Add(titleParam);
 
+            var createTimeParam = insertCommand.CreateParameter();
+            createTimeParam.ParameterName = "@create_time";
+            insertCommand.Parameters.Add(createTimeParam);
+
             var updateTimeParam = insertCommand.CreateParameter();
             updateTimeParam.ParameterName = "@update_time";
             insertCommand.Parameters.Add(updateTimeParam);
+
+            var gizmoIdParam = insertCommand.CreateParameter();
+            gizmoIdParam.ParameterName = "@gizmo_id";
+            insertCommand.Parameters.Add(gizmoIdParam);
 
             var rawJsonParam = insertCommand.CreateParameter();
             rawJsonParam.ParameterName = "@raw_json";
@@ -100,11 +110,14 @@ namespace ChatGpt.Archive.Api.Services
             foreach (var conversation in conversations)
             {
                 var json = JsonSerializer.Serialize(conversation);
+                var createTime = (long)conversation.create_time;
                 var updateTime = (long)conversation.update_time;
 
                 idParam.Value = conversation.id ?? string.Empty;
                 titleParam.Value = conversation.title ?? string.Empty;
+                createTimeParam.Value = createTime;
                 updateTimeParam.Value = updateTime;
+                gizmoIdParam.Value = conversation.gizmo_id ?? (object)DBNull.Value;
                 rawJsonParam.Value = json;
 
                 insertCommand.ExecuteNonQuery();
@@ -120,17 +133,20 @@ namespace ChatGpt.Archive.Api.Services
             connection.Open();
 
             using var command = connection.CreateCommand();
-            command.CommandText = "SELECT raw_json FROM conversations ORDER BY update_time DESC";
+            command.CommandText = "SELECT id, title, create_time, update_time, gizmo_id FROM conversations ORDER BY update_time DESC";
 
             using var reader = command.ExecuteReader();
             while (reader.Read())
             {
-                var json = reader.GetString(0);
-                var conversation = JsonSerializer.Deserialize<Conversation>(json);
-                if (conversation != null)
+                var conversation = new Conversation
                 {
-                    conversations.Add(conversation);
-                }
+                    id = reader.GetString(0),
+                    title = reader.GetString(1),
+                    create_time = reader.GetInt64(2),
+                    update_time = reader.GetInt64(3),
+                    gizmo_id = reader.IsDBNull(4) ? null : reader.GetString(4)
+                };
+                conversations.Add(conversation);
             }
 
             return conversations;
