@@ -112,38 +112,43 @@ namespace ChatGpt.Archive.Api.Services
 
         public void InsertConversations(IEnumerable<Conversation> conversations)
         {
+            // Create PlaintextExtractor for this call (not thread-safe)
+            var plaintextExtractor = new PlaintextExtractor();
+            
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
 
             using var transaction = connection.BeginTransaction();
-            using var insertCommand = connection.CreateCommand();
-            insertCommand.CommandText = @"
+            
+            // Insert conversations
+            using var insertConversationCommand = connection.CreateCommand();
+            insertConversationCommand.CommandText = @"
                 INSERT OR REPLACE INTO conversations (id, title, create_time, update_time, gizmo_id, raw_json)
                 VALUES (@id, @title, @create_time, @update_time, @gizmo_id, @raw_json);";
 
-            var idParam = insertCommand.CreateParameter();
+            var idParam = insertConversationCommand.CreateParameter();
             idParam.ParameterName = "@id";
-            insertCommand.Parameters.Add(idParam);
+            insertConversationCommand.Parameters.Add(idParam);
 
-            var titleParam = insertCommand.CreateParameter();
+            var titleParam = insertConversationCommand.CreateParameter();
             titleParam.ParameterName = "@title";
-            insertCommand.Parameters.Add(titleParam);
+            insertConversationCommand.Parameters.Add(titleParam);
 
-            var createTimeParam = insertCommand.CreateParameter();
+            var createTimeParam = insertConversationCommand.CreateParameter();
             createTimeParam.ParameterName = "@create_time";
-            insertCommand.Parameters.Add(createTimeParam);
+            insertConversationCommand.Parameters.Add(createTimeParam);
 
-            var updateTimeParam = insertCommand.CreateParameter();
+            var updateTimeParam = insertConversationCommand.CreateParameter();
             updateTimeParam.ParameterName = "@update_time";
-            insertCommand.Parameters.Add(updateTimeParam);
+            insertConversationCommand.Parameters.Add(updateTimeParam);
 
-            var gizmoIdParam = insertCommand.CreateParameter();
+            var gizmoIdParam = insertConversationCommand.CreateParameter();
             gizmoIdParam.ParameterName = "@gizmo_id";
-            insertCommand.Parameters.Add(gizmoIdParam);
+            insertConversationCommand.Parameters.Add(gizmoIdParam);
 
-            var rawJsonParam = insertCommand.CreateParameter();
+            var rawJsonParam = insertConversationCommand.CreateParameter();
             rawJsonParam.ParameterName = "@raw_json";
-            insertCommand.Parameters.Add(rawJsonParam);
+            insertConversationCommand.Parameters.Add(rawJsonParam);
 
             foreach (var conversation in conversations)
             {
@@ -158,7 +163,63 @@ namespace ChatGpt.Archive.Api.Services
                 gizmoIdParam.Value = conversation.gizmo_id ?? (object)DBNull.Value;
                 rawJsonParam.Value = json;
 
-                insertCommand.ExecuteNonQuery();
+                insertConversationCommand.ExecuteNonQuery();
+            }
+
+            // Insert messages
+            using var insertMessageCommand = connection.CreateCommand();
+            insertMessageCommand.CommandText = @"
+                INSERT OR REPLACE INTO messages (id, conversation_id, role, content, create_time)
+                VALUES (@id, @conversation_id, @role, @content, @create_time);";
+
+            var msgIdParam = insertMessageCommand.CreateParameter();
+            msgIdParam.ParameterName = "@id";
+            insertMessageCommand.Parameters.Add(msgIdParam);
+
+            var msgConvIdParam = insertMessageCommand.CreateParameter();
+            msgConvIdParam.ParameterName = "@conversation_id";
+            insertMessageCommand.Parameters.Add(msgConvIdParam);
+
+            var msgRoleParam = insertMessageCommand.CreateParameter();
+            msgRoleParam.ParameterName = "@role";
+            insertMessageCommand.Parameters.Add(msgRoleParam);
+
+            var msgContentParam = insertMessageCommand.CreateParameter();
+            msgContentParam.ParameterName = "@content";
+            insertMessageCommand.Parameters.Add(msgContentParam);
+
+            var msgCreateTimeParam = insertMessageCommand.CreateParameter();
+            msgCreateTimeParam.ParameterName = "@create_time";
+            insertMessageCommand.Parameters.Add(msgCreateTimeParam);
+
+            foreach (var conversation in conversations)
+            {
+                if (conversation.mapping == null)
+                    continue;
+
+                var conversationId = conversation.id ?? string.Empty;
+
+                foreach (var messageContainerEntry in conversation.mapping)
+                {
+                    var messageContainer = messageContainerEntry.Value;
+                    var message = messageContainer.message;
+
+                    if (message == null)
+                        continue;
+
+                    var messageId = message.id ?? messageContainer.id ?? string.Empty;
+                    var role = message.author?.role ?? string.Empty;
+                    var plaintext = plaintextExtractor.ExtractPlaintext(message);
+                    var messageCreateTime = message.create_time.HasValue ? (long)message.create_time.Value : 0;
+
+                    msgIdParam.Value = messageId;
+                    msgConvIdParam.Value = conversationId;
+                    msgRoleParam.Value = role;
+                    msgContentParam.Value = plaintext;
+                    msgCreateTimeParam.Value = messageCreateTime;
+
+                    insertMessageCommand.ExecuteNonQuery();
+                }
             }
 
             transaction.Commit();
