@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
-import { Search as SearchIcon } from 'lucide-react'
+import { Search as SearchIcon, X } from 'lucide-react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { InputGroup, InputGroupAddon, InputGroupInput } from './components/ui/input-group'
+import {
+    InputGroup,
+    InputGroupAddon,
+    InputGroupButton,
+    InputGroupInput,
+} from './components/ui/input-group'
 import { useSearch } from './hooks/use-search'
 
 export function Search() {
@@ -49,6 +54,13 @@ export function Search() {
     const { data, isFetching, isError, error } = useSearch(normalizedQuery)
     const results = data ?? []
 
+    const handleClear = () => {
+        setQuery('')
+        setDebouncedQuery('')
+        isOurUrlUpdate.current = true
+        setSearchParams({}, { replace: true })
+    }
+
     const resultCountLabel = isFetching
         ? 'Searching...'
         : `${results.length} ${results.length === 1 ? 'result' : 'results'}`
@@ -65,7 +77,19 @@ export function Search() {
                     <InputGroupAddon>
                         <SearchIcon />
                     </InputGroupAddon>
-                    <InputGroupAddon align="inline-end">{resultCountLabel}</InputGroupAddon>
+                    <InputGroupAddon align="inline-end">
+                        {query.length > 0 ? (
+                            <InputGroupButton
+                                size="icon-xs"
+                                variant="ghost"
+                                aria-label="Clear search"
+                                onClick={handleClear}
+                            >
+                                <X />
+                            </InputGroupButton>
+                        ) : null}
+                        {resultCountLabel}
+                    </InputGroupAddon>
                 </InputGroup>
 
                 {normalizedQuery.length === 0 ? (
