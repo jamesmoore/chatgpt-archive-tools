@@ -281,11 +281,13 @@ namespace ChatGpt.Archive.Api.Services
             using var command = connection.CreateCommand();
             command.CommandText = @"
                 SELECT
-                    conversation_id,
-                    id as message_id,
+                    m.conversation_id,
+                    c.title,
+                    m.id AS message_id,
                     snippet(messages_fts, 0, '<b>', '</b>', '...', 20) AS snippet
                 FROM messages_fts
                 JOIN messages m ON m.rowid = messages_fts.rowid
+                JOIN conversations c ON c.id = m.conversation_id
                 WHERE messages_fts MATCH @query
                 ORDER BY rank
                 LIMIT 50;";
@@ -297,8 +299,9 @@ namespace ChatGpt.Archive.Api.Services
                 var result = new SearchResult
                 {
                     ConversationId = reader.GetString(0),
-                    MessageId = reader.GetString(1),
-                    Snippet = reader.GetString(2)
+                    ConversationTitle = reader.GetString(1),
+                    MessageId = reader.GetString(2),
+                    Snippet = reader.GetString(3)
                 };
                 results.Add(result);
             }

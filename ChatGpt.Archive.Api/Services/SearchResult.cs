@@ -5,5 +5,6 @@ namespace ChatGpt.Archive.Api.Services
         public string ConversationId { get; set; } = string.Empty;
         public string MessageId { get; set; } = string.Empty;
         public string Snippet { get; set; } = string.Empty;
+        public string ConversationTitle { get; set; } = string.Empty;
     }
 }

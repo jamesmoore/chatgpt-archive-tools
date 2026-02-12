@@ -6,5 +6,6 @@ namespace ChatGpt.Archive.Api.Services
     {
         IEnumerable<Conversation> GetLatestConversations();
         Conversation? GetConversation(string conversationId);
+        IEnumerable<SearchResult> Search(string query);
     }
 }

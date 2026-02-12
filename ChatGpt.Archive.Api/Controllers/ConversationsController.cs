@@ -28,6 +28,23 @@ namespace ChatGpt.Archive.Api.Controllers
         }
 
         /// <summary>
+        /// Searches conversations by query string.
+        /// </summary>
+        /// <param name="query">The search query</param>
+        /// <returns></returns>
+        [HttpGet("search")]
+        public ActionResult<IEnumerable<SearchResult>> Search([FromQuery] string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return BadRequest("Query parameter is required");
+            }
+
+            var results = conversationsService.Search(query);
+            return Ok(results);
+        }
+
+        /// <summary>
         /// Returns the conversation in the HTML format.
         /// </summary>
         /// <param name="id"></param>

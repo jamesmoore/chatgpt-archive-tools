@@ -63,5 +63,11 @@ namespace ChatGpt.Archive.Api.Services
             EnsureDatabaseInitialized();
             return archiveRepository.GetById(conversationId);
         }
+
+        public IEnumerable<SearchResult> Search(string query)
+        {
+            EnsureDatabaseInitialized();
+            return archiveRepository.Search(query);
+        }
     }
 }

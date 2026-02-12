@@ -7,12 +7,12 @@ namespace ChatGpt.Archive.Api.Services
 {
     public class PlaintextExtractor
     {
-        private readonly PlaintextFormatter plaintextFormatter = new(false);
+        private readonly FTSPlaintextMessageFormatter plaintextFormatter = new();
         private readonly MarkdownContentVisitor visitor = new(new NullAssetLocator(), false);
 
         public string ExtractPlaintext(Message message)
         {
-            var results = plaintextFormatter.FormatMessage(message, visitor);
+            var results = plaintextFormatter.FormatMessage(message, visitor).Where(p => string.IsNullOrWhiteSpace(p) == false);
             return string.Join(Environment.NewLine, results);
         }
 

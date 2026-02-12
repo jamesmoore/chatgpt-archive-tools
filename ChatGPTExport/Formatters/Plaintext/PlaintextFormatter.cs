@@ -40,7 +40,7 @@ namespace ChatGPTExport.Formatters.Plaintext
             return strings;
         }
 
-        public IEnumerable<string> FormatMessage(Message message, MarkdownContentVisitor visitor)
+        private IEnumerable<string> FormatMessage(Message message, MarkdownContentVisitor visitor)
         {
             var strings = new List<string>();
             try
