@@ -1,4 +1,4 @@
-import type { ConversationSummary } from './models';
+import type { ConversationSearchResult, ConversationSummary } from './models';
 
 const BaseUrl = import.meta.env.VITE_API_BASE_URL ?? '';
 const ApiUrl = `${BaseUrl}/conversations`;
@@ -55,6 +55,10 @@ export async function getConversationMarkdown(id: string): Promise<string> {
  */
 export async function getConversationJson(id: string): Promise<string> {
   return fetchText(`${ApiUrl}/${id}/json`);
+}
+
+export async function search(query: string): Promise<ConversationSearchResult[]> {
+  return fetchJson(`${ApiUrl}/search?query=${encodeURIComponent(query)}`);
 }
 
 export type { ConversationSummary } from './models';
