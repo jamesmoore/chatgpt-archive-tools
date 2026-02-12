@@ -1,14 +1,30 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Search as SearchIcon } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { InputGroup, InputGroupAddon, InputGroupInput } from './components/ui/input-group'
 import { useSearch } from './hooks/use-search'
 
 export function Search() {
     const navigate = useNavigate()
-    const [query, setQuery] = useState('')
-    const [debouncedQuery, setDebouncedQuery] = useState('')
+    const [searchParams, setSearchParams] = useSearchParams()
+    const urlQuery = searchParams.get('q') ?? ''
+    const [query, setQuery] = useState(urlQuery)
+    const [debouncedQuery, setDebouncedQuery] = useState(urlQuery)
 
+    // Guard: when we write the URL ourselves, skip the URL→state sync
+    const isOurUrlUpdate = useRef(false)
+
+    // URL → state: only rehydrate on external navigation (back/forward)
+    useEffect(() => {
+        if (isOurUrlUpdate.current) {
+            isOurUrlUpdate.current = false
+            return
+        }
+        setQuery(urlQuery)
+        setDebouncedQuery(urlQuery)
+    }, [urlQuery])
+
+    // Debounce timer
     useEffect(() => {
         const timeoutId = window.setTimeout(() => {
             setDebouncedQuery(query)
@@ -16,6 +32,18 @@ export function Search() {
 
         return () => window.clearTimeout(timeoutId)
     }, [query])
+
+    // State → URL: write debounced value to URL
+    useEffect(() => {
+        const trimmed = debouncedQuery.trim()
+        if (trimmed !== urlQuery) {
+            isOurUrlUpdate.current = true
+            setSearchParams(
+                trimmed.length > 0 ? { q: trimmed } : {},
+                { replace: true },
+            )
+        }
+    }, [debouncedQuery, urlQuery, setSearchParams])
 
     const normalizedQuery = debouncedQuery.trim()
     const { data, isFetching, isError, error } = useSearch(normalizedQuery)
@@ -26,7 +54,7 @@ export function Search() {
         : `${results.length} ${results.length === 1 ? 'result' : 'results'}`
 
     return (
-        <>
+        <div className='overflow-x-auto [scrollbar-gutter:stable]'>
             <div className="container mx-auto flex max-w-xl flex-col gap-4 py-8">
                 <InputGroup>
                     <InputGroupInput
@@ -73,6 +101,6 @@ export function Search() {
                     </div>
                 )}
             </div>
-        </>
+        </div>
     )
 }
