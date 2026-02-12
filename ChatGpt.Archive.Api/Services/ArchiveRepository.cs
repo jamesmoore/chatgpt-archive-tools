@@ -52,6 +52,14 @@ namespace ChatGpt.Archive.Api.Services
                     raw_json TEXT NOT NULL
                 );
                 
+                CREATE TABLE IF NOT EXISTS messages (
+                    id TEXT PRIMARY KEY,
+                    conversation_id TEXT NOT NULL,
+                    role TEXT,
+                    content TEXT,
+                    create_time INTEGER
+                );
+                
                 CREATE VIRTUAL TABLE IF NOT EXISTS messages_fts USING fts5(
                     content,
                     conversation_id,
