@@ -50,6 +50,12 @@ namespace ChatGpt.Archive.Api.Services
                     update_time INTEGER,
                     gizmo_id TEXT,
                     raw_json TEXT NOT NULL
+                );
+                
+                CREATE VIRTUAL TABLE IF NOT EXISTS messages_fts USING fts5(
+                    content,
+                    conversation_id,
+                    message_id UNINDEXED
                 );";
             createCommand.ExecuteNonQuery();
         }
@@ -169,6 +175,39 @@ namespace ChatGpt.Archive.Api.Services
             }
 
             return null;
+        }
+
+        public IEnumerable<SearchResult> Search(string query)
+        {
+            var results = new List<SearchResult>();
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+
+            using var command = connection.CreateCommand();
+            command.CommandText = @"
+                SELECT
+                    conversation_id,
+                    message_id,
+                    snippet(messages_fts, 0, '<b>', '</b>', '...', 20) AS snippet
+                FROM messages_fts
+                WHERE messages_fts MATCH @query
+                ORDER BY rank
+                LIMIT 50;";
+            command.Parameters.AddWithValue("@query", query);
+
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                var result = new SearchResult
+                {
+                    ConversationId = reader.GetString(0),
+                    MessageId = reader.GetString(1),
+                    Snippet = reader.GetString(2)
+                };
+                results.Add(result);
+            }
+
+            return results;
         }
     }
 }
