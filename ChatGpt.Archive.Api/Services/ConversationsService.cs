@@ -11,10 +11,8 @@ namespace ChatGpt.Archive.Api.Services
         IArchiveRepository archiveRepository,
         ArchiveSourcesOptions options) : IConversationsService
     {
-        private readonly ArchiveSourcesOptions _options = options;
-        private readonly IFileSystem _fileSystem = fileSystem;
         private bool _databaseInitialized = false;
-        private readonly object _initLock = new object();
+        private readonly Lock _initLock = new();
 
         private void EnsureDatabaseInitialized()
         {
@@ -49,7 +47,7 @@ namespace ChatGpt.Archive.Api.Services
 
         private IEnumerable<Conversation> GetConversationsFromSource()
         {
-            var directories = _options.SourceDirectories.Select(p => _fileSystem.DirectoryInfo.New(p));
+            var directories = options.SourceDirectories.Select(p => fileSystem.DirectoryInfo.New(p));
             var conversationFinder = new ConversationFinder();
             var conversationFiles = conversationFinder.GetConversationFiles(directories);
             var conversationsParser = new ConversationsParser([]);
