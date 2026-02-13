@@ -1,4 +1,5 @@
-﻿using ChatGPTExport;
+﻿using ChatGpt.Archive.Api.Database;
+using ChatGPTExport;
 using ChatGPTExport.Models;
 using System.IO.Abstractions;
 

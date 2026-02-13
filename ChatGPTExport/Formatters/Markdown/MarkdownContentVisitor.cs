@@ -189,6 +189,7 @@ namespace ChatGPTExport.Exporters
                         }
                         else
                         {
+                            // TODO prevent this from being displayed in the FTS indexing.
                             Console.Error.WriteLine("\tUnable to find asset " + obj.asset_pointer);
                             yield return $"> ⚠️ **Warning:** Could not find asset: {obj.asset_pointer}.";
                         }

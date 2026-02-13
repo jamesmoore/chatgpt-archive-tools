@@ -1,6 +1,6 @@
 using ChatGPTExport.Models;
 
-namespace ChatGpt.Archive.Api.Services
+namespace ChatGpt.Archive.Api.Database
 {
     public interface IArchiveRepository
     {

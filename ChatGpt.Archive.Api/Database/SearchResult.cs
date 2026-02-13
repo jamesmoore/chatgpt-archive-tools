@@ -1,4 +1,4 @@
-namespace ChatGpt.Archive.Api.Services
+namespace ChatGpt.Archive.Api.Database
 {
     public class SearchResult
     {

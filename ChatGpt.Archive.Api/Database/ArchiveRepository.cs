@@ -1,10 +1,12 @@
+using ChatGpt.Archive.Api.Services;
 using ChatGPTExport.Models;
 using Microsoft.Data.Sqlite;
 using System.IO.Abstractions;
 using System.Text.Json;
 
-namespace ChatGpt.Archive.Api.Services
+namespace ChatGpt.Archive.Api.Database
 {
+    // TODO a DB clear and reload feature
     public class ArchiveRepository : IArchiveRepository
     {
         private const string DatabaseFileName = "archive.db";

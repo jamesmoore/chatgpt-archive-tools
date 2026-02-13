@@ -1,4 +1,5 @@
-﻿using ChatGpt.Archive.Api.Services;
+﻿using ChatGpt.Archive.Api.Database;
+using ChatGpt.Archive.Api.Services;
 using ChatGPTExport;
 using ChatGPTExport.Formatters.Html;
 using Microsoft.AspNetCore.Mvc;

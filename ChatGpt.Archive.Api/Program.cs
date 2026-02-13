@@ -1,4 +1,5 @@
 ﻿using ChatGpt.Archive.Api;
+using ChatGpt.Archive.Api.Database;
 using ChatGpt.Archive.Api.Services;
 using ChatGPTExport;
 using Microsoft.AspNetCore.HttpOverrides;
