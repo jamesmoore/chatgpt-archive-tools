@@ -67,7 +67,7 @@ export function Search() {
 
     return (
         <div className='overflow-x-auto [scrollbar-gutter:stable]'>
-            <div className="container mx-auto flex max-w-xl flex-col gap-4 py-8">
+            <div className="container mx-auto flex max-w-xl flex-col gap-4 py-8 px-4 lg:px-0">
                 <InputGroup>
                     <InputGroupInput
                         placeholder="Search..."
