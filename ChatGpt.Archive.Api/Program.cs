@@ -39,23 +39,26 @@ var cliDataDirectory = parseResult.GetValue(dataDirectoryOption);
 var envSources = Environment.GetEnvironmentVariable("SOURCE")
     ?.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
-var envDataDirectory = Environment.GetEnvironmentVariable("DATA_DIRECTORY");
-
 var selectedSources = (cliSources is { Length: > 0 })
     ? cliSources
     : envSources;
 
-var selectedDataDirectory = !string.IsNullOrWhiteSpace(cliDataDirectory)
-    ? cliDataDirectory
-    : (!string.IsNullOrWhiteSpace(envDataDirectory)
-        ? envDataDirectory
-        : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), DefaultDataDirectory));
+var envDataDirectory = Environment.GetEnvironmentVariable("DATA_DIRECTORY");
+
+var dataDirectories = new List<string?>()
+{
+    cliDataDirectory,
+    envDataDirectory,
+    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), DefaultDataDirectory),
+};
+
+var selectedDataDirectory = dataDirectories.FirstOrDefault(p => !string.IsNullOrWhiteSpace(p));
 
 // Create ArchiveSourcesOptions directly from command line/env vars
 var archiveSourcesOptions = new ArchiveSourcesOptions
 {
     SourceDirectories = selectedSources?.ToList() ?? [],
-    DataDirectory = selectedDataDirectory
+    DataDirectory = selectedDataDirectory!
 };
 
 // Add services to the container.
