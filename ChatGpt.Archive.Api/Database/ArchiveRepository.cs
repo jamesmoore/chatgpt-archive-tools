@@ -298,7 +298,7 @@ namespace ChatGpt.Archive.Api.Database
                 JOIN conversations c ON c.id = m.conversation_id
                 WHERE messages_fts MATCH @query
                 ORDER BY rank
-                LIMIT 50;";
+                LIMIT 200;";
             command.Parameters.AddWithValue("@query", query);
 
             using var reader = command.ExecuteReader();

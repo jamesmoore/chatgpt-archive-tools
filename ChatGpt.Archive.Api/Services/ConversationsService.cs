@@ -65,10 +65,25 @@ namespace ChatGpt.Archive.Api.Services
             return archiveRepository.GetById(conversationId);
         }
 
-        public IEnumerable<SearchResult> Search(string query)
+        public IEnumerable<ConsolidatedSearchResult> Search(string query)
         {
             EnsureDatabaseInitialized();
-            return archiveRepository.Search(query);
+            var flatResult = archiveRepository.Search(query);
+
+            var groupedByConversation = flatResult.GroupBy(r => new { r.ConversationId, r.ConversationTitle });
+
+            var consolidatedResults = groupedByConversation.Select(g => new ConsolidatedSearchResult
+            {
+                ConversationId = g.Key.ConversationId,
+                ConversationTitle = g.Key.ConversationTitle,
+                Messages = g.Select(r => new ConsolidatedSearchResult.MessageResult
+                {
+                    MessageId = r.MessageId,
+                    Snippet = r.Snippet
+                }).ToList()
+            });
+
+            return consolidatedResults;
         }
     }
 }

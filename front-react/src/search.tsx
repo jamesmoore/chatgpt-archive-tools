@@ -106,7 +106,7 @@ export function Search() {
                     <div className="flex flex-col divide-y rounded-md border">
                         {results.map((result) => (
                             <button
-                                key={`${result.conversationId}-${result.messageId}`}
+                                key={`${result.conversationId}}`}
                                 type="button"
                                 onClick={() =>
                                     navigate(
@@ -116,10 +116,15 @@ export function Search() {
                                 className="hover:bg-muted/50 flex w-full flex-col gap-1 p-3 text-left"
                             >
                                 <div className="font-medium">{result.conversationTitle}</div>
-                                <div
-                                    className="text-muted-foreground text-sm"
-                                    dangerouslySetInnerHTML={{ __html: result.snippet }}
-                                />
+                                {
+                                    result.messages.map((message) => (
+                                        <div
+                                            key={message.messageId}
+                                            className="text-muted-foreground text-sm py-1"
+                                            dangerouslySetInnerHTML={{ __html: message.snippet }}
+                                        />
+                                    ))
+                                }
                             </button>
                         ))}
                     </div>

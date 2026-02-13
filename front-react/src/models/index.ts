@@ -8,7 +8,11 @@ export interface ConversationSummary {
 
 export interface ConversationSearchResult {
   conversationId: string;
+  conversationTitle: string;
+  messages: MessageSearchResult[];
+}
+
+export interface MessageSearchResult {
   messageId: string;
   snippet: string;
-  conversationTitle: string;
 }
