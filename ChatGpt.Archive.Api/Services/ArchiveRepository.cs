@@ -199,7 +199,13 @@ namespace ChatGpt.Archive.Api.Services
 
                 var conversationId = conversation.id ?? string.Empty;
 
-                foreach (var messageContainerEntry in conversation.mapping)
+                var mapping = conversation.GetLastestConversation().mapping;
+                if (mapping == null)
+                {
+                    continue;
+                }
+
+                foreach (var messageContainerEntry in mapping)
                 {
                     var messageContainer = messageContainerEntry.Value;
                     var message = messageContainer.message;
