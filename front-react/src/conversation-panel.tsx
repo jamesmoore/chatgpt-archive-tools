@@ -77,9 +77,7 @@ export function ConversationPanel() {
 
     if (format === 'markdown' || format === 'json') {
         const value = content || "";
-        const highlighted = format === "json"
-            ? hljs.highlight(value, { language: "json", ignoreIllegals: true }).value
-            : hljs.highlight(value, { language: "markdown", ignoreIllegals: true }).value;
+        const highlighted = hljs.highlight(value, { language: format, ignoreIllegals: true }).value;
 
         return (
             <div className='overflow-x-auto'>
