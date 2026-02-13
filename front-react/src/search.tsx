@@ -155,11 +155,11 @@ export function Search() {
                                                 className="w-full"
                                             >
                                                 <AccordionItem value="more">
-                                                    <AccordionTrigger className="px-3 py-2 text-xs text-muted-foreground hover:no-underline">
-                                                        <span className="data-[state=open]:hidden">
-                                                            Show more
+                                                    <AccordionTrigger className="group px-3 py-2 text-xs text-muted-foreground hover:no-underline">
+                                                        <span className="group-data-[state=open]:hidden">
+                                                            Show {extraMessages.length} more
                                                         </span>
-                                                        <span className="hidden data-[state=open]:inline">
+                                                        <span className="hidden group-data-[state=open]:inline">
                                                             Show less
                                                         </span>
                                                     </AccordionTrigger>
