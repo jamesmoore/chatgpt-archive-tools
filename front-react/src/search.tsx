@@ -22,6 +22,8 @@ export function Search() {
     const [query, setQuery] = useState(urlQuery)
     const [debouncedQuery, setDebouncedQuery] = useState(urlQuery)
 
+    const inputRef = useRef<HTMLInputElement>(null)
+
     // Guard: when we write the URL ourselves, skip the URL→state sync
     const isOurUrlUpdate = useRef(false)
 
@@ -65,6 +67,7 @@ export function Search() {
         setDebouncedQuery('')
         isOurUrlUpdate.current = true
         setSearchParams({}, { replace: true })
+        inputRef.current?.focus()
     }
 
     const resultCountLabel = isFetching
@@ -76,6 +79,7 @@ export function Search() {
             <div className="container mx-auto flex max-w-xl flex-col gap-4 py-8 px-4 lg:px-0">
                 <InputGroup>
                     <InputGroupInput
+                        ref={inputRef}
                         placeholder="Search..."
                         value={query}
                         onChange={(event) => setQuery(event.target.value)}
