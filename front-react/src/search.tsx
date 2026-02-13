@@ -2,6 +2,12 @@ import { useEffect, useRef, useState } from 'react'
 import { Search as SearchIcon, X } from 'lucide-react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from './components/ui/accordion'
+import {
     InputGroup,
     InputGroupAddon,
     InputGroupButton,
@@ -104,29 +110,85 @@ export function Search() {
                     <div className="text-muted-foreground text-sm">No results found.</div>
                 ) : (
                     <div className="flex flex-col divide-y rounded-md border">
-                        {results.map((result) => (
-                            <button
-                                key={`${result.conversationId}}`}
-                                type="button"
-                                onClick={() =>
-                                    navigate(
-                                        `/conversation/${encodeURIComponent(result.conversationId)}/html`,
-                                    )
-                                }
-                                className="hover:bg-muted/50 flex w-full flex-col gap-1 p-3 text-left"
-                            >
-                                <div className="font-medium">{result.conversationTitle}</div>
-                                {
-                                    result.messages.map((message) => (
-                                        <div
-                                            key={message.messageId}
-                                            className="text-muted-foreground text-sm py-1"
-                                            dangerouslySetInnerHTML={{ __html: message.snippet }}
-                                        />
-                                    ))
-                                }
-                            </button>
-                        ))}
+                        {results.map((result) => {
+                            const visibleMessages = result.messages.slice(0, 3)
+                            const extraMessages = result.messages.slice(3)
+                            const handleNavigate = () =>
+                                navigate(
+                                    `/conversation/${encodeURIComponent(result.conversationId)}/html`,
+                                )
+
+                            return (
+                                <div
+                                    key={result.conversationId}
+                                    className="flex w-full flex-col"
+                                >
+                                    <button
+                                        type="button"
+                                        onClick={handleNavigate}
+                                        className="hover:bg-muted/50 flex w-full flex-col gap-1 p-3 text-left"
+                                    >
+                                        <div className="font-medium">
+                                            {result.conversationTitle}
+                                        </div>
+                                    </button>
+                                    <div className="flex w-full flex-col">
+                                        {visibleMessages.map((message) => (
+                                            <button
+                                                key={message.messageId}
+                                                type="button"
+                                                onClick={handleNavigate}
+                                                className="hover:bg-muted/50 w-full px-3 py-2 text-left text-muted-foreground text-sm"
+                                            >
+                                                <span
+                                                    className="block"
+                                                    dangerouslySetInnerHTML={{
+                                                        __html: message.snippet,
+                                                    }}
+                                                />
+                                            </button>
+                                        ))}
+                                        {extraMessages.length > 0 ? (
+                                            <Accordion
+                                                type="single"
+                                                collapsible
+                                                className="w-full"
+                                            >
+                                                <AccordionItem value="more">
+                                                    <AccordionTrigger className="px-3 py-2 text-xs text-muted-foreground hover:no-underline">
+                                                        <span className="data-[state=open]:hidden">
+                                                            Show more
+                                                        </span>
+                                                        <span className="hidden data-[state=open]:inline">
+                                                            Show less
+                                                        </span>
+                                                    </AccordionTrigger>
+                                                    <AccordionContent className="pt-0 pb-2">
+                                                        <div className="flex w-full flex-col">
+                                                            {extraMessages.map((message) => (
+                                                                <button
+                                                                    key={message.messageId}
+                                                                    type="button"
+                                                                    onClick={handleNavigate}
+                                                                    className="hover:bg-muted/50 w-full px-3 py-2 text-left text-muted-foreground text-sm"
+                                                                >
+                                                                    <span
+                                                                        className="block"
+                                                                        dangerouslySetInnerHTML={{
+                                                                            __html: message.snippet,
+                                                                        }}
+                                                                    />
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    </AccordionContent>
+                                                </AccordionItem>
+                                            </Accordion>
+                                        ) : null}
+                                    </div>
+                                </div>
+                            )
+                        })}
                     </div>
                 )}
             </div>
