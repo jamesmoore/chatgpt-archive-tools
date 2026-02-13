@@ -2,6 +2,7 @@
 using ChatGpt.Archive.Api.Services;
 using ChatGPTExport;
 using ChatGPTExport.Formatters.Html;
+using ChatGPTExport.Formatters.Markdown;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChatGpt.Archive.Api.Controllers
@@ -10,7 +11,7 @@ namespace ChatGpt.Archive.Api.Controllers
     [Route("[controller]")]
     public class ConversationsController(
         IConversationsService conversationsService,
-        ApiAssetLocator apiAssetLocator,
+        IMarkdownAssetRenderer markdownAssetRenderer,
         ConversationFormatterFactory conversationFormatterFactory
         ) : ControllerBase
     {
@@ -90,7 +91,7 @@ namespace ChatGpt.Archive.Api.Controllers
             {
                 return null;
             }
-            var formatted = formatter.First().Format(apiAssetLocator, conversation.GetLastestConversation());
+            var formatted = formatter.First().Format(markdownAssetRenderer, conversation.GetLastestConversation());
             string content = string.Join(Environment.NewLine, formatted);
             return content;
         }

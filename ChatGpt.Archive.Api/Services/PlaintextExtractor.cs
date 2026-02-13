@@ -1,5 +1,6 @@
-﻿using ChatGPTExport.Assets;
-using ChatGPTExport.Exporters;
+﻿using ChatGPTExport.Exporters;
+using ChatGPTExport.Formatters;
+using ChatGPTExport.Formatters.Markdown;
 using ChatGPTExport.Formatters.Plaintext;
 using ChatGPTExport.Models;
 
@@ -16,11 +17,11 @@ namespace ChatGpt.Archive.Api.Services
             return string.Join(Environment.NewLine, results);
         }
 
-        private class NullAssetLocator : IAssetLocator
+        private class NullAssetLocator : IMarkdownAssetRenderer
         {
-            public Asset? GetMarkdownMediaAsset(AssetRequest assetRequest)
+            public IEnumerable<string> RenderAsset(ContentVisitorContext context, string asset_pointer)
             {
-                return null;
+                return [];
             }
         }
     }

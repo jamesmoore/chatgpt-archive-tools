@@ -2,6 +2,8 @@
 using ChatGpt.Archive.Api.Database;
 using ChatGpt.Archive.Api.Services;
 using ChatGPTExport;
+using ChatGPTExport.Assets;
+using ChatGPTExport.Formatters.Markdown;
 using Microsoft.AspNetCore.HttpOverrides;
 using System.CommandLine;
 using System.IO.Abstractions;
@@ -65,7 +67,8 @@ builder.Services.AddSingleton<ConversationFinder>();
 builder.Services.AddSingleton<IArchiveRepository, ArchiveRepository>();
 builder.Services.AddSingleton<IConversationsService, ConversationsService>();
 builder.Services.AddSingleton<IConversationAssetsCache, ConversationAssetsCache>();
-builder.Services.AddSingleton<ApiAssetLocator>();
+builder.Services.AddSingleton<IAssetLocator, ApiAssetLocator>();
+builder.Services.AddSingleton<IMarkdownAssetRenderer, MarkdownAssetRenderer>();
 builder.Services.AddSingleton<ConversationFormatterFactory>();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();

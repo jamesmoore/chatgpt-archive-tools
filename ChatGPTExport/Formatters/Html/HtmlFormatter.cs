@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using ChatGPTExport.Assets;
 using ChatGPTExport.Formatters;
 using ChatGPTExport.Formatters.Html;
+using ChatGPTExport.Formatters.Markdown;
 using ChatGPTExport.Models;
 using Markdig;
 
@@ -13,7 +14,7 @@ namespace ChatGPTExport.Exporters.Html
         private readonly string LineBreak = Environment.NewLine;
         private readonly MarkdownPipeline MarkdownPipeline = CreatePipeline(formatter);
 
-        public IEnumerable<string> Format(IAssetLocator assetLocator, Conversation conversation)
+        public IEnumerable<string> Format(IMarkdownAssetRenderer assetLocator, Conversation conversation)
         {
             var messages = conversation.GetMessagesWithContent();
 
