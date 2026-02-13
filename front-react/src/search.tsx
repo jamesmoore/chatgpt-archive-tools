@@ -111,7 +111,7 @@ export function Search() {
 
                 {normalizedQuery.length === 0 ? (
                     <div className="text-muted-foreground text-sm">
-                        Start typing to search conversations.
+                        Start typing to search chats.
                     </div>
                 ) : isError ? (
                     <div className="text-sm text-destructive">

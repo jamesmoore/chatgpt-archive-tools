@@ -32,7 +32,7 @@ export function AppSidebar() {
     <Sidebar className="h-full">
       <SidebarHeader>
         <SidebarMenu>
-          <SidebarGroupLabel className="text-base my-0.5">Conversations</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-base my-0.5">ChatGPT archive</SidebarGroupLabel>
           <SidebarMenuItem key={'search'}>
             <SidebarMenuButton asChild isActive={false}>
               <Link to={'/'}
