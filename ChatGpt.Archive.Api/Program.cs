@@ -19,11 +19,11 @@ var sourceOption = new Option<string[]>("--source", "-s")
     DefaultValueFactory = (argumentResult) => []
 };
 
-var dataDirectoryOption = new Option<string>("--data-directory", "-d")
+var dataDirectoryOption = new Option<string?>("--data-directory", "-d")
 {
     Arity = ArgumentArity.ZeroOrOne,
     Description = "Data directory for SQLite database",
-    DefaultValueFactory = (argumentResult) => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), DefaultDataDirectory)
+    DefaultValueFactory = (argumentResult) => null
 };
 
 var rootCommand = new RootCommand
