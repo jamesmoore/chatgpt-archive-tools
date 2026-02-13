@@ -71,6 +71,8 @@ export function ConversationPanel() {
                 srcDoc={content}
                 className="flex-1 w-full border-none"
                 title="Conversation HTML"
+                sandbox="allow-scripts"
+                referrerPolicy="no-referrer"
             />
         );
     }
