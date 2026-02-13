@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Search as SearchIcon, X } from 'lucide-react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
+import DOMPurify from 'dompurify'
 import {
     Accordion,
     AccordionContent,
@@ -14,6 +15,12 @@ import {
     InputGroupInput,
 } from './components/ui/input-group'
 import { useSearch } from './hooks/use-search'
+
+const sanitizeSnippet = (snippet: string) =>
+    DOMPurify.sanitize(snippet, {
+        ALLOWED_TAGS: ['b'],
+        ALLOWED_ATTR: [],
+    })
 
 export function Search() {
     const navigate = useNavigate()
@@ -147,7 +154,7 @@ export function Search() {
                                                 <span
                                                     className="block"
                                                     dangerouslySetInnerHTML={{
-                                                        __html: message.snippet,
+                                                        __html: sanitizeSnippet(message.snippet),
                                                     }}
                                                 />
                                             </button>
@@ -179,7 +186,7 @@ export function Search() {
                                                                     <span
                                                                         className="block"
                                                                         dangerouslySetInnerHTML={{
-                                                                            __html: message.snippet,
+                                                                            __html: sanitizeSnippet(message.snippet),
                                                                         }}
                                                                     />
                                                                 </button>

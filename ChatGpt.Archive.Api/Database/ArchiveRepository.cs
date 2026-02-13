@@ -280,6 +280,12 @@ namespace ChatGpt.Archive.Api.Database
             return null;
         }
 
+        private static string EscapeFts5Query(string query)
+        {
+            // Wrap in quotes and escape internal quotes to treat the entire query as literal text
+            return "\"" + query.Replace("\"", "\"\"") + "\"";
+        }
+
         public IEnumerable<SearchResult> Search(string query)
         {
             var results = new List<SearchResult>();
@@ -299,7 +305,7 @@ namespace ChatGpt.Archive.Api.Database
                 WHERE messages_fts MATCH @query
                 ORDER BY rank
                 LIMIT 200;";
-            command.Parameters.AddWithValue("@query", query);
+            command.Parameters.AddWithValue("@query", EscapeFts5Query(query));
 
             using var reader = command.ExecuteReader();
             while (reader.Read())
