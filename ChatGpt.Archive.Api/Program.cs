@@ -103,7 +103,6 @@ if (directories.All(p => p.Exists == false))
 }
 
 // Initialize conversations.
-app.Services.GetRequiredService<IConversationsService>().GetLatestConversations();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
