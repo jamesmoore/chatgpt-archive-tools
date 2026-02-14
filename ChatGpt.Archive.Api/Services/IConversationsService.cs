@@ -1,5 +1,4 @@
-﻿using ChatGpt.Archive.Api.Database;
-using ChatGPTExport.Models;
+﻿using ChatGPTExport.Models;
 
 namespace ChatGpt.Archive.Api.Services
 {
