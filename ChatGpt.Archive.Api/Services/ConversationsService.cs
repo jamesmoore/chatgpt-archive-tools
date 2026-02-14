@@ -8,40 +8,24 @@ namespace ChatGpt.Archive.Api.Services
     public class ConversationsService(
         IFileSystem fileSystem,
         IArchiveRepository archiveRepository,
+        IConversationAssetsCache conversationAssetsCache,
         ConversationFinder conversationFinder,
         ArchiveSourcesOptions options) : IConversationsService
     {
-        private bool _databaseInitialized = false;
-        private readonly Lock _initLock = new();
+        private readonly Lock _loadLock = new();
 
-        private void EnsureDatabaseInitialized()
+        public void LoadConversations()
         {
-            if (_databaseInitialized)
-                return;
-
-            lock (_initLock)
+            lock (_loadLock)
             {
-                if (_databaseInitialized)
-                    return;
-
-                // Ensure schema exists
-                archiveRepository.EnsureSchema();
-
-                // Check if we need to import conversations
-                if (!archiveRepository.HasConversations())
-                {
-                    // Import conversations from source
-                    var conversations = GetConversationsFromSource();
-                    archiveRepository.InsertConversations(conversations);
-                }
-
-                _databaseInitialized = true;
+                // Import conversations from source
+                var conversations = GetConversationsFromSource();
+                archiveRepository.InsertConversations(conversations);
             }
         }
 
         public IEnumerable<Conversation> GetLatestConversations()
         {
-            EnsureDatabaseInitialized();
             return archiveRepository.GetAll();
         }
 
@@ -50,8 +34,9 @@ namespace ChatGpt.Archive.Api.Services
             var directories = options.SourceDirectories.Select(p => fileSystem.DirectoryInfo.New(p));
             var conversationFiles = conversationFinder.GetConversationFiles(directories);
             var conversationsParser = new ConversationsParser([]);
-            var conversations = conversationFiles.Select(p => new { 
-                ParsedConversations = conversationsParser.GetConversations(p), 
+            var conversations = conversationFiles.Select(p => new
+            {
+                ParsedConversations = conversationsParser.GetConversations(p),
                 ParentDirectory = p.Directory
             }).ToList();
             var successfulConversations = conversations.Where(p => p.ParsedConversations.Status == ConversationParseResult.Success && p.ParsedConversations.Conversations != null).ToList();
@@ -61,13 +46,11 @@ namespace ChatGpt.Archive.Api.Services
 
         public Conversation? GetConversation(string conversationId)
         {
-            EnsureDatabaseInitialized();
             return archiveRepository.GetById(conversationId);
         }
 
         public IEnumerable<ConsolidatedSearchResult> Search(string query)
         {
-            EnsureDatabaseInitialized();
             var flatResult = archiveRepository.Search(query);
 
             var groupedByConversation = flatResult.GroupBy(r => new { r.ConversationId, r.ConversationTitle });
@@ -84,6 +67,12 @@ namespace ChatGpt.Archive.Api.Services
             });
 
             return consolidatedResults;
+        }
+
+        public void ClearAll()
+        {
+            archiveRepository.ClearAll();
+            conversationAssetsCache.Reset();
         }
     }
 }

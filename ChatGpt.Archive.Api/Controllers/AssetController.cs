@@ -13,7 +13,7 @@ namespace ChatGpt.Archive.Api.Controllers
         ) : ControllerBase
     {
         [HttpGet("{rootId}/{**path}")]
-        public IActionResult Index(int rootId, string path, [FromQuery(Name = "sig")] string? signature)
+        public IActionResult GetAsset(int rootId, string path, [FromQuery(Name = "sig")] string? signature)
         {
             var decodedPath = Uri.UnescapeDataString(path);
 
@@ -32,9 +32,9 @@ namespace ChatGpt.Archive.Api.Controllers
             return PhysicalFile(fullPath, GetMimeType(fullPath));
         }
 
-        private static string GetMimeType(string path)
+        private string GetMimeType(string path)
         {
-            var ext = System.IO.Path.GetExtension(path);
+            var ext = fileSystem.Path.GetExtension(path);
             if (string.IsNullOrEmpty(ext))
                 return "application/octet-stream";
 

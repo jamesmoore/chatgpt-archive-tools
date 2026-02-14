@@ -41,7 +41,7 @@ export default function Layout({ children, topBarChildren }: LayoutProps) {
             <div className="flex-1 min-w-0 overflow-auto flex flex-col">
               {topBarChildren &&
                 <div className="sticky top-0">
-                  <div className="bg-sidebar p-1 pr-3">
+                  <div className="bg-sidebar p-1">
                     {topBarChildren}
                   </div>
                   <div className="shrink-0 h-px w-full bg-sidebar-border"></div>

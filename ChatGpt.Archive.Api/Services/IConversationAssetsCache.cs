@@ -4,6 +4,7 @@
     {
         MediaAssetDefinition? FindMediaAsset(string searchPattern);
         string? GetMediaAssetPath(int index, string relativePath);
+        void Reset();
     }
 
     public record MediaAssetDefinition(string Name, int RootId, string RelativePath);

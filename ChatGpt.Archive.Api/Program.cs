@@ -67,6 +67,7 @@ builder.Services.AddSingleton(archiveSourcesOptions);
 builder.Services.AddControllers();
 builder.Services.AddSingleton<IFileSystem, FileSystem>();
 builder.Services.AddSingleton<ConversationFinder>();
+builder.Services.AddSingleton<ISchemaInitializer, SqliteSchemaInitializer>();
 builder.Services.AddSingleton<IArchiveRepository, ArchiveRepository>();
 builder.Services.AddSingleton<IConversationsService, ConversationsService>();
 builder.Services.AddSingleton<IConversationAssetsCache, ConversationAssetsCache>();
@@ -102,8 +103,9 @@ if (directories.All(p => p.Exists == false))
     return;
 }
 
+app.Services.GetRequiredService<ISchemaInitializer>().EnsureSchema();
+
 // Initialize conversations.
-app.Services.GetRequiredService<IConversationsService>().GetLatestConversations();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -2,6 +2,7 @@ import type { ConversationSearchResult, ConversationSummary } from './models';
 
 const BaseUrl = import.meta.env.VITE_API_BASE_URL ?? '';
 const ApiUrl = `${BaseUrl}/conversations`;
+const ManageUrl = `${BaseUrl}/manage`;
 
 /**
  * Fetches with error handling - throws on non-2xx responses
@@ -59,6 +60,24 @@ export async function getConversationJson(id: string): Promise<string> {
 
 export async function search(query: string): Promise<ConversationSearchResult[]> {
   return fetchJson(`${ApiUrl}/search?query=${encodeURIComponent(query)}`);
+}
+
+export async function loadConversations(): Promise<void> {
+  const response = await fetch(`${ManageUrl}/cache`, { method: 'POST' });
+  if (!response.ok) {
+    throw new Error(
+      `API request failed: ${response.status} ${response.statusText}`
+    );
+  }
+}
+
+export async function deleteConversations(): Promise<void> {
+  const response = await fetch(`${ManageUrl}/cache`, { method: 'DELETE' });
+  if (!response.ok) {
+    throw new Error(
+      `API request failed: ${response.status} ${response.statusText}`
+    );
+  }
 }
 
 export type { ConversationSummary } from './models';
