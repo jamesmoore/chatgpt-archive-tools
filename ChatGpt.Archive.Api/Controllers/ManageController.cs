@@ -1,8 +1,4 @@
-﻿using ChatGpt.Archive.Api.Database;
-using ChatGpt.Archive.Api.Services;
-using ChatGPTExport;
-using ChatGPTExport.Formatters.Html;
-using ChatGPTExport.Formatters.Markdown;
+﻿using ChatGpt.Archive.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChatGpt.Archive.Api.Controllers
@@ -13,11 +9,18 @@ namespace ChatGpt.Archive.Api.Controllers
         IConversationsService conversationsService
         ) : ControllerBase
     {
-        [HttpGet("clear")]
+        [HttpDelete]
         public ActionResult<bool> Clear()
         {
             conversationsService.ClearAll();
             return Ok(true);
+        }
+
+        [HttpPost("load")]
+        public IActionResult LoadConversations()
+        {
+            conversationsService.LoadConversations();
+            return Ok();
         }
     }
 }

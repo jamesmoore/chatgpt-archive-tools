@@ -12,22 +12,15 @@ namespace ChatGpt.Archive.Api.Services
         ConversationFinder conversationFinder,
         ArchiveSourcesOptions options) : IConversationsService
     {
-        private bool _dataInitialized = false;
-        private readonly Lock _dataLock = new();
+        private readonly Lock _loadLock = new();
 
         public void LoadConversations()
         {
-            if (_dataInitialized) return;
-            lock (_dataLock)
+            lock (_loadLock)
             {
-                // Check if we need to import conversations
-                if (!archiveRepository.HasConversations())
-                {
-                    // Import conversations from source
-                    var conversations = GetConversationsFromSource();
-                    archiveRepository.InsertConversations(conversations);
-                }
-                _dataInitialized = true;
+                // Import conversations from source
+                var conversations = GetConversationsFromSource();
+                archiveRepository.InsertConversations(conversations);
             }
         }
 

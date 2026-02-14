@@ -6,7 +6,6 @@ using System.Text.Json;
 
 namespace ChatGpt.Archive.Api.Database
 {
-    // TODO a DB clear and reload feature
     public class ArchiveRepository : IArchiveRepository
     {
         private const string DatabaseFileName = "archive.db";
