@@ -9,5 +9,6 @@ namespace ChatGpt.Archive.Api.Services
         Conversation? GetConversation(string conversationId);
         IEnumerable<ConsolidatedSearchResult> Search(string query);
         void ClearAll();
+        void LoadConversations();
     }
 }

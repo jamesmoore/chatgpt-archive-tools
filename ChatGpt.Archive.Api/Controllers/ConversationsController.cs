@@ -23,7 +23,11 @@ namespace ChatGpt.Archive.Api.Controllers
         public ActionResult<IEnumerable<ConversationSummary>> Get()
         {
             var latestConversations = conversationsService.GetLatestConversations();
-
+            if(!latestConversations.Any())
+            {
+                conversationsService.LoadConversations();
+                latestConversations = conversationsService.GetLatestConversations();
+            }
             var result = latestConversations.Select(p => new ConversationSummary(p.id!, p.title ?? "No title", p.gizmo_id, p.GetCreateTime(), p.GetUpdateTime()));
 
             return Ok(result);

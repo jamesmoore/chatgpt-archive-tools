@@ -4,7 +4,6 @@ namespace ChatGpt.Archive.Api.Database
 {
     public interface IArchiveRepository
     {
-        void EnsureSchema();
         bool HasConversations();
         void ClearAll();
         void InsertConversations(IEnumerable<Conversation> conversations);
