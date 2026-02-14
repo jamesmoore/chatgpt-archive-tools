@@ -63,7 +63,7 @@ export async function search(query: string): Promise<ConversationSearchResult[]>
 }
 
 export async function loadConversations(): Promise<void> {
-  const response = await fetch(`${ManageUrl}/load`, { method: 'POST' });
+  const response = await fetch(`${ManageUrl}/cache`, { method: 'POST' });
   if (!response.ok) {
     throw new Error(
       `API request failed: ${response.status} ${response.statusText}`
@@ -72,7 +72,7 @@ export async function loadConversations(): Promise<void> {
 }
 
 export async function deleteConversations(): Promise<void> {
-  const response = await fetch(ManageUrl, { method: 'DELETE' });
+  const response = await fetch(`${ManageUrl}/cache`, { method: 'DELETE' });
   if (!response.ok) {
     throw new Error(
       `API request failed: ${response.status} ${response.statusText}`

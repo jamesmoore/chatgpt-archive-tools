@@ -74,15 +74,15 @@ export function Admin() {
       <p>Conversations: {conversations.length}</p>
       <Card>
         <CardHeader>
-          <CardTitle>Conversation management</CardTitle>
+          <CardTitle>Conversation cache management</CardTitle>
           <CardDescription>
-            Load conversations from the source, or delete all stored conversations.
+            Load conversations from the source, or delete all cached conversations.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground">
-              Load and sync conversations into local storage.
+              Load and sync conversations into the cache.
             </p>
             <Button
               onClick={handleLoadConversations}
@@ -94,29 +94,32 @@ export function Admin() {
                   Loading...
                 </>
               ) : (
-                "Load conversations"
+                "Load"
               )}
             </Button>
           </div>
           <div className="flex items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground">
-              Permanently remove all conversations from local storage.
+              Remove all  conversations from the cache.
             </p>
             <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
               <DialogTrigger asChild>
                 <Button
                   variant="destructive"
-                  disabled={loadMutation.isPending || deleteMutation.isPending}
+                  disabled={
+                    loadMutation.isPending ||
+                    deleteMutation.isPending ||
+                    conversations.length === 0
+                  }
                 >
-                  Delete conversations
+                  Delete
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Delete all conversations?</DialogTitle>
+                  <DialogTitle>Delete all cached conversations?</DialogTitle>
                   <DialogDescription>
-                    This action cannot be undone. All stored conversations will be
-                    permanently deleted.
+                    All cached conversations will be deleted. Your original source conversations will not be affected, and you can load them back into the cache at any time. Are you sure you want to proceed?
                   </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>

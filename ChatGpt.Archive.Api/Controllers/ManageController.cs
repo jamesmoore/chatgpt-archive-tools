@@ -9,15 +9,15 @@ namespace ChatGpt.Archive.Api.Controllers
         IConversationsService conversationsService
         ) : ControllerBase
     {
-        [HttpDelete]
-        public ActionResult<bool> Clear()
+        [HttpDelete("cache")]  // DELETE /manage/cache
+        public IActionResult ClearCache()
         {
             conversationsService.ClearAll();
-            return Ok(true);
+            return Ok();
         }
 
-        [HttpPost("load")]
-        public IActionResult LoadConversations()
+        [HttpPost("cache")]    // POST /manage/cache (to rebuild/reload)
+        public IActionResult RebuildCache()
         {
             conversationsService.LoadConversations();
             return Ok();

@@ -13,7 +13,7 @@ namespace ChatGpt.Archive.Api.Controllers
         ) : ControllerBase
     {
         [HttpGet("{rootId}/{**path}")]
-        public IActionResult Index(int rootId, string path, [FromQuery(Name = "sig")] string? signature)
+        public IActionResult GetAsset(int rootId, string path, [FromQuery(Name = "sig")] string? signature)
         {
             var decodedPath = Uri.UnescapeDataString(path);
 
