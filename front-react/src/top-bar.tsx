@@ -37,16 +37,17 @@ export function TopBar() {
       </div>
 
       <div className="flex items-center gap-2 justify-self-end">
-        <Button
-          variant={isWrapped ? 'default' : 'outline'}
-          size="icon"
-          onClick={toggleWrap}
-          title="Toggle word wrap"
-          disabled={!isTextFormat}
-          aria-label="Toggle word wrap"
-        >
-          <WrapText className="h-4 w-4" />
-        </Button>
+        {isTextFormat &&
+          <Button
+            variant={isWrapped ? 'default' : 'outline'}
+            size="icon"
+            onClick={toggleWrap}
+            title="Toggle word wrap"
+            aria-label="Toggle word wrap"
+          >
+            <WrapText className="h-4 w-4" />
+          </Button>
+        }
         <Button
           variant="outline"
           size="icon"
