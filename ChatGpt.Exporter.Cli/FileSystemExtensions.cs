@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO.Abstractions;
-using System.Text;
+﻿using System.IO.Abstractions;
 
 namespace ChatGpt.Exporter.Cli
 {

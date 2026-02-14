@@ -1,5 +1,4 @@
 using System.IO.Abstractions.TestingHelpers;
-using ChatGPTExport;
 
 namespace ChatGpt.Exporter.Cli.Tests;
 
