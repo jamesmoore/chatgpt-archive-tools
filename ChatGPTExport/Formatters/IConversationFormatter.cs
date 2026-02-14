@@ -1,11 +1,12 @@
 ﻿using ChatGPTExport.Assets;
+using ChatGPTExport.Formatters.Markdown;
 using ChatGPTExport.Models;
 
 namespace ChatGPTExport.Formatters
 {
     public interface IConversationFormatter
     {
-        IEnumerable<string> Format(IAssetLocator assetLocator, Conversation conversation);
+        IEnumerable<string> Format(IMarkdownAssetRenderer assetLocator, Conversation conversation);
         string GetExtension();
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using ChatGPTExport.Assets;
+using ChatGPTExport.Formatters.Markdown;
 using ChatGPTExport.Models;
 
 namespace ChatGPTExport.Formatters.Json
@@ -13,7 +13,7 @@ namespace ChatGPTExport.Formatters.Json
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         };
 
-        public IEnumerable<string> Format(IAssetLocator assetLocator, Conversation conversation)
+        public IEnumerable<string> Format(IMarkdownAssetRenderer assetLocator, Conversation conversation)
         {
             return [JsonSerializer.Serialize(conversation, options)];
         }

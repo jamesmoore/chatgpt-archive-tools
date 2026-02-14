@@ -1,43 +1,53 @@
-﻿using ChatGPTExport;
-using ChatGPTExport.Assets;
+﻿using ChatGpt.Archive.Api.Database;
+using ChatGPTExport;
 using ChatGPTExport.Models;
 using System.IO.Abstractions;
 
 namespace ChatGpt.Archive.Api.Services
 {
-    public class ConversationsService : IConversationsService
+    public class ConversationsService(
+        IFileSystem fileSystem,
+        IArchiveRepository archiveRepository,
+        ConversationFinder conversationFinder,
+        ArchiveSourcesOptions options) : IConversationsService
     {
-        private readonly ArchiveSourcesOptions _options;
-        private readonly IFileSystem _fileSystem;
-        private readonly IConversationAssetsCache _directoryCache;
-        private readonly Lazy<IEnumerable<Conversation>> _storedConversations;
+        private bool _databaseInitialized = false;
+        private readonly Lock _initLock = new();
 
-        public ConversationsService(
-            IFileSystem fileSystem,
-            IConversationAssetsCache directoryCache,
-            ArchiveSourcesOptions options)
+        private void EnsureDatabaseInitialized()
         {
-            _fileSystem = fileSystem;
-            _directoryCache = directoryCache;
-            _options = options;
-            _storedConversations = new Lazy<IEnumerable<Conversation>>(GetConversations, LazyThreadSafetyMode.ExecutionAndPublication);
-        }
+            if (_databaseInitialized)
+                return;
 
-        private IEnumerable<Conversation> EnsureConversationsPresent()
-        {
-            return _storedConversations.Value;
+            lock (_initLock)
+            {
+                if (_databaseInitialized)
+                    return;
+
+                // Ensure schema exists
+                archiveRepository.EnsureSchema();
+
+                // Check if we need to import conversations
+                if (!archiveRepository.HasConversations())
+                {
+                    // Import conversations from source
+                    var conversations = GetConversationsFromSource();
+                    archiveRepository.InsertConversations(conversations);
+                }
+
+                _databaseInitialized = true;
+            }
         }
 
         public IEnumerable<Conversation> GetLatestConversations()
         {
-            var conversations = EnsureConversationsPresent();
-            return conversations;
+            EnsureDatabaseInitialized();
+            return archiveRepository.GetAll();
         }
 
-        private IEnumerable<Conversation> GetConversations()
+        private IEnumerable<Conversation> GetConversationsFromSource()
         {
-            var directories = _options.SourceDirectories.Select(p => _fileSystem.DirectoryInfo.New(p));
-            var conversationFinder = new ConversationFinder();
+            var directories = options.SourceDirectories.Select(p => fileSystem.DirectoryInfo.New(p));
             var conversationFiles = conversationFinder.GetConversationFiles(directories);
             var conversationsParser = new ConversationsParser([]);
             var conversations = conversationFiles.Select(p => new { 
@@ -45,18 +55,35 @@ namespace ChatGpt.Archive.Api.Services
                 ParentDirectory = p.Directory
             }).ToList();
             var successfulConversations = conversations.Where(p => p.ParsedConversations.Status == ConversationParseResult.Success && p.ParsedConversations.Conversations != null).ToList();
-
-            var parentDirectories = successfulConversations.OrderByDescending(p => p.ParsedConversations.Conversations!.GetUpdateTime()).Select(p => p.ParentDirectory!).ToList();
-            _directoryCache.SetConversationAssets(parentDirectories.Select(ConversationAssets.FromDirectory).ToList());
             var latestConversations = successfulConversations.Select(p => p.ParsedConversations.Conversations!).GetLatestConversations();
             return latestConversations;
         }
 
         public Conversation? GetConversation(string conversationId)
         {
-            var conversations = EnsureConversationsPresent();
-            var conversation = conversations.FirstOrDefault(p => p.id == conversationId);
-            return conversation;
+            EnsureDatabaseInitialized();
+            return archiveRepository.GetById(conversationId);
+        }
+
+        public IEnumerable<ConsolidatedSearchResult> Search(string query)
+        {
+            EnsureDatabaseInitialized();
+            var flatResult = archiveRepository.Search(query);
+
+            var groupedByConversation = flatResult.GroupBy(r => new { r.ConversationId, r.ConversationTitle });
+
+            var consolidatedResults = groupedByConversation.Select(g => new ConsolidatedSearchResult
+            {
+                ConversationId = g.Key.ConversationId,
+                ConversationTitle = g.Key.ConversationTitle,
+                Messages = g.Select(r => new ConsolidatedSearchResult.MessageResult
+                {
+                    MessageId = r.MessageId,
+                    Snippet = r.Snippet
+                }).ToList()
+            });
+
+            return consolidatedResults;
         }
     }
 }

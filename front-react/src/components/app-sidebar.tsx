@@ -1,19 +1,19 @@
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarSeparator,
   useSidebar,
 } from "@/components/ui/sidebar"
 import { useEffect } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { useConversations } from '../hooks/use-conversations'
+import { Search } from "lucide-react";
 
 export function AppSidebar() {
   const { id, format } = useParams();
@@ -30,12 +30,27 @@ export function AppSidebar() {
 
   return (
     <Sidebar className="h-full">
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarGroupLabel className="text-base my-0.5">ChatGPT archive</SidebarGroupLabel>
+          <SidebarMenuItem key={'search'}>
+            <SidebarMenuButton asChild isActive={false}>
+              <Link to={'/'}
+                onClick={() => {
+                  setOpenMobile(false);
+                }}
+              >
+                <Search /> Search chats
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
+
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-base my-0.5">Conversations</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarSeparator />
               {conversations.map((item) => (
                 <SidebarMenuItem key={item.id}>
                   <SidebarMenuButton asChild isActive={id === item.id}>
@@ -55,8 +70,6 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
-      </SidebarFooter >
     </Sidebar>
   )
 }

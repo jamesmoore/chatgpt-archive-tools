@@ -1,4 +1,5 @@
-﻿using ChatGPTExport.Models;
+﻿using ChatGpt.Archive.Api.Database;
+using ChatGPTExport.Models;
 
 namespace ChatGpt.Archive.Api.Services
 {
@@ -6,5 +7,6 @@ namespace ChatGpt.Archive.Api.Services
     {
         IEnumerable<Conversation> GetLatestConversations();
         Conversation? GetConversation(string conversationId);
+        IEnumerable<ConsolidatedSearchResult> Search(string query);
     }
 }

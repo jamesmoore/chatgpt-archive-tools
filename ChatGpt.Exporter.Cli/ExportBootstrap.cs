@@ -1,6 +1,7 @@
 ﻿using ChatGpt.Exporter.Cli.Assets;
 using ChatGPTExport;
 using ChatGPTExport.Assets;
+using ChatGPTExport.Formatters.Markdown;
 using ChatGPTExport.Models;
 using System.IO.Abstractions;
 
@@ -52,7 +53,7 @@ namespace ChatGpt.Exporter.Cli
                 .ToList();
 
             var conversationAssetsList = successfulConversations.OrderByDescending(p => p.Conversations.GetUpdateTime()).Select(p => p.ConversationAssets);
-            var assetLocator = exportAssetLocatorFactory.GetAssetLocator(conversationAssetsList, destination);
+            var assetLocator = new MarkdownAssetRenderer(exportAssetLocatorFactory.GetAssetLocator(conversationAssetsList, destination));
 
             var count = conversations.Count;
             var position = 0;

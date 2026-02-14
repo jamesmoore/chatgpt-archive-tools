@@ -2,8 +2,8 @@ using System.Buffers;
 using System.IO;
 using System.IO.Abstractions;
 using System.Text;
-using ChatGPTExport.Assets;
 using ChatGPTExport.Formatters;
+using ChatGPTExport.Formatters.Markdown;
 using ChatGPTExport.Models;
 
 namespace ChatGPTExport
@@ -17,7 +17,7 @@ namespace ChatGPTExport
         /// <param name="destination">Destination directory.</param>
         /// <param name="assetLocator">The asset locator.</param>
         /// <exception cref="ApplicationException"></exception>
-        public void Process(Conversation conversation, IDirectoryInfo destination, IAssetLocator assetLocator)
+        public void Process(Conversation conversation, IDirectoryInfo destination, IMarkdownAssetRenderer assetLocator)
         {
             try
             {
@@ -100,7 +100,12 @@ namespace ChatGPTExport
             }
         }
 
-        private static void ExportConversation(Dictionary<string, IEnumerable<string>> fileContentsMap, IAssetLocator assetLocator, IConversationFormatter exporter, Conversation conversation, string filename)
+        private static void ExportConversation(
+            Dictionary<string, IEnumerable<string>> fileContentsMap, 
+            IMarkdownAssetRenderer assetLocator, 
+            IConversationFormatter exporter, 
+            Conversation conversation, 
+            string filename)
         {
             try
             {

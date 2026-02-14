@@ -1,16 +1,15 @@
 using ChatGPTExport.Assets;
 using ChatGPTExport.Exporters;
-using ChatGPTExport.Formatters;
+using ChatGPTExport.Formatters.Markdown;
 using ChatGPTExport.Models;
-using Markdig;
 
 namespace ChatGPTExport.Formatters.Plaintext
 {
-    internal class PlaintextFormatter(bool showHidden) : IConversationFormatter
+    public class PlaintextFormatter(bool showHidden) : IConversationFormatter
     {
         private readonly string LineBreak = Environment.NewLine;
 
-        public IEnumerable<string> Format(IAssetLocator assetLocator, Conversation conversation)
+        public IEnumerable<string> Format(IMarkdownAssetRenderer assetLocator, Conversation conversation)
         {
             var messages = conversation.GetMessagesWithContent();
 
@@ -36,30 +35,37 @@ namespace ChatGPTExport.Formatters.Plaintext
 
             foreach (var message in messages)
             {
-                try
-                {
-                    var visitResult = message.Accept(visitor);
-
-                    if (message.author != null && visitResult != null && visitResult.Lines.Any())
-                    {
-                        var markdown = string.Join(LineBreak, visitResult.Lines);
-                        
-                        // Convert markdown to plaintext
-                        var plaintext = Markdig.Markdown.ToPlainText(markdown);
-
-                        var authorname = string.IsNullOrWhiteSpace(message.author.name) ? "" : $" ({message.author.name})";
-                        strings.Add($"{message.author.role}{authorname}{visitResult.Suffix}:");
-                        strings.Add(plaintext);
-                        strings.Add("-" + new string('-', 78));
-                        strings.Add("");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine(ex.Message);
-                }
+                strings.AddRange(FormatMessage(message, visitor));
             }
 
+            return strings;
+        }
+
+        private IEnumerable<string> FormatMessage(Message message, MarkdownContentVisitor visitor)
+        {
+            var strings = new List<string>();
+            try
+            {
+                var visitResult = message.Accept(visitor);
+
+                if (message.author != null && visitResult != null && visitResult.Lines.Any())
+                {
+                    var markdown = string.Join(LineBreak, visitResult.Lines);
+
+                    // Convert markdown to plaintext
+                    var plaintext = Markdig.Markdown.ToPlainText(markdown);
+
+                    var authorname = string.IsNullOrWhiteSpace(message.author.name) ? "" : $" ({message.author.name})";
+                    strings.Add( $"{message.author.role}{authorname}{visitResult.Suffix}:");
+                    strings.Add(plaintext);
+                    strings.Add("-" + new string('-', 78));
+                    strings.Add("");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(ex.Message);
+            }
             return strings;
         }
 

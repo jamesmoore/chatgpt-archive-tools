@@ -1,6 +1,7 @@
 using ChatGPTExport.Assets;
 using ChatGPTExport.Exporters;
 using ChatGPTExport.Formatters;
+using ChatGPTExport.Formatters.Markdown;
 using ChatGPTExport.Models;
 
 namespace ChatGTPExportTests.Formatters.Markdown;
@@ -9,9 +10,11 @@ public class MarkdownContentVisitorTests
 {
     private static MarkdownContentVisitor CreateVisitor()
     {
-        return new MarkdownContentVisitor(new NullAssetLocator(), showHidden: false);
+        NullAssetLocator nullAssetLocator = new();
+        MarkdownAssetRenderer markdownAssetRenderer = new(nullAssetLocator);
+        return new MarkdownContentVisitor(markdownAssetRenderer, showHidden: false);
     }
-
+      
     private static ContentVisitorContext CreateContext(string role)
     {
         return new ContentVisitorContext(role, null, null, new MessageMetadata(), string.Empty);

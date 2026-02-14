@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 
 namespace ChatGPTExport.Exporters
 {
-    public partial class MarkdownContentVisitor(IAssetLocator assetLocator, bool showHidden) : IContentVisitor<MarkdownContentResult>
+    public partial class MarkdownContentVisitor(IMarkdownAssetRenderer markdownAssetRenderer, bool showHidden) : IContentVisitor<MarkdownContentResult>
     {
         private const string trackingSource = "?utm_source=chatgpt.com";
         private const string ImageAssetPointer = "image_asset_pointer";
@@ -180,17 +180,12 @@ namespace ChatGPTExport.Exporters
             {
                 case ImageAssetPointer when string.IsNullOrWhiteSpace(obj.asset_pointer) == false:
                     {
-                        var searchPattern = GetSearchPattern(obj.asset_pointer);
-                        var markdownImage = GetMediaAsset(context, searchPattern);
+                        var asset_pointer = obj.asset_pointer;
+                        var strings = markdownAssetRenderer.RenderAsset(context, asset_pointer);
 
-                        if (markdownImage != null)
+                        foreach(var str in strings)
                         {
-                            yield return markdownImage.GetMarkdownLink();
-                        }
-                        else
-                        {
-                            Console.Error.WriteLine("\tUnable to find asset " + obj.asset_pointer);
-                            yield return $"> ⚠️ **Warning:** Could not find asset: {obj.asset_pointer}.";
+                            yield return str;
                         }
 
                         if (context.MessageMetadata.image_gen_title != null)
@@ -203,19 +198,25 @@ namespace ChatGPTExport.Exporters
 
                 case "real_time_user_audio_video_asset_pointer" when string.IsNullOrWhiteSpace(obj.audio_asset_pointer?.asset_pointer) == false:
                     {
-                        var searchPattern = GetSearchPattern(obj.audio_asset_pointer.asset_pointer);
-                        var markdownAsset = GetMediaAsset(context, searchPattern);
+                        var asset_pointer = obj.audio_asset_pointer.asset_pointer;
+                        var strings = markdownAssetRenderer.RenderAsset(context, asset_pointer);
 
-                        yield return $"{markdownAsset?.GetMarkdownLink()}  ";
+                        foreach (var str in strings)
+                        {
+                            yield return str;
+                        }
                         break;
                     }
 
                 case "audio_asset_pointer" when string.IsNullOrWhiteSpace(obj.asset_pointer) == false:
                     {
-                        var searchPattern = GetSearchPattern(obj.asset_pointer);
-                        var markdownAsset = GetMediaAsset(context, searchPattern);
+                        var asset_pointer = obj.asset_pointer;
+                        var strings = markdownAssetRenderer.RenderAsset(context, asset_pointer);
 
-                        yield return $"{markdownAsset?.GetMarkdownLink()}  ";
+                        foreach (var str in strings)
+                        {
+                            yield return str;
+                        }
                         break;
                     }
 
@@ -223,21 +224,6 @@ namespace ChatGPTExport.Exporters
                     yield return $"*{obj.text}*  ";
                     break;
             }
-        }
-
-        private static string GetSearchPattern(string assetPointer)
-        {
-            return assetPointer.Replace("sediment://", string.Empty).Replace("file-service://", string.Empty);
-        }
-
-        private Asset? GetMediaAsset(ContentVisitorContext context, string searchPattern)
-        {
-            return assetLocator.GetMarkdownMediaAsset(new AssetRequest(
-                searchPattern,
-                context.Role,
-                context.CreatedDate,
-                context.UpdatedDate)
-                );
         }
 
         public MarkdownContentResult Visit(ContentCode content, ContentVisitorContext context)

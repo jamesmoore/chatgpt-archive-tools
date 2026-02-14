@@ -1,15 +1,34 @@
 ﻿using ChatGPTExport;
 using ChatGPTExport.Assets;
+using System.IO.Abstractions;
 
 namespace ChatGpt.Archive.Api.Services
 {
     public class ConversationAssetsCache : IConversationAssetsCache
     {
-        private IList<ConversationAssets>? conversationAssets = null;
+        private Lazy<IList<ConversationAssets>> conversationAssets;
+        private readonly ArchiveSourcesOptions options;
+        private readonly ConversationFinder conversationFinder;
+        private readonly IFileSystem fileSystem;
 
-        public void SetConversationAssets(IEnumerable<ConversationAssets> directoryInfos)
+        public ConversationAssetsCache(
+            ArchiveSourcesOptions options,
+            ConversationFinder conversationFinder,
+            IFileSystem fileSystem
+        )
         {
-            this.conversationAssets = directoryInfos.ToList();
+            this.options = options;
+            this.conversationFinder = conversationFinder;
+            this.fileSystem = fileSystem;
+            this.conversationAssets = new Lazy<IList<ConversationAssets>>(() => GetConversationAssets().ToList());
+        }
+
+        private IEnumerable<ConversationAssets> GetConversationAssets()
+        {
+            var sourceDirectories = options.SourceDirectories.Select(p => fileSystem.DirectoryInfo.New(p));
+            var conversationAssets = conversationFinder.GetConversationFiles(sourceDirectories).OrderByDescending(p => p.LastWriteTimeUtc);
+            var assetsDirectries = conversationAssets.Select(p => p.Directory).Select(p => ConversationAssets.FromDirectory(p!));
+            return assetsDirectries;
         }
 
         public MediaAssetDefinition? FindMediaAsset(string searchPattern)
@@ -19,7 +38,7 @@ namespace ChatGpt.Archive.Api.Services
                 return null;
             }
 
-            var foundAsset = conversationAssets.Select((p, i) =>
+            var foundAsset = conversationAssets.Value.Select((p, i) =>
             (
                 Index: i,
                 p.ParentDirectory,
@@ -38,6 +57,7 @@ namespace ChatGpt.Archive.Api.Services
 
         public string? GetMediaAssetPath(int index, string relativePath)
         {
+            var conversationAssets = this.conversationAssets?.Value;
             if (conversationAssets == null || index >= conversationAssets.Count)
             {
                 return null;

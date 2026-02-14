@@ -5,3 +5,14 @@ export interface ConversationSummary {
   created: string;
   updated: string;
 }
+
+export interface ConversationSearchResult {
+  conversationId: string;
+  conversationTitle: string;
+  messages: MessageSearchResult[];
+}
+
+export interface MessageSearchResult {
+  messageId: string;
+  snippet: string;
+}
