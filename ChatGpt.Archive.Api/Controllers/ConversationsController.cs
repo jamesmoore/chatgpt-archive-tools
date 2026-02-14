@@ -94,9 +94,6 @@ namespace ChatGpt.Archive.Api.Controllers
             string content = string.Join(Environment.NewLine, formatted);
             return content;
         }
-
-
-
     }
 
     public record ConversationSummary(string Id, string Title, string? GizmoId, DateTimeOffset Created, DateTimeOffset Updated);
