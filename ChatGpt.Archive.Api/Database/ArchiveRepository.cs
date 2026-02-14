@@ -31,8 +31,6 @@ namespace ChatGpt.Archive.Api.Database
 
         public void EnsureSchema()
         {
-            var dbPath = GetDatabasePath();
-            
             // Ensure data directory exists
             if (!_fileSystem.Directory.Exists(_options.DataDirectory))
             {
@@ -110,6 +108,32 @@ namespace ChatGpt.Archive.Api.Database
 
             var count = (long)command.ExecuteScalar()!;
             return count > 0;
+        }
+
+        public void ClearAll()
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+
+            using var command = connection.CreateCommand();
+            command.CommandText = @"
+                PRAGMA foreign_keys = OFF;
+
+                DROP TRIGGER IF EXISTS messages_ai;
+                DROP TRIGGER IF EXISTS messages_ad;
+                DROP TRIGGER IF EXISTS messages_au;
+
+                DROP TABLE IF EXISTS messages_fts;
+                DROP TABLE IF EXISTS messages;
+                DROP TABLE IF EXISTS conversations;
+
+                DROP INDEX IF EXISTS idx_messages_conversation;
+                DROP INDEX IF EXISTS idx_conversations_update_time;
+
+                PRAGMA foreign_keys = ON;";
+            command.ExecuteNonQuery();
+
+            EnsureSchema();
         }
 
         public void InsertConversations(IEnumerable<Conversation> conversations)

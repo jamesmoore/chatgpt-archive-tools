@@ -8,6 +8,7 @@ namespace ChatGpt.Archive.Api.Services
     public class ConversationsService(
         IFileSystem fileSystem,
         IArchiveRepository archiveRepository,
+        IConversationAssetsCache conversationAssetsCache,
         ConversationFinder conversationFinder,
         ArchiveSourcesOptions options) : IConversationsService
     {
@@ -84,6 +85,16 @@ namespace ChatGpt.Archive.Api.Services
             });
 
             return consolidatedResults;
+        }
+
+        public void ClearAll()
+        {
+            lock (_initLock)
+            {
+                archiveRepository.ClearAll();
+                conversationAssetsCache.Reset();
+                _databaseInitialized = false;
+            }
         }
     }
 }

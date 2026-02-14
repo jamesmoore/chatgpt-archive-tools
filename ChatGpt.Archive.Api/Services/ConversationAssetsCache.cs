@@ -66,5 +66,10 @@ namespace ChatGpt.Archive.Api.Services
             var parentPath = conversationAssets[index].ParentDirectory;
             return parentPath.FileSystem.Path.Combine(parentPath.FullName, relativePath);
         }
+
+        public void Reset()
+        {
+            conversationAssets = new Lazy<IList<ConversationAssets>>(() => GetConversationAssets().ToList());
+        }
     }
 }
