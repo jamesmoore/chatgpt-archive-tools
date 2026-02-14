@@ -42,11 +42,11 @@ export function Admin() {
       await loadMutation.mutateAsync();
       await refetch();
       setStatusType("success");
-      setStatusMessage("Conversations loaded successfully.");
+      setStatusMessage("Chats loaded successfully.");
     } catch (error) {
       setStatusType("error");
       setStatusMessage(
-        error instanceof Error ? error.message : "Failed to load conversations.",
+        error instanceof Error ? error.message : "Failed to load chats.",
       );
     }
   };
@@ -59,30 +59,30 @@ export function Admin() {
       await deleteMutation.mutateAsync();
       await refetch();
       setStatusType("success");
-      setStatusMessage("Conversations deleted successfully.");
+      setStatusMessage("Chats deleted successfully.");
       setIsDeleteDialogOpen(false);
     } catch (error) {
       setStatusType("error");
       setStatusMessage(
-        error instanceof Error ? error.message : "Failed to delete conversations.",
+        error instanceof Error ? error.message : "Failed to delete chats.",
       );
     }
   };
 
   return (
     <div className="p-4 space-y-4">
-      <p>Conversations: {conversations.length}</p>
+      <p>Chats: {conversations.length}</p>
       <Card>
         <CardHeader>
-          <CardTitle>Conversation cache management</CardTitle>
+          <CardTitle>Chat cache management</CardTitle>
           <CardDescription>
-            Load conversations from the source, or delete all cached conversations.
+            Load chats from the source, or delete all cached chats.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground">
-              Load and sync conversations into the cache.
+              Load and sync chats into the cache.
             </p>
             <Button
               onClick={handleLoadConversations}
@@ -100,7 +100,7 @@ export function Admin() {
           </div>
           <div className="flex items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground">
-              Remove all  conversations from the cache.
+              Remove all  chats from the cache.
             </p>
             <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
               <DialogTrigger asChild>
@@ -117,9 +117,9 @@ export function Admin() {
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Delete all cached conversations?</DialogTitle>
+                  <DialogTitle>Delete all cached chats?</DialogTitle>
                   <DialogDescription>
-                    All cached conversations will be deleted. Your original source conversations will not be affected, and you can load them back into the cache at any time. Are you sure you want to proceed?
+                    All cached chats will be deleted. Your original source chats will not be affected, and you can load them back into the cache at any time. Are you sure you want to proceed?
                   </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>

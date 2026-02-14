@@ -51,13 +51,13 @@ export function ConversationPanel() {
 
     if (!id) {
         return <div className="flex-1 flex justify-center items-center text-red-600">
-            No conversation ID provided.
+            No chat ID provided.
         </div>;
     }
 
     if (error) {
         return <div className="flex-1 flex justify-center items-center text-red-600">
-            {error instanceof Error ? error.message : "Failed to load conversation."}
+            {error instanceof Error ? error.message : "Failed to load chat."}
         </div>;
     }
 
@@ -70,7 +70,7 @@ export function ConversationPanel() {
             <iframe
                 srcDoc={content}
                 className="flex-1 w-full border-none"
-                title="Conversation HTML"
+                title="Chat HTML"
                 sandbox="allow-scripts allow-same-origin"
                 referrerPolicy="no-referrer"
             />
