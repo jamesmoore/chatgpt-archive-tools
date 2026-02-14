@@ -31,6 +31,11 @@ export function Search() {
 
     const inputRef = useRef<HTMLInputElement>(null)
 
+    // Auto-focus the search input when the component mounts
+    useEffect(() => {
+        inputRef.current?.focus()
+    }, [])
+
     // Guard: when we write the URL ourselves, skip the URL→state sync
     const isOurUrlUpdate = useRef(false)
 
