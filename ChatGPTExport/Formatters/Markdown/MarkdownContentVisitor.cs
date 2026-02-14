@@ -1,5 +1,4 @@
-﻿using ChatGPTExport.Assets;
-using ChatGPTExport.Formatters;
+﻿using ChatGPTExport.Formatters;
 using ChatGPTExport.Formatters.Markdown;
 using ChatGPTExport.Models;
 using System.Data;

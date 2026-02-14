@@ -1,12 +1,12 @@
 using System.Buffers;
-using System.IO;
 using System.IO.Abstractions;
 using System.Text;
+using ChatGPTExport;
 using ChatGPTExport.Formatters;
 using ChatGPTExport.Formatters.Markdown;
 using ChatGPTExport.Models;
 
-namespace ChatGPTExport
+namespace ChatGpt.Exporter.Cli
 {
     public class ConversationExporter(IFileSystem fileSystem, IEnumerable<IConversationFormatter> exporters, ExportMode exportMode)
     {

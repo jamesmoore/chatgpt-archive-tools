@@ -1,5 +1,4 @@
-﻿using ChatGPTExport;
-using ChatGPTExport.Assets;
+﻿using ChatGPTExport.Assets;
 using System.IO.Abstractions;
 
 namespace ChatGpt.Exporter.Cli.Assets
