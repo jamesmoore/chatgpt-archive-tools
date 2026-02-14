@@ -1,7 +1,7 @@
 using System.IO.Abstractions.TestingHelpers;
 using ChatGPTExport;
 
-namespace ChatGTPExportTests;
+namespace ChatGpt.Exporter.Cli.Tests;
 
 public class FileSystemExtensionsTests
 {
