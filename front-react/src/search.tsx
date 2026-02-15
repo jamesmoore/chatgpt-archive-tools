@@ -131,7 +131,7 @@ export function Search() {
                             const extraMessages = result.messages.slice(3)
                             const handleNavigate = () =>
                                 navigate(
-                                    `/conversation/${encodeURIComponent(result.conversationId)}/html`,
+                                    `/conversation/${encodeURIComponent(result.conversationId)}/html#${encodeURIComponent("msg-" + result.messages[0].messageId)}`,
                                 )
 
                             return (
