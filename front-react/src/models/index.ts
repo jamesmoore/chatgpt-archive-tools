@@ -26,4 +26,5 @@ export interface SourceDirectory {
 export interface Status {
   sourceDirectories: SourceDirectory[];
   dataDirectory: string;
+  databasePath: string;
 }

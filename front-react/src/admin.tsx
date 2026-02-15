@@ -246,11 +246,21 @@ export function Admin() {
                             No data directory configured.
                         </p>
                     ) : (
-                        <div className="space-y-4">
-                            <span className="font-medium">
-                                {status.dataDirectory}
-                            </span>
-                        </div>
+                        <>
+                            <div className="">
+                                <span className="font-medium">
+                                    {status.dataDirectory}
+                                </span>
+                            </div>
+                            <div className="space-y-2 pt-4">
+                                <div className="text-sm text-muted-foreground">
+                                    Database path: 
+                                </div>
+                                <div className="font-medium">
+                                    {status.databasePath}
+                                </div>
+                            </div>
+                        </>
                     )}
                 </CardContent>
             </Card>
