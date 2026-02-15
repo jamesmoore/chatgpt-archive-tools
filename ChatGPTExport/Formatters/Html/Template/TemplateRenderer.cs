@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.IO;
 using System.Reflection;
 using Scriban;
@@ -7,10 +8,11 @@ namespace ChatGPTExport.Formatters.Html.Template
     internal static class TemplateRenderer
     {
         private static readonly Assembly Assembly = typeof(TemplateRenderer).Assembly;
+        private static readonly ConcurrentDictionary<string, Scriban.Template> TemplateCache = new();
 
         public static string RenderTemplate(string templateName, object model)
         {
-            var template = LoadTemplate(templateName);
+            var template = TemplateCache.GetOrAdd(templateName, LoadTemplate);
             return template.Render(model);
         }
 

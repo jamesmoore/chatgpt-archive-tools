@@ -24,3 +24,5 @@
     {{ fragment.html }}
     {{~ end ~}}
     {{ end }}
+</body>
+</html>
