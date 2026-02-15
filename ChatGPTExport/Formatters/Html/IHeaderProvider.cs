@@ -1,7 +1,9 @@
-﻿namespace ChatGPTExport.Formatters.Html
+﻿using ChatGPTExport.Formatters.Html.Headers;
+
+namespace ChatGPTExport.Formatters.Html
 {
     internal interface IHeaderProvider
     {
-        string GetHeaders(HtmlPage htmlPage);
+        string GetHeaders(HeaderInput htmlPage);
     }
 }

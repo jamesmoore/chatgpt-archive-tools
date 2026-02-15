@@ -2,13 +2,17 @@
 using System.Text.RegularExpressions;
 using ChatGPTExport.Formatters;
 using ChatGPTExport.Formatters.Html;
+using ChatGPTExport.Formatters.Html.Headers;
 using ChatGPTExport.Formatters.Markdown;
 using ChatGPTExport.Models;
 using Markdig;
 
 namespace ChatGPTExport.Exporters.Html
 {
-    internal partial class HtmlFormatter(IHtmlFormatter formatter, bool showHidden) : IConversationFormatter
+    internal partial class HtmlFormatter(
+        IHtmlFormatter formatter,
+        IHeaderProvider headerProvider,
+        bool showHidden) : IConversationFormatter
     {
         private readonly string LineBreak = Environment.NewLine;
         private readonly MarkdownPipeline MarkdownPipeline = CreatePipeline(formatter);
@@ -38,7 +42,7 @@ namespace ChatGPTExport.Exporters.Html
                 }
             }
 
-            var bodyHtml = strings.Select(p => GetHtmlFragment(p.MessageId, p.Author, p.Content, p.HasImage, MarkdownPipeline));
+            var htmlFragments = strings.Select(p => GetHtmlFragment(p.MessageId, p.Author, p.Content, p.HasImage, MarkdownPipeline));
 
             var titleString = WebUtility.HtmlEncode(conversation.title ?? "No title");
 
@@ -57,8 +61,12 @@ namespace ChatGPTExport.Exporters.Html
             metaHeaders.Add("chatgpt_created", conversation.GetCreateTime().ToString("s"));
             metaHeaders.Add("chatgpt_updated", conversation.GetUpdateTime().ToString("s"));
 
+            var body = new HeaderInput(htmlFragments, metaHeaders);
+
+            var headers = headerProvider.GetHeaders(body);
+
             string html = formatter.FormatHtmlPage(
-                new HtmlPage(titleString, bodyHtml, metaHeaders));
+                new HtmlPage(titleString, [headers], htmlFragments));
 
             return [html];
         }
@@ -94,12 +102,13 @@ namespace ChatGPTExport.Exporters.Html
 
             var id = $"<a id=\"msg-{WebUtility.HtmlEncode(messageId)}\"></a>";
 
-            var html = id + Markdown.ToHtml(markdown, markdownPipeline);
+            var html = id + Environment.NewLine + Markdown.ToHtml(markdown, markdownPipeline);
 
             var (HasCode, Languages) = GetLanguages(markdown);
 
             var fragment = new HtmlFragment(
-                author.role == "user" ? formatter.FormatUserInput(html) : html,
+                author.role == "user",
+                html,
                 HasCode,
                 hasMath,
                 hasImage,

@@ -2,7 +2,7 @@
 
 namespace ChatGPTExport.Formatters.Html.Template
 {
-    internal class TailwindHtmlFormatter(IHeaderProvider headerProvider) : IHtmlFormatter
+    internal class TailwindHtmlFormatter : IHtmlFormatter
     {
         public void ApplyMarkdownPipelineBuilder(MarkdownPipelineBuilder markdownPipelineBuilder)
         {
@@ -60,7 +60,7 @@ namespace ChatGPTExport.Formatters.Html.Template
 }
 </style>
 
-{{headerProvider.GetHeaders(page)}}
+{{string.Join(Environment.NewLine, page.Headers)}}
 </head>
 <body class="dark:bg-neutral-900 dark:text-neutral-100 antialiased">
 <div class="container mx-auto max-w-4xl px-4 py-6">
@@ -81,7 +81,7 @@ namespace ChatGPTExport.Formatters.Html.Template
             prose-code:py-[0.15rem]
             prose-code:text-[--tw-prose-code]
             ">
-  {{page.GetBodyString()}}
+    {{string.Join(Environment.NewLine, page.Body.Select(p => p.IsUser ? FormatUserInput(p.Html) : p.Html))}}
 </div>
 </div> 
 </body>
@@ -89,7 +89,7 @@ namespace ChatGPTExport.Formatters.Html.Template
 """;
         }
 
-        public string FormatUserInput(string html)
+        private string FormatUserInput(string html)
         {
             return $"""
 <div class="flex justify-end my-4">
