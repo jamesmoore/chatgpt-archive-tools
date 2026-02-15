@@ -92,7 +92,8 @@ namespace ChatGPTExport.Exporters.Html
                 markdown = escaped;
             }
 
-            var id = $"<a id=\"msg-{messageId}\"></a>";
+            var encodedMessageId = WebUtility.HtmlAttributeEncode(messageId);
+            var id = $"<a id=\"msg-{encodedMessageId}\"></a>";
 
             var html = id + Markdown.ToHtml(markdown, markdownPipeline);
 
