@@ -1,38 +1,19 @@
 using Microsoft.Data.Sqlite;
-using System.IO.Abstractions;
 
 namespace ChatGpt.Archive.Api.Database
 {
     public class SqliteSchemaInitializer : ISchemaInitializer
     {
-        private const string DatabaseFileName = "archive.db";
-        private readonly string _connectionString;
-        private readonly IFileSystem _fileSystem;
-        private readonly ArchiveSourcesOptions _options;
+        private readonly DatabaseConfiguration _databaseConfiguration;
 
-        public SqliteSchemaInitializer(IFileSystem fileSystem, ArchiveSourcesOptions options)
+        public SqliteSchemaInitializer(DatabaseConfiguration databaseConfiguration)
         {
-            _fileSystem = fileSystem;
-            _options = options;
-
-            if (string.IsNullOrWhiteSpace(options.DataDirectory))
-            {
-                throw new ArgumentException("DataDirectory must be configured", nameof(options));
-            }
-
-            _connectionString = $"Data Source={GetDatabasePath()}";
+            _databaseConfiguration = databaseConfiguration;
         }
-
-        private string GetDatabasePath() => Path.Combine(_options.DataDirectory, DatabaseFileName);
 
         public void EnsureSchema()
         {
-            if (!_fileSystem.Directory.Exists(_options.DataDirectory))
-            {
-                _fileSystem.Directory.CreateDirectory(_options.DataDirectory);
-            }
-
-            using var connection = new SqliteConnection(_connectionString);
+            using var connection = new SqliteConnection(_databaseConfiguration.ConnectionString);
             connection.Open();
 
             using var createCommand = connection.CreateCommand();

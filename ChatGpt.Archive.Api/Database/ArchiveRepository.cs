@@ -1,42 +1,22 @@
 using ChatGpt.Archive.Api.Services;
 using ChatGPTExport.Models;
 using Microsoft.Data.Sqlite;
-using System.IO.Abstractions;
 using System.Text.Json;
 
 namespace ChatGpt.Archive.Api.Database
 {
     public class ArchiveRepository : IArchiveRepository
     {
-        private const string DatabaseFileName = "archive.db";
-        private readonly string _connectionString;
-        private readonly IFileSystem _fileSystem;
-        private readonly ArchiveSourcesOptions _options;
+        private readonly DatabaseConfiguration _databaseConfiguration;
 
-        public ArchiveRepository(IFileSystem fileSystem, ArchiveSourcesOptions options)
+        public ArchiveRepository(DatabaseConfiguration databaseConfiguration)
         {
-            _fileSystem = fileSystem;
-            _options = options;
-
-            if (string.IsNullOrWhiteSpace(options.DataDirectory))
-            {
-                throw new ArgumentException("DataDirectory must be configured", nameof(options));
-            }
-
-            _connectionString = $"Data Source={GetDatabasePath()}";
+            _databaseConfiguration = databaseConfiguration;
         }
-
-        private string GetDatabasePath() => Path.Combine(_options.DataDirectory, DatabaseFileName);
 
         public bool HasConversations()
         {
-            var dbPath = GetDatabasePath();
-            if (!_fileSystem.File.Exists(dbPath))
-            {
-                return false;
-            }
-
-            using var connection = new SqliteConnection(_connectionString);
+            using var connection = new SqliteConnection(_databaseConfiguration.ConnectionString);
             connection.Open();
 
             using var command = connection.CreateCommand();
@@ -48,7 +28,7 @@ namespace ChatGpt.Archive.Api.Database
 
         public void ClearAll()
         {
-            using var connection = new SqliteConnection(_connectionString);
+            using var connection = new SqliteConnection(_databaseConfiguration.ConnectionString);
             connection.Open();
 
             using var command = connection.CreateCommand();
@@ -63,7 +43,7 @@ namespace ChatGpt.Archive.Api.Database
             // Create PlaintextExtractor for this call (not thread-safe)
             var plaintextExtractor = new PlaintextExtractor();
             
-            using var connection = new SqliteConnection(_connectionString);
+            using var connection = new SqliteConnection(_databaseConfiguration.ConnectionString);
             connection.Open();
 
             using var transaction = connection.BeginTransaction();
@@ -182,7 +162,7 @@ namespace ChatGpt.Archive.Api.Database
         public IEnumerable<Conversation> GetAll()
         {
             var conversations = new List<Conversation>();
-            using var connection = new SqliteConnection(_connectionString);
+            using var connection = new SqliteConnection(_databaseConfiguration.ConnectionString);
             connection.Open();
 
             using var command = connection.CreateCommand();
@@ -209,7 +189,7 @@ namespace ChatGpt.Archive.Api.Database
 
         public Conversation? GetById(string id)
         {
-            using var connection = new SqliteConnection(_connectionString);
+            using var connection = new SqliteConnection(_databaseConfiguration.ConnectionString);
             connection.Open();
 
             using var command = connection.CreateCommand();
@@ -235,7 +215,7 @@ namespace ChatGpt.Archive.Api.Database
         public IEnumerable<SearchResult> Search(string query)
         {
             var results = new List<SearchResult>();
-            using var connection = new SqliteConnection(_connectionString);
+            using var connection = new SqliteConnection(_databaseConfiguration.ConnectionString);
             connection.Open();
 
             using var command = connection.CreateCommand();

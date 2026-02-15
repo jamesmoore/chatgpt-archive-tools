@@ -63,6 +63,7 @@ var archiveSourcesOptions = new ArchiveSourcesOptions
 
 // Add services to the container.
 builder.Services.AddSingleton(archiveSourcesOptions);
+builder.Services.AddSingleton<DatabaseConfiguration>();
 
 builder.Services.AddControllers();
 builder.Services.AddSingleton<IFileSystem, FileSystem>();
@@ -103,6 +104,11 @@ if (directories.All(p => p.Exists == false))
     return;
 }
 
+// Ensure data directory exists before initializing schema
+var databaseConfig = app.Services.GetRequiredService<DatabaseConfiguration>();
+databaseConfig.EnsureDataDirectoryExists(fileSystem);
+
+// Initialize database schema
 app.Services.GetRequiredService<ISchemaInitializer>().EnsureSchema();
 
 // Initialize conversations.
