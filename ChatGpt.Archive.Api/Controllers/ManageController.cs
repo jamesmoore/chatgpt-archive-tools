@@ -33,29 +33,13 @@ namespace ChatGpt.Archive.Api.Controllers
         {
             var sourceDirectories = archiveSourcesOptions.SourceDirectories.
                 Select(p => fileSystem.DirectoryInfo.New(p)).
-                Select(p => new SourceDirectory()
-                {
-                    DirectoryName  = p.FullName,
-                    Conversations = conversationFinder.GetConversationFiles(p).Select(p => p.FullName).ToArray(),
-                });
-            return Ok(new Status
-            {
-                SourceDirectories = sourceDirectories.ToArray(),
-                DataDirectory = archiveSourcesOptions.DataDirectory,
-            });
+                Select(p => new SourceDirectory(p.FullName, conversationFinder.GetConversationFiles(p).Select(p => p.FullName).ToArray()));
+            return Ok(new Status(sourceDirectories.ToArray(), archiveSourcesOptions.DataDirectory));
         }
 
-        public class Status
-        {
-            public SourceDirectory[] SourceDirectories { get; set; }
-            public string DataDirectory { get; set; }
-        }
+        public record Status(SourceDirectory[] SourceDirectories, string DataDirectory);
 
-        public class SourceDirectory
-        {
-            public string DirectoryName { get; set; }
-            public string[] Conversations { get; set; }
-        }
+        public record SourceDirectory(string DirectoryName, string[] Conversations);
     }
 }
 
