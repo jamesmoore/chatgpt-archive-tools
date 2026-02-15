@@ -17,7 +17,6 @@ export function ConversationPanel() {
 
     const iframeRef = useRef<HTMLIFrameElement>(null);
 
-
     useEffect(() => {
         const handleStorageChange = () => {
             setIsWrapped(getWrapStatus());
