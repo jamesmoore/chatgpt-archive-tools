@@ -67,9 +67,18 @@ export function ConversationPanel() {
     }
 
     function scrollToMessage() {
-        const targetMessageId = window.location.hash
+        let targetMessageId = window.location.hash
             .replace(/^#/, "")
             .replace(/^msg-/, "");
+
+        try {
+            if (targetMessageId) {
+                targetMessageId = decodeURIComponent(targetMessageId);
+            }
+        } catch {
+            // If decoding fails, fall back to the raw value to avoid breaking existing behavior.
+        }
+
         if (!iframeRef.current || !targetMessageId) return;
 
         const doc = iframeRef.current.contentDocument;
