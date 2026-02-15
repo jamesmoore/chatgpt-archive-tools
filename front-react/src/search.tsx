@@ -129,9 +129,11 @@ export function Search() {
                         {results.map((result) => {
                             const visibleMessages = result.messages.slice(0, 3)
                             const extraMessages = result.messages.slice(3)
-                            const handleNavigate = () =>
+                            const handleNavigate = (messageId: string) =>
                                 navigate(
-                                    `/conversation/${encodeURIComponent(result.conversationId)}/html#msg-${encodeURIComponent(result.messages[0].messageId)}`,
+                                    messageId ? 
+                                    `/conversation/${encodeURIComponent(result.conversationId)}/html#msg-${encodeURIComponent(messageId)}` :
+                                    `/conversation/${encodeURIComponent(result.conversationId)}/html`
                                 )
 
                             return (
@@ -141,7 +143,7 @@ export function Search() {
                                 >
                                     <button
                                         type="button"
-                                        onClick={handleNavigate}
+                                        onClick={() => handleNavigate("")}
                                         className="hover:bg-muted/50 flex w-full flex-col gap-1 p-3 text-left"
                                     >
                                         <div className="font-medium">
@@ -153,7 +155,7 @@ export function Search() {
                                             <button
                                                 key={message.messageId}
                                                 type="button"
-                                                onClick={handleNavigate}
+                                                onClick={() => handleNavigate(message.messageId)}
                                                 className="hover:bg-muted/50 w-full px-3 py-2 text-left text-muted-foreground text-sm"
                                             >
                                                 <span
@@ -185,7 +187,7 @@ export function Search() {
                                                                 <button
                                                                     key={message.messageId}
                                                                     type="button"
-                                                                    onClick={handleNavigate}
+                                                                    onClick={() => handleNavigate(message.messageId)}
                                                                     className="hover:bg-muted/50 w-full px-3 py-2 text-left text-muted-foreground text-sm"
                                                                 >
                                                                     <span
