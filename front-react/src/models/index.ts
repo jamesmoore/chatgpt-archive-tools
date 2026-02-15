@@ -19,6 +19,7 @@ export interface MessageSearchResult {
 
 export interface SourceDirectory {
   directoryName: string;
+  exists: boolean;
   conversations: string[];
 }
 

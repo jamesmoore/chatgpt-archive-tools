@@ -16,7 +16,7 @@ namespace ChatGPTExport
 
         public IEnumerable<IFileInfo> GetConversationFiles(IDirectoryInfo sourceDir)
         {
-            return sourceDir.GetFiles(SearchPattern, SearchOption.AllDirectories);
+            return sourceDir.Exists ? sourceDir.GetFiles(SearchPattern, SearchOption.AllDirectories) : [];
         }
     }
 }

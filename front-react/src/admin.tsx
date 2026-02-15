@@ -179,7 +179,13 @@ export function Admin() {
                             <Accordion type="multiple" className="w-full">
                                 {status.sourceDirectories.map((sourceDirectory) => (
                                     <Fragment key={sourceDirectory.directoryName}>
-                                        <span className="font-medium">{sourceDirectory.directoryName}</span>
+                                        <span className="font-medium">{sourceDirectory.directoryName}
+                                        </span>
+                                        {!sourceDirectory.exists && (
+                                            <span className="pl-1 text-sm text-destructive">
+                                                Source directory does not exist.
+                                            </span>
+                                        )}
                                         <AccordionItem value={sourceDirectory.directoryName}>
                                             <AccordionTrigger className="text-sm">
                                                 <div className="flex flex-col items-start">
@@ -222,7 +228,7 @@ export function Admin() {
                 <CardHeader>
                     <CardTitle>Data directory</CardTitle>
                     <CardDescription>
-                        Directory where chat data is stored.
+                        Directory where chat data is cached.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -241,9 +247,9 @@ export function Admin() {
                         </p>
                     ) : (
                         <div className="space-y-4">
-                            <p className="text-sm text-muted-foreground">
-                                Data directory: {status.dataDirectory}
-                            </p>
+                            <span className="font-medium">
+                                {status.dataDirectory}
+                            </span>
                         </div>
                     )}
                 </CardContent>
