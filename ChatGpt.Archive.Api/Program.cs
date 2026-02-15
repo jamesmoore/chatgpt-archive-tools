@@ -9,6 +9,7 @@ using System.CommandLine;
 using System.IO.Abstractions;
 
 const string DefaultDataDirectory = "chatgpt-archive";
+const int BrowserOpenDelayMs = 1000;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -149,7 +150,7 @@ if (string.IsNullOrEmpty(noOpenBrowser) || !noOpenBrowser.Equals("true", StringC
             // Open browser after a short delay to ensure server is ready
             _ = Task.Run(async () =>
             {
-                await Task.Delay(1000);
+                await Task.Delay(BrowserOpenDelayMs);
                 try
                 {
                     var url = httpUrl.Replace("0.0.0.0", "localhost").Replace("+", "localhost");
