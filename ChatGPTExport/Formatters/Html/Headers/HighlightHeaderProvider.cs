@@ -11,7 +11,7 @@
             "ini",
         ];
 
-        public string GetHeaders(HtmlPage htmlPage)
+        public string GetHeaders(HeaderInput htmlPage)
         {
             return htmlPage.HasCode ? GetCodeBlock(htmlPage.Languages) : "";
         }

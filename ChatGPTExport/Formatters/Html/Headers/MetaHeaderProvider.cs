@@ -2,7 +2,7 @@
 {
     internal class MetaHeaderProvider : IHeaderProvider
     {
-        public string GetHeaders(HtmlPage htmlPage)
+        public string GetHeaders(HeaderInput htmlPage)
         {
             var headers = new List<string>();
             foreach (var meta in htmlPage.MetaHeaders)

@@ -2,7 +2,7 @@
 
 namespace ChatGPTExport.Formatters.Html.Template
 {
-    internal class BootstrapHtmlFormatter(IHeaderProvider headerProvider) : IHtmlFormatter
+    internal class BootstrapHtmlFormatter : IHtmlFormatter
     {
         public void ApplyMarkdownPipelineBuilder(MarkdownPipelineBuilder markdownPipelineBuilder)
         {
@@ -19,19 +19,17 @@ namespace ChatGPTExport.Formatters.Html.Template
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>{{page.Title}}</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.7/css/bootstrap.min.css">
-{{headerProvider.GetHeaders(page)}}
+{{string.Join(Environment.NewLine, page.Headers)}}
 </head>
 <body class="container">
 <div class="my-4">
   <h1>{{page.Title}}</h1>
 </div>
-{{page.GetBodyString()}}
-</body>
-</html>
+    {{string.Join(Environment.NewLine, page.Body.Select(p => p.IsUser ? FormatUserInput(p.Html) : p.Html))}}
 """;
         }
 
-        public string FormatUserInput(string html)
+        private string FormatUserInput(string html)
         {
             return $"""
 <div class="d-flex justify-content-end mb-2">

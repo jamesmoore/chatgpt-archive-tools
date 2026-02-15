@@ -2,7 +2,7 @@
 {
     internal class GlightboxHeaderProvider : IHeaderProvider
     {
-        public string GetHeaders(HtmlPage htmlPage)
+        public string GetHeaders(HeaderInput htmlPage)
         {
             if (htmlPage.HasImage)
             {

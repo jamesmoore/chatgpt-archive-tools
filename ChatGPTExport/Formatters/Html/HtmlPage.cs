@@ -1,15 +1,13 @@
 ﻿namespace ChatGPTExport.Formatters.Html
 {
-    public record HtmlPage(string Title, IEnumerable<HtmlFragment> Body, Dictionary<string, string> MetaHeaders)
+
+    public record HtmlPage(string Title, IEnumerable<string> Headers, IEnumerable<HtmlFragment> Body)
     {
-        public string GetBodyString() => string.Join(Environment.NewLine, Body);
-        public bool HasCode => Body.Any(p => p.HasCode);
-        public bool HasMath => Body.Any(p => p.HasMath);
-        public bool HasImage => Body.Any(_ => _.HasImage);
-        public IReadOnlyCollection<string> Languages => Body.SelectMany(p => p.Languages).Distinct().ToList();
     }
 
+
     public record HtmlFragment(
+        bool IsUser,
         string Html,
         bool HasCode,
         bool HasMath,

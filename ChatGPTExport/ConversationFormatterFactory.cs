@@ -37,8 +37,8 @@ namespace ChatGPTExport
                     ]
                 );
 
-                var formatter = htmlFormat == HtmlFormat.Bootstrap ? new BootstrapHtmlFormatter(headerProvider) as IHtmlFormatter : new TailwindHtmlFormatter(headerProvider);
-                exporters.Add(new HtmlFormatter(formatter, showHidden));
+                var formatter = htmlFormat == HtmlFormat.Bootstrap ? new BootstrapHtmlFormatter() as IHtmlFormatter : new TailwindHtmlFormatter();
+                exporters.Add(new HtmlFormatter(formatter, headerProvider, showHidden));
             }
             if (exportTypes.Contains(ExportType.Text))
             {

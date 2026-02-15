@@ -6,6 +6,5 @@ namespace ChatGPTExport.Formatters.Html
     {
         void ApplyMarkdownPipelineBuilder(MarkdownPipelineBuilder markdownPipelineBuilder);
         string FormatHtmlPage(HtmlPage page);
-        string FormatUserInput(string html);
     }
 }
