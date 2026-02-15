@@ -16,3 +16,14 @@ export interface MessageSearchResult {
   messageId: string;
   snippet: string;
 }
+
+export interface SourceDirectory {
+  directoryName: string;
+  exists: boolean;
+  conversations: string[];
+}
+
+export interface Status {
+  sourceDirectories: SourceDirectory[];
+  dataDirectory: string;
+}

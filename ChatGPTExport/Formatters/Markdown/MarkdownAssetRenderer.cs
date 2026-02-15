@@ -11,7 +11,7 @@ namespace ChatGPTExport.Formatters.Markdown
 
             if (markdownAsset != null)
             {
-                yield return markdownAsset?.GetMarkdownLink();
+                yield return markdownAsset.GetMarkdownLink();
             }
             else
             {

@@ -31,7 +31,7 @@ namespace ChatGpt.Archive.Api.Services
 
         private IEnumerable<Conversation> GetConversationsFromSource()
         {
-            var directories = options.SourceDirectories.Select(p => fileSystem.DirectoryInfo.New(p));
+            var directories = options.SourceDirectories.Select(fileSystem.DirectoryInfo.New);
             var conversationFiles = conversationFinder.GetConversationFiles(directories);
             var conversationsParser = new ConversationsParser([]);
             var conversations = conversationFiles.Select(p => new
