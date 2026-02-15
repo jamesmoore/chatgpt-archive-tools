@@ -1,4 +1,8 @@
-import type { ConversationSearchResult, ConversationSummary } from './models';
+import type {
+  ConversationSearchResult,
+  ConversationSummary,
+  Status,
+} from './models';
 
 const BaseUrl = import.meta.env.VITE_API_BASE_URL ?? '';
 const ApiUrl = `${BaseUrl}/conversations`;
@@ -80,4 +84,8 @@ export async function deleteConversations(): Promise<void> {
   }
 }
 
-export type { ConversationSummary } from './models';
+export async function getStatus(): Promise<Status> {
+  return fetchJson<Status>(`${ManageUrl}/status`);
+}
+
+export type { ConversationSummary, SourceDirectory, Status } from './models';
