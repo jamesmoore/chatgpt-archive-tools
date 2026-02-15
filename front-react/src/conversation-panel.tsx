@@ -66,11 +66,10 @@ export function ConversationPanel() {
         return <LoadingSpinner />;
     }
 
-    const targetMessageId = window.location.hash
-        .replace(/^#/, "")
-        .replace(/^msg-/, "");
-
     function scrollToMessage() {
+        const targetMessageId = window.location.hash
+            .replace(/^#/, "")
+            .replace(/^msg-/, "");
         if (!iframeRef.current || !targetMessageId) return;
 
         const doc = iframeRef.current.contentDocument;
