@@ -26,8 +26,6 @@ namespace ChatGPTExport.Formatters.Html.Template
   <h1>{{page.Title}}</h1>
 </div>
     {{string.Join(Environment.NewLine, page.Body.Select(p => p.IsUser ? FormatUserInput(p.Html) : p.Html))}}
-</ body >
-</ html >
 """;
         }
 
