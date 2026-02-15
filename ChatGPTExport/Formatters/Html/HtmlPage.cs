@@ -1,10 +1,10 @@
 ﻿namespace ChatGPTExport.Formatters.Html
 {
 
-    public record HtmlPage(string Title, IEnumerable<string> Headers, IEnumerable<HtmlFragment> Body)
-    {
-    }
-
+    public record HtmlPage(
+        string Title,
+        IEnumerable<string> Headers,
+        IEnumerable<HtmlFragment> Body);
 
     public record HtmlFragment(
         bool IsUser,
@@ -12,8 +12,5 @@
         bool HasCode,
         bool HasMath,
         bool HasImage,
-        IReadOnlyCollection<string> Languages)
-    {
-        public override string ToString() => Html;
-    }
+        IReadOnlyCollection<string> Languages);
 }

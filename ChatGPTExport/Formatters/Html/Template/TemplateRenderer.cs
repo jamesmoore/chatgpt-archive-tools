@@ -1,7 +1,6 @@
 using System.Collections.Concurrent;
 using System.IO;
 using System.Reflection;
-using Scriban;
 
 namespace ChatGPTExport.Formatters.Html.Template
 {
