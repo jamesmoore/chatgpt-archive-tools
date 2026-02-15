@@ -42,7 +42,7 @@ namespace ChatGPTExport.Exporters.Html
                 }
             }
 
-            var htmlFragments = strings.Select(p => GetHtmlFragment(p.MessageId, p.Author, p.Content, p.HasImage, MarkdownPipeline));
+            var htmlFragments = strings.Select(p => GetHtmlFragment(p.MessageId, p.Author, p.Content, p.HasImage, MarkdownPipeline)).ToList();
 
             var titleString = WebUtility.HtmlEncode(conversation.title ?? "No title");
 
