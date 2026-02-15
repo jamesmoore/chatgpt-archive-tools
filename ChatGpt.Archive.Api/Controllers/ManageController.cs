@@ -1,4 +1,5 @@
-﻿using ChatGpt.Archive.Api.Services;
+﻿using ChatGpt.Archive.Api.Database;
+using ChatGpt.Archive.Api.Services;
 using ChatGPTExport;
 using Microsoft.AspNetCore.Mvc;
 using System.IO.Abstractions;
@@ -11,6 +12,7 @@ namespace ChatGpt.Archive.Api.Controllers
         IConversationsService conversationsService,
         ArchiveSourcesOptions archiveSourcesOptions,
         ConversationFinder conversationFinder,
+        DatabaseConfiguration databaseConfiguration,
         IFileSystem fileSystem
         ) : ControllerBase
     {
@@ -38,10 +40,18 @@ namespace ChatGpt.Archive.Api.Controllers
                     new SourceDirectory(p.FullName, true, conversationFinder.GetConversationFiles(p).Select(q => q.FullName).ToArray()) :
                     new SourceDirectory(p.FullName, false, [])
                     );
-            return Ok(new Status(sourceDirectories.ToArray(), archiveSourcesOptions.DataDirectory));
+            return Ok(new Status(
+                sourceDirectories.ToArray(), 
+                archiveSourcesOptions.DataDirectory,
+                databaseConfiguration.DatabasePath                
+                ));
         }
 
-        public record Status(SourceDirectory[] SourceDirectories, string DataDirectory);
+        public record Status(
+            SourceDirectory[] SourceDirectories, 
+            string DataDirectory,
+            string DatabasePath
+            );
 
         public record SourceDirectory(string DirectoryName, bool Exists, string[] Conversations);
     }
