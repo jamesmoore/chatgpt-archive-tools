@@ -13,7 +13,15 @@ namespace ChatGPTExport.Formatters.Html.Template
         public static string RenderTemplate(string templateName, object model)
         {
             var template = TemplateCache.GetOrAdd(templateName, LoadTemplate);
-            return template.Render(model);
+            
+            try
+            {
+                return template.Render(model);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Failed to render template '{templateName}': {ex.Message}", ex);
+            }
         }
 
         private static Scriban.Template LoadTemplate(string templateName)
@@ -29,7 +37,14 @@ namespace ChatGPTExport.Formatters.Html.Template
             using var reader = new StreamReader(stream);
             var templateContent = reader.ReadToEnd();
             
-            return Scriban.Template.Parse(templateContent);
+            try
+            {
+                return Scriban.Template.Parse(templateContent);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Failed to parse template '{templateName}': {ex.Message}", ex);
+            }
         }
     }
 }
