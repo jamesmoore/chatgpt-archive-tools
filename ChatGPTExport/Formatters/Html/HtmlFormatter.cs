@@ -17,7 +17,7 @@ namespace ChatGPTExport.Exporters.Html
         {
             var messages = conversation.GetMessagesWithContent();
 
-            var strings = new List<(Author Author, string Content, bool HasImage)>();
+            var strings = new List<(string MessageId, Author Author, string Content, bool HasImage)>();
 
             var visitor = new MarkdownContentVisitor(assetLocator, showHidden);
 
@@ -27,9 +27,9 @@ namespace ChatGPTExport.Exporters.Html
                 {
                     var visitResult = message.Accept(visitor);
 
-                    if (message.author != null && visitResult != null && visitResult.Lines.Any())
+                    if (message.author != null && visitResult != null && visitResult.Lines.Any() && message.id != null)
                     {
-                        strings.Add((message.author, string.Join(LineBreak, visitResult.Lines), visitResult.HasImage));
+                        strings.Add((message.id, message.author, string.Join(LineBreak, visitResult.Lines), visitResult.HasImage));
                     }
                 }
                 catch (Exception ex)
@@ -38,7 +38,7 @@ namespace ChatGPTExport.Exporters.Html
                 }
             }
 
-            var bodyHtml = strings.Select(p => GetHtmlFragment(p.Author, p.Content, p.HasImage, MarkdownPipeline));
+            var bodyHtml = strings.Select(p => GetHtmlFragment(p.MessageId, p.Author, p.Content, p.HasImage, MarkdownPipeline));
 
             var titleString = WebUtility.HtmlEncode(conversation.title ?? "No title");
 
@@ -78,9 +78,9 @@ namespace ChatGPTExport.Exporters.Html
             return (codeBlockRegex.Count > 0, languages);
         }
 
-        private HtmlFragment GetHtmlFragment(Author author, string markdown, bool hasImage, MarkdownPipeline markdownPipeline)
+        private HtmlFragment GetHtmlFragment(string messageId, Author author, string markdown, bool hasImage, MarkdownPipeline markdownPipeline)
         {
-            var doc = Markdig.Markdown.Parse(markdown, markdownPipeline);
+            var doc = Markdown.Parse(markdown, markdownPipeline);
 
             var hasMath = false;
 
@@ -92,7 +92,9 @@ namespace ChatGPTExport.Exporters.Html
                 markdown = escaped;
             }
 
-            var html = Markdig.Markdown.ToHtml(markdown, markdownPipeline);
+            var id = $"<a id=\"msg-{WebUtility.HtmlEncode(messageId)}\"></a>";
+
+            var html = id + Markdown.ToHtml(markdown, markdownPipeline);
 
             var (HasCode, Languages) = GetLanguages(markdown);
 

@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import hljs from "highlight.js";
 import githubStyles from "highlight.js/styles/github.css?inline";
 import githubDarkStyles from "highlight.js/styles/github-dark.css?inline";
@@ -13,8 +13,9 @@ export function ConversationPanel() {
     const { id, format } = useParams();
     const { data: content, error, isLoading } = useConversation(id, format);
     const { theme } = useTheme();
-
     const [isWrapped, setIsWrapped] = useState(() => getWrapStatus());
+
+    const iframeRef = useRef<HTMLIFrameElement>(null);
 
     useEffect(() => {
         const handleStorageChange = () => {
@@ -65,6 +66,27 @@ export function ConversationPanel() {
         return <LoadingSpinner />;
     }
 
+    function scrollToMessage() {
+        let targetMessageId = window.location.hash
+            .replace(/^#/, "")
+            .replace(/^msg-/, "");
+
+        try {
+            if (targetMessageId) {
+                targetMessageId = decodeURIComponent(targetMessageId);
+            }
+        } catch {
+            // If decoding fails, fall back to the raw value to avoid breaking existing behavior.
+        }
+
+        if (!iframeRef.current || !targetMessageId) return;
+
+        const doc = iframeRef.current.contentDocument;
+        const element = doc?.getElementById(`msg-${targetMessageId}`);
+
+        element?.scrollIntoView({ block: "start" });
+    }
+
     if (format === "html" && content) {
         return (
             <iframe
@@ -73,6 +95,8 @@ export function ConversationPanel() {
                 title="Chat HTML"
                 sandbox="allow-scripts allow-same-origin"
                 referrerPolicy="no-referrer"
+                ref={iframeRef}
+                onLoad={() => scrollToMessage()}
             />
         );
     }
