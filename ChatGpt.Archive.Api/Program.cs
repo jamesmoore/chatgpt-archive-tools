@@ -9,6 +9,7 @@ using System.CommandLine;
 using System.IO.Abstractions;
 
 const string DefaultDataDirectory = "chatgpt-archive";
+const int BrowserOpenDelayMs = 1000;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -133,5 +134,40 @@ app.MapControllers();
 
 // Fallback for React Router (must be after MapControllers)
 app.MapFallbackToFile("index.html");
+
+// Open browser only if NO_OPEN_BROWSER is not set
+var noOpenBrowser = Environment.GetEnvironmentVariable("NO_OPEN_BROWSER");
+if (string.IsNullOrEmpty(noOpenBrowser) || !noOpenBrowser.Equals("true", StringComparison.OrdinalIgnoreCase))
+{
+    app.Lifetime.ApplicationStarted.Register(() =>
+    {
+        // Get the HTTP URL from configured addresses
+        var addresses = app.Urls;
+        var httpUrl = addresses.FirstOrDefault(url => url.StartsWith("http://", StringComparison.OrdinalIgnoreCase));
+        
+        if (!string.IsNullOrEmpty(httpUrl))
+        {
+            // Open browser after a short delay to ensure server is ready
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(BrowserOpenDelayMs);
+                try
+                {
+                    var url = httpUrl.Replace("0.0.0.0", "localhost").Replace("+", "localhost");
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = url,
+                        UseShellExecute = true
+                    });
+                    Console.WriteLine($"Opening browser at: {url}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to open browser: {ex.Message}");
+                }
+            });
+        }
+    });
+}
 
 app.Run();
