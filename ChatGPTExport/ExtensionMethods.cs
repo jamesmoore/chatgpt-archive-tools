@@ -61,67 +61,41 @@ namespace ChatGPTExport
 
         public static int GetRealElementWidth(this string element)
         {
-            const char VariationSelector16 = '\uFE0F';
+            const int VariationSelector16 = 0xFE0F;
 
-            // FLAG EMOJI SPECIAL CASE
-            if (IsFlagEmoji(element))
+            var runes = element.EnumerateRunes().ToList();
+
+            // Special case: Regional Indicator pairs (flag emoji) - count as 3
+            if (runes.Count == 2 &&
+                runes[0].Value >= 0x1F1E6 && runes[0].Value <= 0x1F1FF &&
+                runes[1].Value >= 0x1F1E6 && runes[1].Value <= 0x1F1FF)
             {
                 return 3;
             }
 
-            if (element.Contains(VariationSelector16)) //  eg "⚠️" or 🗂️ or 🧛‍♂️
+            // Check if element contains Variation Selector 16
+            bool hasVS16 = runes.Any(r => r.Value == VariationSelector16);
+
+            if (hasVS16)
             {
+                // Complex emoji with VS16 (more than just char + VS16) - count as 2
                 if (element.Length > 2)
                 {
                     return 2;
                 }
-                else
-                {
-                    return element.Length - 1;
-                }
+                // Simple char + VS16 - don't count the VS16
+                return runes.Count(r => r.Value != VariationSelector16);
             }
-            else if (element.Length == 2 && char.IsSurrogatePair(element, 0))
+
+            // For surrogate pairs (emoji without VS16), count as 2 units
+            // This matches how the external system (ChatGPT API) counts positions
+            if (element.Length == 2 && char.IsSurrogatePair(element, 0))
             {
-                return 2; // external system treats this emoji as 2 units
+                return 2;
             }
-            else if (element.Length > 1)
-            {
-                // Count surrogate pairs as 1 unit
-                int unitCount = 0;
-                for (int i = 0; i < element.Length; i++)
-                {
-                    if (char.IsHighSurrogate(element[i]) &&
-                        i + 1 < element.Length &&
-                        char.IsLowSurrogate(element[i + 1]))
-                    {
-                        unitCount++;
-                        i++; // skip low surrogate
-                    }
-                    else
-                    {
-                        unitCount++;
-                    }
-                }
 
-                return unitCount;
-            }
-            else
-            {
-                return element.Length;
-            }
-        }
-
-
-        static bool IsFlagEmoji(string element)
-        {
-            if (element.Length != 4)
-                return false;
-
-            int first = char.ConvertToUtf32(element, 0);
-            int second = char.ConvertToUtf32(element, 2);
-
-            return first >= 0x1F1E6 && first <= 0x1F1FF &&
-                   second >= 0x1F1E6 && second <= 0x1F1FF;
+            // For complex sequences, count the number of runes (Unicode scalar values)
+            return runes.Count;
         }
     }
 }
