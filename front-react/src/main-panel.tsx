@@ -2,7 +2,13 @@ import { useConversations } from "./hooks/use-conversations";
 import { Search } from "./search";
 import { Link } from "react-router-dom";
 import { Button } from "./components/ui/button";
-import { Card, CardContent } from "./components/ui/card";
+import {
+    Empty,
+    EmptyContent,
+    EmptyDescription,
+    EmptyHeader,
+    EmptyTitle,
+} from "./components/ui/empty";
 
 export function MainPanel() {
 
@@ -11,23 +17,24 @@ export function MainPanel() {
     } = useConversations();
 
 
-    if(conversations.length === 0) {
+    if (conversations.length === 0) {
         return (
-            <div className="flex h-full items-center justify-center p-4">
-                <Card className="w-full max-w-xl">
-                    <CardContent className="flex flex-col items-center gap-4 text-center">
-                        <p>No chats found. Please go to the admin page to load your chats.</p>
-                        <Button asChild>
-                            <Link to="/admin">Go to admin page</Link>
-                        </Button>
-                    </CardContent>
-                </Card>
-            </div>
+            <Empty>
+                <EmptyHeader>
+                    <EmptyTitle>No chats found</EmptyTitle>
+                    <EmptyDescription>Please go to the admin page to load your chats.</EmptyDescription>
+                </EmptyHeader>
+                <EmptyContent>
+                    <Button asChild>
+                        <Link to="/admin">Go to admin page</Link>
+                    </Button>
+                </EmptyContent>
+            </Empty>
         )
 
     }
     else {
-        return <Search/>
+        return <Search />
     }
 
 
