@@ -5,18 +5,14 @@ using System.Text.Json;
 
 namespace ChatGpt.Archive.Api.Database
 {
-    public class ArchiveRepository : IArchiveRepository
+    public class ArchiveRepository(
+        DatabaseConfiguration databaseConfiguration,
+        FTS5Escaper fTS5Escaper
+        ) : IArchiveRepository
     {
-        private readonly DatabaseConfiguration _databaseConfiguration;
-
-        public ArchiveRepository(DatabaseConfiguration databaseConfiguration)
-        {
-            _databaseConfiguration = databaseConfiguration;
-        }
-
         public bool HasConversations()
         {
-            using var connection = new SqliteConnection(_databaseConfiguration.ConnectionString);
+            using var connection = new SqliteConnection(databaseConfiguration.ConnectionString);
             connection.Open();
 
             using var command = connection.CreateCommand();
@@ -28,7 +24,7 @@ namespace ChatGpt.Archive.Api.Database
 
         public void ClearAll()
         {
-            using var connection = new SqliteConnection(_databaseConfiguration.ConnectionString);
+            using var connection = new SqliteConnection(databaseConfiguration.ConnectionString);
             connection.Open();
 
             using var command = connection.CreateCommand();
@@ -43,7 +39,7 @@ namespace ChatGpt.Archive.Api.Database
             // Create PlaintextExtractor for this call (not thread-safe)
             var plaintextExtractor = new PlaintextExtractor();
             
-            using var connection = new SqliteConnection(_databaseConfiguration.ConnectionString);
+            using var connection = new SqliteConnection(databaseConfiguration.ConnectionString);
             connection.Open();
 
             using var transaction = connection.BeginTransaction();
@@ -162,7 +158,7 @@ namespace ChatGpt.Archive.Api.Database
         public IEnumerable<Conversation> GetAll()
         {
             var conversations = new List<Conversation>();
-            using var connection = new SqliteConnection(_databaseConfiguration.ConnectionString);
+            using var connection = new SqliteConnection(databaseConfiguration.ConnectionString);
             connection.Open();
 
             using var command = connection.CreateCommand();
@@ -189,7 +185,7 @@ namespace ChatGpt.Archive.Api.Database
 
         public Conversation? GetById(string id)
         {
-            using var connection = new SqliteConnection(_databaseConfiguration.ConnectionString);
+            using var connection = new SqliteConnection(databaseConfiguration.ConnectionString);
             connection.Open();
 
             using var command = connection.CreateCommand();
@@ -206,18 +202,35 @@ namespace ChatGpt.Archive.Api.Database
             return null;
         }
 
-        private static string EscapeFts5Query(string query)
-        {
-            // Wrap in quotes and escape internal quotes to treat the entire query as literal text
-            return "\"" + query.Replace("\"", "\"\"") + "\"";
-        }
-
         public IEnumerable<SearchResult> Search(string query)
         {
             var results = new List<SearchResult>();
-            using var connection = new SqliteConnection(_databaseConfiguration.ConnectionString);
+            using var connection = new SqliteConnection(databaseConfiguration.ConnectionString);
             connection.Open();
 
+            var ftsQuery = fTS5Escaper.EscapeFts5Query(query);
+            try
+            {
+                ExecuteSearch(connection, ftsQuery, results);
+            }
+            catch (SqliteException)
+            {
+                var fallbackQuery = fTS5Escaper.QuoteAsLiteral((query ?? string.Empty).Trim());
+                if (!string.Equals(ftsQuery, fallbackQuery, StringComparison.Ordinal))
+                {
+                    ExecuteSearch(connection, fallbackQuery, results);
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return results;
+        }
+
+        private static void ExecuteSearch(SqliteConnection connection, string query, List<SearchResult> results)
+        {
             using var command = connection.CreateCommand();
             command.CommandText = @"
                 SELECT
@@ -231,7 +244,7 @@ namespace ChatGpt.Archive.Api.Database
                 WHERE messages_fts MATCH @query
                 ORDER BY rank
                 LIMIT 200;";
-            command.Parameters.AddWithValue("@query", EscapeFts5Query(query));
+            command.Parameters.AddWithValue("@query", query);
 
             using var reader = command.ExecuteReader();
             while (reader.Read())
@@ -245,8 +258,8 @@ namespace ChatGpt.Archive.Api.Database
                 };
                 results.Add(result);
             }
-
-            return results;
         }
+
+
     }
 }
