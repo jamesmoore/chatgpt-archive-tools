@@ -1,12 +1,17 @@
 using ChatGpt.Archive.Api.Services;
 using ChatGPTExport.Models;
 using Microsoft.Data.Sqlite;
+using System.Text.RegularExpressions;
 using System.Text.Json;
 
 namespace ChatGpt.Archive.Api.Database
 {
-    public class ArchiveRepository : IArchiveRepository
+    public partial class ArchiveRepository : IArchiveRepository
     {
+        private const int MaxSearchQueryLength = 512;
+        private static readonly Regex BooleanOperatorRegex = BooleanOperatorCompiledRegex();
+        private static readonly Regex NearOperatorRegex = NearOperatorCompiledRegex();
+
         private readonly DatabaseConfiguration _databaseConfiguration;
 
         public ArchiveRepository(DatabaseConfiguration databaseConfiguration)
@@ -206,18 +211,105 @@ namespace ChatGpt.Archive.Api.Database
             return null;
         }
 
-        private static string EscapeFts5Query(string query)
-        {
-            // Wrap in quotes and escape internal quotes to treat the entire query as literal text
-            return "\"" + query.Replace("\"", "\"\"") + "\"";
-        }
-
         public IEnumerable<SearchResult> Search(string query)
         {
             var results = new List<SearchResult>();
             using var connection = new SqliteConnection(_databaseConfiguration.ConnectionString);
             connection.Open();
 
+            var ftsQuery = EscapeFts5Query(query);
+            try
+            {
+                ExecuteSearch(connection, ftsQuery, results);
+            }
+            catch (SqliteException)
+            {
+                var fallbackQuery = QuoteAsLiteral((query ?? string.Empty).Trim());
+                if (!string.Equals(ftsQuery, fallbackQuery, StringComparison.Ordinal))
+                {
+                    ExecuteSearch(connection, fallbackQuery, results);
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return results;
+        }
+
+        private static string EscapeFts5Query(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return "\"\"";
+            }
+
+            var trimmed = query.Trim();
+            if (trimmed.Length > MaxSearchQueryLength)
+            {
+                throw new ArgumentException($"Search query is too long (max {MaxSearchQueryLength} characters).", nameof(query));
+            }
+
+            var hasOperators = BooleanOperatorRegex.IsMatch(trimmed) || NearOperatorRegex.IsMatch(trimmed);
+            if (hasOperators && IsLikelyValidFtsExpression(trimmed))
+            {
+                return trimmed;
+            }
+
+            return QuoteAsLiteral(trimmed);
+        }
+
+        private static bool IsLikelyValidFtsExpression(string query)
+        {
+            var parenDepth = 0;
+            var inQuotes = false;
+
+            for (var i = 0; i < query.Length; i++)
+            {
+                var ch = query[i];
+
+                if (ch == '"')
+                {
+                    if (inQuotes && i + 1 < query.Length && query[i + 1] == '"')
+                    {
+                        i++;
+                        continue;
+                    }
+
+                    inQuotes = !inQuotes;
+                    continue;
+                }
+
+                if (inQuotes)
+                {
+                    continue;
+                }
+
+                if (ch == '(')
+                {
+                    parenDepth++;
+                }
+                else if (ch == ')')
+                {
+                    parenDepth--;
+                    if (parenDepth < 0)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return !inQuotes && parenDepth == 0;
+        }
+
+        private static string QuoteAsLiteral(string query)
+        {
+            return "\"" + query.Replace("\"", "\"\"") + "\"";
+        }
+
+        private static void ExecuteSearch(SqliteConnection connection, string query, List<SearchResult> results)
+        {
             using var command = connection.CreateCommand();
             command.CommandText = @"
                 SELECT
@@ -231,7 +323,7 @@ namespace ChatGpt.Archive.Api.Database
                 WHERE messages_fts MATCH @query
                 ORDER BY rank
                 LIMIT 200;";
-            command.Parameters.AddWithValue("@query", EscapeFts5Query(query));
+            command.Parameters.AddWithValue("@query", query);
 
             using var reader = command.ExecuteReader();
             while (reader.Read())
@@ -245,8 +337,11 @@ namespace ChatGpt.Archive.Api.Database
                 };
                 results.Add(result);
             }
-
-            return results;
         }
+
+        [GeneratedRegex(@"\b(?:AND|OR|NOT)\b", RegexOptions.IgnoreCase | RegexOptions.Compiled)]
+        private static partial Regex BooleanOperatorCompiledRegex();
+        [GeneratedRegex(@"\bNEAR\s*\(", RegexOptions.IgnoreCase | RegexOptions.Compiled)]
+        private static partial Regex NearOperatorCompiledRegex();
     }
 }
