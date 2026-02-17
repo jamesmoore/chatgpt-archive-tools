@@ -339,9 +339,9 @@ namespace ChatGpt.Archive.Api.Database
             }
         }
 
-        [GeneratedRegex(@"\b(?:AND|OR|NOT)\b", RegexOptions.IgnoreCase | RegexOptions.Compiled)]
+        [GeneratedRegex(@"\b(?:AND|OR|NOT)\b")]
         private static partial Regex BooleanOperatorCompiledRegex();
-        [GeneratedRegex(@"\bNEAR\s*\(", RegexOptions.IgnoreCase | RegexOptions.Compiled)]
+        [GeneratedRegex(@"\bNEAR\s*\(")]
         private static partial Regex NearOperatorCompiledRegex();
     }
 }
