@@ -65,7 +65,7 @@ namespace ChatGPTExport.Exporters
 
                 var groupedWebpagesItems = content_references.Where(p => p.type == "grouped_webpages").SelectMany(p => p.items ?? []).ToList();
 
-                var reindexedElements = textPart.GetRenderedElementIndexes();
+                var reindexedElements = new CodePointIndexMap(textPart);
 
                 foreach (var contentReference in reversed)
                 {
@@ -73,8 +73,8 @@ namespace ChatGPTExport.Exporters
 
                     if (replacement != null)
                     {
-                        var start_idx = contentReference.start_idx < reindexedElements.Count ? reindexedElements[contentReference.start_idx] : contentReference.start_idx;
-                        var end_idx = contentReference.end_idx < reindexedElements.Count ? reindexedElements[contentReference.end_idx] : contentReference.end_idx;
+                        var start_idx = reindexedElements.ToUtf16Index(contentReference.start_idx);
+                        var end_idx = reindexedElements.ToUtf16Index(contentReference.end_idx);
                         var firstPartSpan = parts[0].AsSpan();
                         var firstSpan = firstPartSpan[..start_idx];
                         var lastSpan = firstPartSpan[end_idx..];
