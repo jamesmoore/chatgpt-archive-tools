@@ -53,9 +53,11 @@ namespace ChatGPTExport.Exporters
             {
                 var textPart = parts[0];
 
-                var sourcesFootnote = content_references.Where(p => p.type == "sources_footnote").FirstOrDefault();
+                var sourcesFootnote = content_references.FirstOrDefault(p => p.type == "sources_footnote");
 
-                var reversed = content_references.OrderByDescending(p => p.start_idx).ToList();
+                var startReferences = content_references.Where(p => p.start_idx == 0 && p.end_idx == 0).Reverse().ToList();
+                var otherIndexes = content_references.Except(startReferences).OrderByDescending(p => p.start_idx).ToList();
+                var reversed = otherIndexes.Concat(startReferences);
 
                 if (sourcesFootnote != null)
                 {
@@ -69,7 +71,8 @@ namespace ChatGPTExport.Exporters
 
                 foreach (var contentReference in reversed)
                 {
-                    var replacement = GetContentReferenceReplacement(contentReference, groupedWebpagesItems);
+                    var suffix = startReferences.Contains(contentReference) ? contentReference == startReferences.First(p => p != sourcesFootnote) ? "  " + Environment.NewLine : ", " : "";
+                    var replacement = GetContentReferenceReplacement(contentReference, groupedWebpagesItems, suffix);
 
                     if (replacement != null)
                     {
@@ -103,7 +106,11 @@ namespace ChatGPTExport.Exporters
             return new MarkdownContentResult(parts);
         }
 
-        private string? GetContentReferenceReplacement(MessageMetadata.Content_References contentReference, List<MessageMetadata.Content_References.Item> groupedWebpagesItems)
+        private string? GetContentReferenceReplacement(
+            MessageMetadata.Content_References contentReference, 
+            List<MessageMetadata.Content_References.Item> groupedWebpagesItems,
+            string suffix
+            )
         {
             switch (contentReference.type)
             {
@@ -127,7 +134,7 @@ namespace ChatGPTExport.Exporters
                     var videolink = $"[![{contentReference.title}]({contentReference.thumbnail_url})]({contentReference.url?.Replace("&utm_source=chatgpt.com", "")} \"{contentReference.title}\")";
                     return videolink;
                 case "grouped_webpages":
-                    var refHighlight = string.Join("", contentReference.items?.Select(p => $"[^{groupedWebpagesItems.IndexOf(p) + 1}]").ToArray() ?? []);
+                    var refHighlight = string.Join("", contentReference.items?.Select(p => $"[^{groupedWebpagesItems.IndexOf(p) + 1}]" + suffix).ToArray() ?? []);
                     return refHighlight;
                 case "image_group":
                     var safe_urls = contentReference.safe_urls ?? [];
