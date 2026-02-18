@@ -6,8 +6,14 @@ namespace ChatGpt.Exporter.Cli.Assets
 {
     public class ExistingAssetLocator(IDirectoryInfo destinationDirectory) : IAssetLocator
     {
+        private static readonly char[] InvalidPatternChars = Path.GetInvalidFileNameChars()
+            .Concat(['*', '?'])
+            .Distinct()
+            .ToArray();
+
         private List<string>? cache = null;
         private readonly IFileSystem fileSystem = destinationDirectory.FileSystem;
+        private readonly char[] pathSeparators = [destinationDirectory.FileSystem.Path.DirectorySeparatorChar, destinationDirectory.FileSystem.Path.AltDirectorySeparatorChar];
 
         private IEnumerable<string> GetCachedDestinationFiles(string searchPattern)
         {
@@ -28,7 +34,20 @@ namespace ChatGpt.Exporter.Cli.Assets
 
         public Asset? GetMarkdownMediaAsset(AssetRequest assetRequest)
         {
-            // it may already exist in the destination directory from a previous export 
+            // Validate search pattern is not null or empty
+            if (string.IsNullOrWhiteSpace(assetRequest.SearchPattern))
+            {
+                return null;
+            }
+
+            // Check for invalid characters, wildcards, and path separators
+            if (assetRequest.SearchPattern.IndexOfAny(InvalidPatternChars) >= 0 ||
+                assetRequest.SearchPattern.IndexOfAny(pathSeparators) >= 0)
+            {
+                return null;
+            }
+
+            // it may already exist in the destination directory from a previous export
             var destinationMatches = GetCachedDestinationFiles(assetRequest.SearchPattern).ToList();
             if (destinationMatches.Count == 0)
             {
