@@ -13,6 +13,7 @@ namespace ChatGpt.Exporter.Cli.Assets
 
         private List<string>? cache = null;
         private readonly IFileSystem fileSystem = destinationDirectory.FileSystem;
+        private readonly char[] pathSeparators = [destinationDirectory.FileSystem.Path.DirectorySeparatorChar, destinationDirectory.FileSystem.Path.AltDirectorySeparatorChar];
 
         private IEnumerable<string> GetCachedDestinationFiles(string searchPattern)
         {
@@ -40,7 +41,6 @@ namespace ChatGpt.Exporter.Cli.Assets
             }
 
             // Check for invalid characters, wildcards, and path separators
-            var pathSeparators = new[] { fileSystem.Path.DirectorySeparatorChar, fileSystem.Path.AltDirectorySeparatorChar };
             if (assetRequest.SearchPattern.IndexOfAny(InvalidPatternChars) >= 0 ||
                 assetRequest.SearchPattern.IndexOfAny(pathSeparators) >= 0)
             {
