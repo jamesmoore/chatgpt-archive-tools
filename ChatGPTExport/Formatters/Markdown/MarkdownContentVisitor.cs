@@ -74,7 +74,7 @@ namespace ChatGPTExport.Exporters
                 var groupedWebpages = content_references.Where(p => p.type == "grouped_webpages").ToList();
                 var groupedWebpagesModelPredictedFallback = content_references.Where(p => p.type == "grouped_webpages_model_predicted_fallback").ToList();
 
-                // Exlcude references from grouped_webpages_model_predicted_fallback, if they are presenmt in a grouped_webpages list.
+                // Exlcude references from grouped_webpages_model_predicted_fallback, if they are present in a grouped_webpages list.
                 var itemsToExclude = new List<Content_References.Item>();
                 foreach (var groupedItem in groupedWebpagesModelPredictedFallback.SelectMany(p => p.items))
                 {
