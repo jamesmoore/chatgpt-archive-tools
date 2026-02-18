@@ -127,7 +127,7 @@ namespace ChatGPTExport.Models
                 this.recipient != null
                 )
             {
-                return this.content.Accept(visitor, new ContentVisitorContext(this.author.role, GetCreateTime(), GetUpdateTime(), metadata, this.recipient));
+                return this.content.Accept(visitor, new ContentVisitorContext(this.author, GetCreateTime(), GetUpdateTime(), metadata, this.recipient));
             }
             else
             {

@@ -46,6 +46,11 @@ namespace ChatGPTExport.Exporters
 
         public MarkdownContentResult Visit(ContentText content, ContentVisitorContext context)
         {
+            if (context.Author.role == "tool" && context.Author.name == "personalized_context" && showHidden == false)
+            {
+                return new MarkdownContentResult();
+            }
+
             var parts = content.parts?.Where(TextContentFilter).SelectMany(p => DecodeText(p, context)).ToList() ?? [];
 
             var content_references = context.MessageMetadata.content_references;
@@ -189,7 +194,7 @@ namespace ChatGPTExport.Exporters
                         var asset_pointer = obj.asset_pointer;
                         var strings = markdownAssetRenderer.RenderAsset(context, asset_pointer);
 
-                        foreach(var str in strings)
+                        foreach (var str in strings)
                         {
                             yield return str;
                         }

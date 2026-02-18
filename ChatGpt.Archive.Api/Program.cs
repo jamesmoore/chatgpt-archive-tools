@@ -69,6 +69,7 @@ builder.Services.AddSingleton<DatabaseConfiguration>();
 builder.Services.AddControllers();
 builder.Services.AddSingleton<IFileSystem, FileSystem>();
 builder.Services.AddSingleton<ConversationFinder>();
+builder.Services.AddSingleton<FTS5Escaper>();
 builder.Services.AddSingleton<ISchemaInitializer, SqliteSchemaInitializer>();
 builder.Services.AddSingleton<IArchiveRepository, ArchiveRepository>();
 builder.Services.AddSingleton<IConversationsService, ConversationsService>();

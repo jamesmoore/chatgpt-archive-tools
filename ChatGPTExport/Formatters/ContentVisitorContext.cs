@@ -3,10 +3,13 @@
 namespace ChatGPTExport.Formatters
 {
     public record ContentVisitorContext(
-        string Role, 
+        Author Author, 
         DateTimeOffset? CreatedDate,
         DateTimeOffset? UpdatedDate,
         MessageMetadata MessageMetadata,
         string Recipient
-        );
+        )
+    {
+        public string Role => Author.role ?? string.Empty;
+    };
 }
