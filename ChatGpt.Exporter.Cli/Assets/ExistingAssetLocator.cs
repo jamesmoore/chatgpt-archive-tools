@@ -7,7 +7,7 @@ namespace ChatGpt.Exporter.Cli.Assets
     public class ExistingAssetLocator(IDirectoryInfo destinationDirectory) : IAssetLocator
     {
         private static readonly char[] InvalidPatternChars = Path.GetInvalidFileNameChars()
-            .Concat(new[] { '*', '?' })
+            .Concat(['*', '?'])
             .Distinct()
             .ToArray();
 
