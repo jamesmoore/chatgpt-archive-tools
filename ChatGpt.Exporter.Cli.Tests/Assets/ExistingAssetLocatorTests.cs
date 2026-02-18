@@ -2,7 +2,7 @@ using ChatGpt.Exporter.Cli.Assets;
 using ChatGPTExport.Assets;
 using System.IO.Abstractions.TestingHelpers;
 
-namespace ChatGTPExportTests.Assets
+namespace ChatGpt.Exporter.Cli.Tests.Assets
 {
     public class ExistingAssetLocatorTests
     {
