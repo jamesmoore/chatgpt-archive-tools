@@ -1,10 +1,11 @@
-﻿using System.Text.Json.Nodes;
+﻿using System.IO;
+using System.Text.Json.Nodes;
 
 namespace ChatGPTExport.Validators
 {
     public static class JsonComparer
     {
-        public static List<string> CompareJson(string json1, string json2)
+        public static List<string> CompareJson(Stream json1, string json2)
         {
             var differences = new List<string>();
 
@@ -67,7 +68,19 @@ namespace ChatGPTExport.Validators
         private static bool JsonEquals(JsonNode? node1, JsonNode? node2)
         {
             if (node1 is null || node2 is null) return node1?.ToJsonString() == node2?.ToJsonString();
-            return node1.ToJsonString() == node2.ToJsonString();
+            
+            if(node1.GetValueKind() == System.Text.Json.JsonValueKind.Number &&
+                node2.GetValueKind() == System.Text.Json.JsonValueKind.Number)
+            {
+                return node1.GetValue<double>() == node2.GetValue<double>();
+            }
+            
+            var matches = node1.ToJsonString() == node2.ToJsonString();
+            if (matches == false)
+            {
+                return false;
+            }
+            return matches;
         }
 
         private static bool IsNullOrMissing(JsonNode? node)

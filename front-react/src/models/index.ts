@@ -1,0 +1,30 @@
+export interface ConversationSummary {
+  id: string;
+  title: string;
+  gizmoId?: string;
+  created: string;
+  updated: string;
+}
+
+export interface ConversationSearchResult {
+  conversationId: string;
+  conversationTitle: string;
+  messages: MessageSearchResult[];
+}
+
+export interface MessageSearchResult {
+  messageId: string;
+  snippet: string;
+}
+
+export interface SourceDirectory {
+  directoryName: string;
+  exists: boolean;
+  conversations: string[];
+}
+
+export interface Status {
+  sourceDirectories: SourceDirectory[];
+  dataDirectory: string;
+  databasePath: string;
+}
