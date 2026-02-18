@@ -1,3 +1,4 @@
+using ChatGpt.Exporter.Cli.Assets;
 using ChatGPTExport.Assets;
 using System.IO.Abstractions.TestingHelpers;
 
@@ -17,7 +18,7 @@ namespace ChatGTPExportTests.Assets
             var destPath = fs.Path.Combine(fs.Path.DirectorySeparatorChar.ToString(), "dest");
             fs.AddDirectory(destPath);
             var destDir = fs.DirectoryInfo.New(destPath);
-            var locator = new ExistingAssetLocator(fs, destDir);
+            var locator = new ExistingAssetLocator(destDir);
 
             var request = new AssetRequest(pattern, "role", null, null);
             var result = locator.GetMarkdownMediaAsset(request);
@@ -35,13 +36,13 @@ namespace ChatGTPExportTests.Assets
             fs.AddFile(filePath, new MockFileData("data"));
 
             var destDir = fs.DirectoryInfo.New(destPath);
-            var locator = new ExistingAssetLocator(fs, destDir);
+            var locator = new ExistingAssetLocator(destDir);
 
             var request = new AssetRequest("image1", "role", null, null);
             var result = locator.GetMarkdownMediaAsset(request);
 
             Assert.NotNull(result);
-            Assert.Contains("image1.png", result);
+            Assert.Contains("image1.png", result.Name);
         }
     }
 }
