@@ -113,7 +113,7 @@ namespace ChatGPTExport.Exporters
         }
 
         /// <summary>
-        /// Get the content reference items, but exlcude references from grouped_webpages_model_predicted_fallback that are present in a grouped_webpages list.
+        /// Get the content reference items, but exclude references from grouped_webpages_model_predicted_fallback that are present in a grouped_webpages list.
         /// </summary>
         /// <param name="content_references"></param>
         /// <returns></returns>
