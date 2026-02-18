@@ -61,8 +61,8 @@ namespace ChatGPTExport.Exporters
                 var sourcesFootnote = content_references.FirstOrDefault(p => p.type == "sources_footnote");
 
                 var startReferences = content_references.Where(p => p.start_idx == 0 && p.end_idx == 0).Reverse().ToList();
-                var otherIndexes = content_references.Except(startReferences).OrderByDescending(p => p.start_idx).ToList();
-                var reversed = otherIndexes.Concat(startReferences);
+                var bodyReferences = content_references.Except(startReferences).OrderByDescending(p => p.start_idx).ToList();
+                var reversed = bodyReferences.Concat(startReferences);
 
                 if (sourcesFootnote != null)
                 {
