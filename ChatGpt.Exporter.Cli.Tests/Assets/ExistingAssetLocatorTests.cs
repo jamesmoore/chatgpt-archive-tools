@@ -12,6 +12,12 @@ namespace ChatGpt.Exporter.Cli.Tests.Assets
         [InlineData("image/")]
         [InlineData("image\\")]
         [InlineData("invali<d")]
+        [InlineData("")]
+        [InlineData(" ")]
+        [InlineData("  ")]
+        [InlineData("\t")]
+        [InlineData("\n")]
+        [InlineData("   \t  ")]
         public void GetMarkdownMediaAsset_InvalidPattern_ReturnsNull(string pattern)
         {
             var fs = new MockFileSystem();
