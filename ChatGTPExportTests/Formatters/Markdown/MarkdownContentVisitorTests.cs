@@ -17,7 +17,7 @@ public class MarkdownContentVisitorTests
       
     private static ContentVisitorContext CreateContext(string role)
     {
-        return new ContentVisitorContext(role, null, null, new MessageMetadata(), string.Empty);
+        return new ContentVisitorContext(new Author() { role = role }, null, null, new MessageMetadata(), string.Empty);
     }
 
     [Fact]
