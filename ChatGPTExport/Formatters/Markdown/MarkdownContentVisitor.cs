@@ -71,20 +71,7 @@ namespace ChatGPTExport.Exporters
                     Debug.Assert(footnote == sourcesFootnote);
                 }
 
-                var groupedWebpages = content_references.Where(p => p.type == "grouped_webpages").ToList();
-                var groupedWebpagesModelPredictedFallback = content_references.Where(p => p.type == "grouped_webpages_model_predicted_fallback").ToList();
-
-                // Exlcude references from grouped_webpages_model_predicted_fallback, if they are present in a grouped_webpages list.
-                var itemsToExclude = new List<Content_References.Item>();
-                foreach (var groupedItem in groupedWebpagesModelPredictedFallback.SelectMany(p => p.items))
-                {
-                    if (groupedWebpages.Any(p => p.items.Any(q => q.url == groupedItem.url)))
-                    {
-                        itemsToExclude.Add(groupedItem);
-                    }
-                }
-
-                var footnoteItems = content_references.Where(p => p.type == "grouped_webpages" || p.type == "grouped_webpages_model_predicted_fallback").SelectMany(p => p.items ?? []).Except(itemsToExclude).ToList();
+                var footnoteItems = GetFootnoteItems(content_references);
 
                 var reindexedElements = new CodePointIndexMap(textPart);
 
@@ -123,6 +110,29 @@ namespace ChatGPTExport.Exporters
             }
 
             return new MarkdownContentResult(parts);
+        }
+
+        /// <summary>
+        /// Get the content reference items, but exlcude references from grouped_webpages_model_predicted_fallback that are present in a grouped_webpages list.
+        /// </summary>
+        /// <param name="content_references"></param>
+        /// <returns></returns>
+        private static List<Content_References.Item> GetFootnoteItems(Content_References[] content_references)
+        {
+            var itemsToExclude = new List<Content_References.Item>();
+            var groupedWebpages = content_references.Where(p => p.type == "grouped_webpages").ToList();
+            var groupedWebpagesModelPredictedFallback = content_references.Where(p => p.type == "grouped_webpages_model_predicted_fallback").ToList();
+
+            foreach (var groupedItem in groupedWebpagesModelPredictedFallback.SelectMany(p => p.items))
+            {
+                if (groupedWebpages.Any(p => p.items.Any(q => q.url == groupedItem.url)))
+                {
+                    itemsToExclude.Add(groupedItem);
+                }
+            }
+
+            var footnoteItems = content_references.Where(p => p.type == "grouped_webpages" || p.type == "grouped_webpages_model_predicted_fallback").SelectMany(p => p.items ?? []).Except(itemsToExclude).ToList();
+            return footnoteItems;
         }
 
         private string? GetContentReferenceReplacement(
