@@ -26,6 +26,26 @@ namespace ChatGpt.Exporter.Cli.Tests.Assets
             Assert.Null(result);
         }
 
+        [Theory]
+        [InlineData("")]
+        [InlineData(" ")]
+        [InlineData("  ")]
+        [InlineData("\t")]
+        [InlineData("\n")]
+        public void GetMarkdownMediaAsset_NullOrWhitespacePattern_ReturnsNull(string pattern)
+        {
+            var fs = new MockFileSystem();
+            var destPath = fs.Path.Combine(fs.Path.DirectorySeparatorChar.ToString(), "dest");
+            fs.AddDirectory(destPath);
+            var destDir = fs.DirectoryInfo.New(destPath);
+            var locator = new ExistingAssetLocator(destDir);
+
+            var request = new AssetRequest(pattern, "role", null, null);
+            var result = locator.GetMarkdownMediaAsset(request);
+
+            Assert.Null(result);
+        }
+
         [Fact]
         public void GetMarkdownMediaAsset_ValidPattern_ReturnsMarkdown()
         {

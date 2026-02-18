@@ -6,6 +6,11 @@ namespace ChatGpt.Exporter.Cli.Assets
 {
     public class ExistingAssetLocator(IDirectoryInfo destinationDirectory) : IAssetLocator
     {
+        private static readonly char[] InvalidPatternChars = Path.GetInvalidFileNameChars()
+            .Concat(new[] { '*', '?' })
+            .Distinct()
+            .ToArray();
+
         private List<string>? cache = null;
         private readonly IFileSystem fileSystem = destinationDirectory.FileSystem;
 
@@ -28,12 +33,16 @@ namespace ChatGpt.Exporter.Cli.Assets
 
         public Asset? GetMarkdownMediaAsset(AssetRequest assetRequest)
         {
-            var invalidChars = fileSystem.Path.GetInvalidFileNameChars()
-                .Concat(new[] { '*', '?', fileSystem.Path.DirectorySeparatorChar, fileSystem.Path.AltDirectorySeparatorChar })
-                .Distinct()
-                .ToArray();
+            // Validate search pattern is not null or empty
+            if (string.IsNullOrWhiteSpace(assetRequest.SearchPattern))
+            {
+                return null;
+            }
 
-            if (assetRequest.SearchPattern.IndexOfAny(invalidChars) >= 0)
+            // Check for invalid characters, wildcards, and path separators
+            var pathSeparators = new[] { fileSystem.Path.DirectorySeparatorChar, fileSystem.Path.AltDirectorySeparatorChar };
+            if (assetRequest.SearchPattern.IndexOfAny(InvalidPatternChars) >= 0 ||
+                assetRequest.SearchPattern.IndexOfAny(pathSeparators) >= 0)
             {
                 return null;
             }
