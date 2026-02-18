@@ -5,6 +5,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using static ChatGPTExport.Models.MessageMetadata;
 
 namespace ChatGPTExport.Exporters
 {
@@ -62,7 +63,7 @@ namespace ChatGPTExport.Exporters
 
                 var startReferences = content_references.Where(p => p.start_idx == 0 && p.end_idx == 0).Reverse().ToList();
                 var bodyReferences = content_references.Except(startReferences).OrderByDescending(p => p.start_idx).ToList();
-                var reversed = bodyReferences.Concat(startReferences);
+                var reversed = bodyReferences.Concat(startReferences).ToList();
 
                 if (sourcesFootnote != null)
                 {
@@ -70,14 +71,27 @@ namespace ChatGPTExport.Exporters
                     Debug.Assert(footnote == sourcesFootnote);
                 }
 
-                var groupedWebpagesItems = content_references.Where(p => p.type == "grouped_webpages").SelectMany(p => p.items ?? []).ToList();
+                var groupedWebpages = content_references.Where(p => p.type == "grouped_webpages").ToList();
+                var groupedWebpagesModelPredictedFallback = content_references.Where(p => p.type == "grouped_webpages_model_predicted_fallback").ToList();
+
+                // Exlcude references from grouped_webpages_model_predicted_fallback, if they are presenmt in a grouped_webpages list.
+                var itemsToExclude = new List<Content_References.Item>();
+                foreach (var groupedItem in groupedWebpagesModelPredictedFallback.SelectMany(p => p.items))
+                {
+                    if (groupedWebpages.Any(p => p.items.Any(q => q.url == groupedItem.url)))
+                    {
+                        itemsToExclude.Add(groupedItem);
+                    }
+                }
+
+                var footnoteItems = content_references.Where(p => p.type == "grouped_webpages" || p.type == "grouped_webpages_model_predicted_fallback").SelectMany(p => p.items ?? []).Except(itemsToExclude).ToList();
 
                 var reindexedElements = new CodePointIndexMap(textPart);
 
                 foreach (var contentReference in reversed)
                 {
                     var suffix = startReferences.Contains(contentReference) ? contentReference == startReferences.First(p => p != sourcesFootnote) ? "  " + Environment.NewLine : ", " : "";
-                    var replacement = GetContentReferenceReplacement(contentReference, groupedWebpagesItems, suffix);
+                    var replacement = GetContentReferenceReplacement(contentReference, footnoteItems, suffix);
 
                     if (replacement != null)
                     {
@@ -92,12 +106,12 @@ namespace ChatGPTExport.Exporters
                 }
 
                 parts.Add(string.Empty);
-                var footnotes = groupedWebpagesItems.Select((p, i) => $"[^{i + 1}]: [{p.title}]({p.url?.Replace(trackingSource, "")})  ");
+                var footnotes = footnoteItems.Select((p, i) => $"[^{i + 1}]: [{p.title}]({p.url?.Replace(trackingSource, "")})  ");
                 parts.AddRange(footnotes);
 
                 if (sourcesFootnote != null)
                 {
-                    var existingUrls = groupedWebpagesItems.Select(p => p.url).ToArray();
+                    var existingUrls = footnoteItems.Select(p => p.url).ToArray();
                     var newSources = sourcesFootnote.sources?.Where(p => existingUrls.Contains(p.url) == false).ToList() ?? [];
                     if (newSources.Any())
                     {
@@ -112,7 +126,7 @@ namespace ChatGPTExport.Exporters
         }
 
         private string? GetContentReferenceReplacement(
-            MessageMetadata.Content_References contentReference, 
+            MessageMetadata.Content_References contentReference,
             List<MessageMetadata.Content_References.Item> groupedWebpagesItems,
             string suffix
             )
@@ -123,7 +137,6 @@ namespace ChatGPTExport.Exporters
                 case "sources_footnote":
                     return null;
                 case "hidden":
-                case "grouped_webpages_model_predicted_fallback":
                 case "image_v2":
                 case "tldr":
                 case "nav_list":
@@ -138,8 +151,9 @@ namespace ChatGPTExport.Exporters
                 case "video":
                     var videolink = $"[![{contentReference.title}]({contentReference.thumbnail_url})]({contentReference.url?.Replace("&utm_source=chatgpt.com", "")} \"{contentReference.title}\")";
                     return videolink;
+                case "grouped_webpages_model_predicted_fallback":
                 case "grouped_webpages":
-                    var refHighlight = string.Join("", contentReference.items?.Select(p => $"[^{groupedWebpagesItems.IndexOf(p) + 1}]" + suffix).ToArray() ?? []);
+                    var refHighlight = string.Join("", contentReference.items?.Select(p => groupedWebpagesItems.IndexOf(p) < 0 ? string.Empty : $"[^{groupedWebpagesItems.IndexOf(p) + 1}]" + suffix).ToArray() ?? []);
                     return refHighlight;
                 case "image_group":
                     var safe_urls = contentReference.safe_urls ?? [];
