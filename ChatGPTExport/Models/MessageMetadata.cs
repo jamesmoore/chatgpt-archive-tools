@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace ChatGPTExport.Models
@@ -83,6 +84,7 @@ namespace ChatGPTExport.Models
             public Dictionary<string, JsonElement>? ExtraData { get; set; }
         }
 
+        [DebuggerDisplay("{start_idx}-{end_idx} \"{matched_text}\" {type}")]
         public class Content_References
         {
             public string? matched_text { get; set; }
