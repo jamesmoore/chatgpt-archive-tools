@@ -73,12 +73,21 @@ namespace ChatGPTExport.Exporters
 
                 var footnoteItems = GetFootnoteItems(content_references);
 
+                var footnoteIndexByItem = footnoteItems
+                    .Select((item, index) => (item, index))
+                    .ToDictionary(p => p.item, p => p.index + 1);
+
                 var reindexedElements = new CodePointIndexMap(textPart);
 
-                foreach (var contentReference in reversed)
+                var reversedWithSufficx = reversed.Select(p =>
                 {
-                    var suffix = startReferences.Contains(contentReference) ? contentReference == startReferences.First(p => p != sourcesFootnote) ? "  " + Environment.NewLine : ", " : "";
-                    var replacement = GetContentReferenceReplacement(contentReference, footnoteItems, suffix);
+                    var suffix = startReferences.Contains(p) ? p == startReferences.First(pr => pr != sourcesFootnote) ? "  " + Environment.NewLine : ", " : "";
+                    return (contentReference: p, suffix);
+                }).ToList();
+
+                foreach (var (contentReference, suffix) in reversedWithSufficx)
+                {
+                    var replacement = GetContentReferenceReplacement(contentReference, footnoteIndexByItem, suffix);
 
                     if (replacement != null)
                     {
@@ -142,7 +151,7 @@ namespace ChatGPTExport.Exporters
 
         private string? GetContentReferenceReplacement(
             MessageMetadata.Content_References contentReference,
-            List<MessageMetadata.Content_References.Item> footnoteItems,
+            Dictionary<MessageMetadata.Content_References.Item, int> footnoteIndexByItem,
             string suffix
             )
         {
@@ -168,7 +177,12 @@ namespace ChatGPTExport.Exporters
                     return videolink;
                 case "grouped_webpages_model_predicted_fallback":
                 case "grouped_webpages":
-                    var refHighlight = string.Join("", contentReference.items?.Select(p => footnoteItems.IndexOf(p) < 0 ? string.Empty : $"[^{footnoteItems.IndexOf(p) + 1}]" + suffix).ToArray() ?? []);
+                    var strings = contentReference.items?.Select(item =>
+                        footnoteIndexByItem.TryGetValue(item, out var footnoteNumber)
+                            ? $"[^{footnoteNumber}]" + suffix
+                            : string.Empty
+                    ).ToArray();
+                    var refHighlight = string.Join("", strings ?? []);
                     return refHighlight;
                 case "image_group":
                     var safe_urls = contentReference.safe_urls ?? [];
