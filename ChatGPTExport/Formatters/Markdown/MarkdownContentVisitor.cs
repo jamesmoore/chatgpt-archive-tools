@@ -114,6 +114,7 @@ namespace ChatGPTExport.Exporters
 
         /// <summary>
         /// Get the content reference items, but exclude references from grouped_webpages_model_predicted_fallback that are present in a grouped_webpages list.
+        /// Prioritise grouped_webpages over grouped_webpages_model_predicted_fallback references.
         /// </summary>
         /// <param name="content_references"></param>
         /// <returns></returns>
@@ -123,9 +124,13 @@ namespace ChatGPTExport.Exporters
             var groupedWebpages = content_references.Where(p => p.type == "grouped_webpages").ToList();
             var groupedWebpagesModelPredictedFallback = content_references.Where(p => p.type == "grouped_webpages_model_predicted_fallback").ToList();
 
-            foreach (var groupedItem in groupedWebpagesModelPredictedFallback.SelectMany(p => p.items))
+            var groupedWebpagesUrls = new HashSet<string>(
+                groupedWebpages.Where(p => p.items != null).SelectMany(p => p.items!.Where(p => p.url != null).Select(q => q.url!))
+            );
+
+            foreach (var groupedItem in groupedWebpagesModelPredictedFallback.SelectMany(p => p.items ?? []))
             {
-                if (groupedWebpages.Any(p => p.items.Any(q => q.url == groupedItem.url)))
+                if (groupedItem.url != null && groupedWebpagesUrls.Contains(groupedItem.url))
                 {
                     itemsToExclude.Add(groupedItem);
                 }
