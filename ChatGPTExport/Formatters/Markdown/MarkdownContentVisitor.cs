@@ -79,13 +79,13 @@ namespace ChatGPTExport.Exporters
 
                 var reindexedElements = new CodePointIndexMap(textPart);
 
-                var reversedWithSufficx = reversed.Select(p =>
+                var reversedWithSuffix = reversed.Select(p =>
                 {
                     var suffix = startReferences.Contains(p) ? p == startReferences.First(pr => pr != sourcesFootnote) ? "  " + Environment.NewLine : ", " : "";
                     return (contentReference: p, suffix);
                 }).ToList();
 
-                foreach (var (contentReference, suffix) in reversedWithSufficx)
+                foreach (var (contentReference, suffix) in reversedWithSuffix)
                 {
                     var replacement = GetContentReferenceReplacement(contentReference, footnoteIndexByItem, suffix);
 
