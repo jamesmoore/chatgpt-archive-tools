@@ -142,7 +142,7 @@ namespace ChatGPTExport.Exporters
 
         private string? GetContentReferenceReplacement(
             MessageMetadata.Content_References contentReference,
-            List<MessageMetadata.Content_References.Item> groupedWebpagesItems,
+            List<MessageMetadata.Content_References.Item> footnoteItems,
             string suffix
             )
         {
@@ -168,7 +168,7 @@ namespace ChatGPTExport.Exporters
                     return videolink;
                 case "grouped_webpages_model_predicted_fallback":
                 case "grouped_webpages":
-                    var refHighlight = string.Join("", contentReference.items?.Select(p => groupedWebpagesItems.IndexOf(p) < 0 ? string.Empty : $"[^{groupedWebpagesItems.IndexOf(p) + 1}]" + suffix).ToArray() ?? []);
+                    var refHighlight = string.Join("", contentReference.items?.Select(p => footnoteItems.IndexOf(p) < 0 ? string.Empty : $"[^{footnoteItems.IndexOf(p) + 1}]" + suffix).ToArray() ?? []);
                     return refHighlight;
                 case "image_group":
                     var safe_urls = contentReference.safe_urls ?? [];
