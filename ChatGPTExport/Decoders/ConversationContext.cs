@@ -1,6 +1,4 @@
-﻿using ChatGPTExport.Formatters.Markdown;
-
-namespace ChatGPTExport.Formatters
+﻿namespace ChatGPTExport.Decoders
 {
     public class ConversationContext
     {

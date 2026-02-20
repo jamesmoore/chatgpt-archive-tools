@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using ChatGPTExport.Formatters;
+using ChatGPTExport.Decoders;
+using ChatGPTExport.Visitor;
 
 namespace ChatGPTExport.Models
 {

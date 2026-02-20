@@ -1,6 +1,7 @@
-﻿using ChatGPTExport.Models;
+﻿using ChatGPTExport.Decoders;
+using ChatGPTExport.Models;
 
-namespace ChatGPTExport.Formatters
+namespace ChatGPTExport.Visitor
 {
     public interface IContentVisitor<T>
     {

@@ -1,5 +1,3 @@
-using ChatGPTExport.Formatters;
-
 namespace ChatGPTExport.Decoders
 {
     public class MarkdownDecoderFactory(

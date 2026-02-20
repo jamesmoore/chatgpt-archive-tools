@@ -2,8 +2,8 @@
 using ChatGPTExport.Formatters;
 using ChatGPTExport.Formatters.Html;
 using ChatGPTExport.Formatters.Html.Headers;
-using ChatGPTExport.Formatters.Markdown;
 using ChatGPTExport.Models;
+using ChatGPTExport.Visitor;
 using Markdig;
 using System.Net;
 using System.Text.RegularExpressions;

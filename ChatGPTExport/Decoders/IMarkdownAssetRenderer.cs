@@ -1,6 +1,4 @@
-﻿using ChatGPTExport.Formatters;
-
-namespace ChatGPTExport.Decoders
+﻿namespace ChatGPTExport.Decoders
 {
     public interface IMarkdownAssetRenderer
     {

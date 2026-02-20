@@ -1,4 +1,3 @@
-using ChatGPTExport.Formatters;
 using ChatGPTExport.Models;
 using System.Text.RegularExpressions;
 

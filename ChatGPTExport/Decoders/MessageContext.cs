@@ -1,6 +1,6 @@
 ﻿using ChatGPTExport.Models;
 
-namespace ChatGPTExport.Formatters
+namespace ChatGPTExport.Decoders
 {
     public record MessageContext(
         Author Author,

@@ -1,6 +1,4 @@
-﻿using ChatGPTExport.Formatters;
-using ChatGPTExport.Formatters.Markdown;
-using ChatGPTExport.Models;
+﻿using ChatGPTExport.Models;
 using System.Diagnostics;
 using System.Text.Json;
 using static ChatGPTExport.Models.MessageMetadata;

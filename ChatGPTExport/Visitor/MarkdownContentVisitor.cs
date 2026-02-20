@@ -1,7 +1,7 @@
 ﻿using ChatGPTExport.Decoders;
 using ChatGPTExport.Models;
 
-namespace ChatGPTExport.Formatters.Markdown
+namespace ChatGPTExport.Visitor
 {
     public class MarkdownContentVisitor(MarkdownDecoderFactory decoders) : IContentVisitor<MarkdownContentResult>
     {
