@@ -36,8 +36,7 @@ namespace ChatGpt.Archive.Api.Database
 
         public void InsertConversations(IEnumerable<Conversation> conversations)
         {
-            // Create PlaintextExtractor for this call (not thread-safe)
-            var plaintextExtractor = new PlaintextExtractor();
+
             
             using var connection = new SqliteConnection(databaseConfiguration.ConnectionString);
             connection.Open();
@@ -118,6 +117,9 @@ namespace ChatGpt.Archive.Api.Database
 
             foreach (var conversation in conversations)
             {
+                // Create PlaintextExtractor for this call (not thread-safe)
+                var plaintextExtractor = new PlaintextExtractor();
+
                 if (conversation.mapping == null)
                     continue;
 

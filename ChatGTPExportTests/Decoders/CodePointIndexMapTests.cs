@@ -1,4 +1,6 @@
-﻿namespace ChatGTPExportTests.Formatters.Markdown
+﻿using ChatGPTExport.Decoders;
+
+namespace ChatGTPExportTests.Decoders
 {
     public class CodePointIndexMapTests
     {
@@ -7,7 +9,7 @@
         {
             var testString = "Hello, 👋🌍!"; // Contains ASCII and multi-code-unit emojis
 
-            var map = new ChatGPTExport.Formatters.Markdown.CodePointIndexMap(testString);
+            var map = new CodePointIndexMap(testString);
 
             Assert.Equal(0, map.ToUtf16Index(0)); // 'H'
             Assert.Equal(7, map.ToUtf16Index(7)); // '👋' starts at UTF-16 index 7
@@ -19,7 +21,7 @@
         public void CodePointIndexMap_OutOfRangeTest()
         {
             var testString = "Test";
-            var map = new ChatGPTExport.Formatters.Markdown.CodePointIndexMap(testString);
+            var map = new CodePointIndexMap(testString);
             Assert.Throws<ArgumentOutOfRangeException>(() => map.ToUtf16Index(-1));
             Assert.Throws<ArgumentOutOfRangeException>(() => map.ToUtf16Index(5)); // Only 4 code points
         }   

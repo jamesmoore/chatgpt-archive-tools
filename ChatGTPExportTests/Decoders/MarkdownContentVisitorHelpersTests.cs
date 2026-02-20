@@ -1,6 +1,6 @@
-using ChatGPTExport.Formatters.Markdown;
+using ChatGPTExport.Decoders;
 
-namespace ChatGTPExportTests.Formatters.Markdown;
+namespace ChatGTPExportTests.Decoders;
 
 public class MarkdownContentVisitorHelpersTests
 {

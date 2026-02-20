@@ -1,4 +1,4 @@
-﻿namespace ChatGPTExport.Formatters.Markdown
+﻿namespace ChatGPTExport.Decoders
 {
     public record MarkdownContentResult(IEnumerable<string> Lines, string? Suffix = null, bool HasImage = false)
     {

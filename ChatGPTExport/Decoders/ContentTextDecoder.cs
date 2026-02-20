@@ -1,51 +1,18 @@
-﻿using ChatGPTExport.Formatters;
-using ChatGPTExport.Formatters.Markdown;
-using ChatGPTExport.Models;
-using System.Data;
+﻿using ChatGPTExport.Models;
 using System.Diagnostics;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using static ChatGPTExport.Models.MessageMetadata;
 
-namespace ChatGPTExport.Exporters
+namespace ChatGPTExport.Decoders
 {
-    public partial class MarkdownContentVisitor(IMarkdownAssetRenderer markdownAssetRenderer, bool showHidden) : IContentVisitor<MarkdownContentResult>
+    public class ContentTextDecoder(
+        ConversationContext conversationContext,
+        bool showHidden)
     {
         private const string trackingSource = "?utm_source=chatgpt.com";
-        private const string ImageAssetPointer = "image_asset_pointer";
         private readonly string LineBreak = Environment.NewLine;
-        private CanvasCreateModel? canvasContext = null;
 
-        /// <summary>
-        /// Catch all for unhandled content types.
-        /// </summary>
-        /// <param name="content"></param>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        public MarkdownContentResult Visit(ContentBase content, ContentVisitorContext context)
-        {
-            string name = content.GetType().Name;
-            Console.WriteLine("\tUnhandled content type: " + name);
-
-            var lines = new List<string>
-            {
-                $"Unhandled content type: {content}"
-            };
-
-            if (content.ExtraData != null && content.ExtraData.Count != 0)
-            {
-                lines.Add("|Name|Value|");
-                lines.Add("|---|---|");
-                foreach (var item in content.ExtraData.Take(1))
-                {
-                    lines.Add("|" + item.Key + "|" + item.Value.GetRawText().Replace("\\n", "<br>") + "|");
-                }
-            }
-
-            return new MarkdownContentResult(lines);
-        }
-
-        public MarkdownContentResult Visit(ContentText content, ContentVisitorContext context)
+        public MarkdownContentResult DecodeToMarkdown(ContentText content, MessageContext context)
         {
             if (context.Author.role == "tool" && context.Author.name == "personalized_context" && showHidden == false)
             {
@@ -150,10 +117,10 @@ namespace ChatGPTExport.Exporters
         }
 
         private string? GetContentReferenceReplacement(
-            MessageMetadata.Content_References contentReference,
-            Dictionary<MessageMetadata.Content_References.Item, int> footnoteIndexByItem,
-            string suffix
-            )
+    MessageMetadata.Content_References contentReference,
+    Dictionary<MessageMetadata.Content_References.Item, int> footnoteIndexByItem,
+    string suffix
+    )
         {
             switch (contentReference.type)
             {
@@ -208,158 +175,8 @@ namespace ChatGPTExport.Exporters
                 ;
         }
 
-        public MarkdownContentResult Visit(ContentMultimodalText content, ContentVisitorContext context)
-        {
-            var markdownContent = new List<string>();
-            bool hasImage = false;
-            foreach (var part in content.parts ?? [])
-            {
-                if (part.IsObject && part.ObjectValue != null)
-                {
-                    var mediaAssets = GetMarkdownMediaAsset(context, part.ObjectValue);
-                    markdownContent.AddRange(mediaAssets);
-                    hasImage = hasImage || part.ObjectValue.content_type == ImageAssetPointer;
-                }
-                else if (part.IsString && part.StringValue != null)
-                {
-                    markdownContent.Add(part.StringValue);
-                }
-            }
-            return new MarkdownContentResult(markdownContent, null, hasImage);
-        }
 
-        private IEnumerable<string> GetMarkdownMediaAsset(ContentVisitorContext context, ContentMultimodalText.ContentMultimodalTextParts obj)
-        {
-            switch (obj.content_type)
-            {
-                case ImageAssetPointer when string.IsNullOrWhiteSpace(obj.asset_pointer) == false:
-                    {
-                        var asset_pointer = obj.asset_pointer;
-                        var strings = markdownAssetRenderer.RenderAsset(context, asset_pointer);
-
-                        foreach (var str in strings)
-                        {
-                            yield return str;
-                        }
-
-                        if (context.MessageMetadata.image_gen_title != null)
-                        {
-                            yield return $"*{context.MessageMetadata.image_gen_title}*  ";
-                        }
-                        yield return $"**Size:** {obj.size_bytes} **Dims:** {obj.width}x{obj.height}  ";
-                        break;
-                    }
-
-                case "real_time_user_audio_video_asset_pointer" when string.IsNullOrWhiteSpace(obj.audio_asset_pointer?.asset_pointer) == false:
-                    {
-                        var asset_pointer = obj.audio_asset_pointer.asset_pointer;
-                        var strings = markdownAssetRenderer.RenderAsset(context, asset_pointer);
-
-                        foreach (var str in strings)
-                        {
-                            yield return str;
-                        }
-                        break;
-                    }
-
-                case "audio_asset_pointer" when string.IsNullOrWhiteSpace(obj.asset_pointer) == false:
-                    {
-                        var asset_pointer = obj.asset_pointer;
-                        var strings = markdownAssetRenderer.RenderAsset(context, asset_pointer);
-
-                        foreach (var str in strings)
-                        {
-                            yield return str;
-                        }
-                        break;
-                    }
-
-                case "audio_transcription" when string.IsNullOrWhiteSpace(obj.text) == false:
-                    yield return $"*{obj.text}*  ";
-                    break;
-            }
-        }
-
-        public MarkdownContentResult Visit(ContentCode content, ContentVisitorContext context)
-        {
-            if (showHidden == false && context.Recipient != "all")
-            {
-                return new MarkdownContentResult();
-            }
-
-            if (string.IsNullOrWhiteSpace(content.text))
-            {
-                return new MarkdownContentResult();
-            }
-
-            var searchRegex = SearchRegex();
-            var matches = searchRegex.Match(content.text);
-            if (content.language == "unknown" && matches.Success)
-            {
-                var code = matches.Groups[1].Value;
-                return new MarkdownContentResult($"> 🔍 **Web search:** {code}.");
-            }
-            else if (content.language == "unknown" && content.text.IsValidJson())
-            {
-                var code = ToCodeBlock(content.text, "json");
-                return new MarkdownContentResult(code);
-            }
-            else
-            {
-                var code = ToCodeBlock(content.text, content.language);
-                return new MarkdownContentResult(code);
-            }
-        }
-
-        private string ToCodeBlock(string code, string? language = null)
-        {
-            return $"```{language}{LineBreak}{code}{LineBreak}```";
-        }
-
-        public MarkdownContentResult Visit(ContentThoughts content, ContentVisitorContext context)
-        {
-            return GetShowAllGuardedContentResult(() =>
-            {
-                var markdownContent = new List<string>();
-                if (content.thoughts != null)
-                {
-                    foreach (var thought in content.thoughts)
-                    {
-                        markdownContent.Add(thought.summary + "  ");
-                        markdownContent.Add(thought.content + "  ");
-                    }
-                }
-                return new MarkdownContentResult(markdownContent, " 💭");
-            });
-        }
-
-        public MarkdownContentResult Visit(ContentExecutionOutput content, ContentVisitorContext context)
-        {
-            return GetShowAllGuardedContentResult(() =>
-            {
-                if (content.text == null)
-                {
-                    return new MarkdownContentResult();
-                }
-
-                var code = ToCodeBlock(content.text);
-                return new MarkdownContentResult(code);
-            });
-        }
-
-        public MarkdownContentResult Visit(ContentReasoningRecap content, ContentVisitorContext context)
-        {
-            return GetShowAllGuardedContentResult(() =>
-            {
-                if (content.content == null)
-                {
-                    return new MarkdownContentResult();
-                }
-                return new MarkdownContentResult(content.content);
-            });
-        }
-
-        private IEnumerable<string> DecodeText(string text, ContentVisitorContext context)
+        private IEnumerable<string> DecodeText(string text, MessageContext context)
         {
             // image prompt
             if (text.Contains("\"prompt\":") && text.Contains("\"size\":"))
@@ -401,22 +218,22 @@ namespace ChatGPTExport.Exporters
                 if (context.Recipient == "canmore.create_textdoc")
                 {
                     var createCanvas = JsonSerializer.Deserialize<CanvasCreateModel>(text);
-                    canvasContext = createCanvas;
+                    conversationContext.CanvasContext = createCanvas;
                 }
                 else if (context.Recipient == "canmore.update_textdoc")
                 {
                     var updateCanvas = JsonSerializer.Deserialize<CanvasUpdateModel>(text + "]}"); // for some reason the json isn't complete.
-                    Debug.Assert(canvasContext != null);
-                    canvasContext ??= new CanvasCreateModel() { type = "document " }; // default to document if no canvas exists
+                    Debug.Assert(conversationContext.CanvasContext != null);
+                    conversationContext.CanvasContext ??= new CanvasCreateModel() { type = "document " }; // default to document if no canvas exists
 
                     foreach (var update in updateCanvas?.updates ?? [])
                     {
-                        canvasContext.content = update.replacement;
+                        conversationContext.CanvasContext.content = update.replacement;
                     }
                 }
 
-                var canvasContextType = canvasContext?.type;
-                var canvasContextContent = canvasContext?.content;
+                var canvasContextType = conversationContext.CanvasContext?.type;
+                var canvasContextContent = conversationContext.CanvasContext?.content;
                 if (canvasContextContent != null && canvasContextType == "document")
                 {
                     yield return canvasContextContent;
@@ -456,54 +273,9 @@ namespace ChatGPTExport.Exporters
             public bool HasPrompt() => string.IsNullOrWhiteSpace(prompt) == false && string.IsNullOrWhiteSpace(size) == false;
         }
 
-        [GeneratedRegex("""^search\("(.*)"\)$""")]
-        private static partial Regex SearchRegex();
-
-        public MarkdownContentResult Visit(ContentUserEditableContext content, ContentVisitorContext context)
+        private string ToCodeBlock(string code, string? language = null)
         {
-            return GetShowAllGuardedContentResult(() =>
-            {
-                var markdownContent = new List<string>
-                {
-                    "**User profile:** " + content.user_profile + "  ",
-                    "**User instructions:** " + content.user_instructions + "  "
-                };
-                return new MarkdownContentResult(markdownContent);
-            });
-        }
-
-        public MarkdownContentResult Visit(ContentTetherBrowsingDisplay content, ContentVisitorContext context)
-        {
-            return GetShowAllGuardedContentResult(() =>
-            {
-                if (content.result == null)
-                {
-                    return new MarkdownContentResult();
-                }
-                var lines = new string?[] {
-                    content.result.Replace("\n", "  \n"),
-                    content.summary
-                }.OfType<string>();
-                return new MarkdownContentResult(lines);
-            });
-        }
-
-        public MarkdownContentResult Visit(ContentComputerOutput content, ContentVisitorContext context)
-        {
-            return new MarkdownContentResult();
-        }
-
-        public MarkdownContentResult Visit(ContentSystemError content, ContentVisitorContext context)
-        {
-            return GetShowAllGuardedContentResult(() =>
-            {
-                return new MarkdownContentResult($"🔴 {content.name}: {content.text}");
-            });
-        }
-
-        private MarkdownContentResult GetShowAllGuardedContentResult(Func<MarkdownContentResult> func)
-        {
-            return showHidden ? func() : new MarkdownContentResult();
+            return $"```{language}{LineBreak}{code}{LineBreak}```";
         }
     }
 }

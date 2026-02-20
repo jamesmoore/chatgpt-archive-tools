@@ -1,4 +1,4 @@
-﻿namespace ChatGPTExport.Formatters.Markdown
+﻿namespace ChatGPTExport.Decoders
 {
     public static class MarkdownContentVisitorHelpers
     {

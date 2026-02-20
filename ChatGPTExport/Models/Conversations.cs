@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using ChatGPTExport.Formatters;
+using ChatGPTExport.Decoders;
+using ChatGPTExport.Visitor;
 
 namespace ChatGPTExport.Models
 {
@@ -127,7 +128,7 @@ namespace ChatGPTExport.Models
                 this.recipient != null
                 )
             {
-                return this.content.Accept(visitor, new ContentVisitorContext(this.author, GetCreateTime(), GetUpdateTime(), metadata, this.recipient));
+                return this.content.Accept(visitor, new MessageContext(this.author, GetCreateTime(), GetUpdateTime(), metadata, this.recipient));
             }
             else
             {
@@ -183,7 +184,7 @@ namespace ChatGPTExport.Models
         [JsonExtensionData]
         public Dictionary<string, JsonElement>? ExtraData { get; set; }
 
-        public virtual T Accept<T>(IContentVisitor<T> visitor, ContentVisitorContext context)
+        public virtual T Accept<T>(IContentVisitor<T> visitor, MessageContext context)
         {
             return visitor.Visit(this, context);
         }
@@ -193,7 +194,7 @@ namespace ChatGPTExport.Models
     {
         public List<string>? parts { get; set; }
 
-        public override T Accept<T>(IContentVisitor<T> visitor, ContentVisitorContext context)
+        public override T Accept<T>(IContentVisitor<T> visitor, MessageContext context)
         {
             return visitor.Visit(this, context);
         }
@@ -279,7 +280,7 @@ namespace ChatGPTExport.Models
             }
         }
 
-        public override T Accept<T>(IContentVisitor<T> visitor, ContentVisitorContext context)
+        public override T Accept<T>(IContentVisitor<T> visitor, MessageContext context)
         {
             return visitor.Visit(this, context);
         }
@@ -298,7 +299,7 @@ namespace ChatGPTExport.Models
             public bool? finished { get; set; }
         }
 
-        public override T Accept<T>(IContentVisitor<T> visitor, ContentVisitorContext context)
+        public override T Accept<T>(IContentVisitor<T> visitor, MessageContext context)
         {
             return visitor.Visit(this, context);
         }
@@ -308,7 +309,7 @@ namespace ChatGPTExport.Models
     {
         public string? content { get; set; }
 
-        public override T Accept<T>(IContentVisitor<T> visitor, ContentVisitorContext context)
+        public override T Accept<T>(IContentVisitor<T> visitor, MessageContext context)
         {
             return visitor.Visit(this, context);
         }
@@ -320,7 +321,7 @@ namespace ChatGPTExport.Models
         public string? response_format_name { get; set; }
         public string? text { get; set; }
 
-        public override T Accept<T>(IContentVisitor<T> visitor, ContentVisitorContext context)
+        public override T Accept<T>(IContentVisitor<T> visitor, MessageContext context)
         {
             return visitor.Visit(this, context);
         }
@@ -330,7 +331,7 @@ namespace ChatGPTExport.Models
     {
         public string? text { get; set; }
 
-        public override T Accept<T>(IContentVisitor<T> visitor, ContentVisitorContext context)
+        public override T Accept<T>(IContentVisitor<T> visitor, MessageContext context)
         {
             return visitor.Visit(this, context);
         }
@@ -341,7 +342,7 @@ namespace ChatGPTExport.Models
         public string? user_profile { get; set; }
         public string? user_instructions { get; set; }
 
-        public override T Accept<T>(IContentVisitor<T> visitor, ContentVisitorContext context)
+        public override T Accept<T>(IContentVisitor<T> visitor, MessageContext context)
         {
             return visitor.Visit(this, context);
         }
@@ -351,7 +352,7 @@ namespace ChatGPTExport.Models
     {
         public string? result { get; set; }
         public string? summary { get; set; }
-        public override T Accept<T>(IContentVisitor<T> visitor, ContentVisitorContext context)
+        public override T Accept<T>(IContentVisitor<T> visitor, MessageContext context)
         {
             return visitor.Visit(this, context);
         }
@@ -359,7 +360,7 @@ namespace ChatGPTExport.Models
 
     public class ContentComputerOutput : ContentBase
     {
-        public override T Accept<T>(IContentVisitor<T> visitor, ContentVisitorContext context)
+        public override T Accept<T>(IContentVisitor<T> visitor, MessageContext context)
         {
             return visitor.Visit(this, context);
         }
@@ -369,7 +370,7 @@ namespace ChatGPTExport.Models
     {
         public string? name { get; set; }
         public string? text { get; set; }
-        public override T Accept<T>(IContentVisitor<T> visitor, ContentVisitorContext context)
+        public override T Accept<T>(IContentVisitor<T> visitor, MessageContext context)
         {
             return visitor.Visit(this, context);
         }

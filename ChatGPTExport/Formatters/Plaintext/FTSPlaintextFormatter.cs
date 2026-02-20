@@ -1,5 +1,5 @@
-using ChatGPTExport.Exporters;
 using ChatGPTExport.Models;
+using ChatGPTExport.Visitor;
 
 namespace ChatGPTExport.Formatters.Plaintext
 {

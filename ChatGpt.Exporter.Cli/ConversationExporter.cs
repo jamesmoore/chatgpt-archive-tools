@@ -2,8 +2,8 @@ using System.Buffers;
 using System.IO.Abstractions;
 using System.Text;
 using ChatGPTExport;
+using ChatGPTExport.Decoders;
 using ChatGPTExport.Formatters;
-using ChatGPTExport.Formatters.Markdown;
 using ChatGPTExport.Models;
 
 namespace ChatGpt.Exporter.Cli
@@ -103,13 +103,13 @@ namespace ChatGpt.Exporter.Cli
         private static void ExportConversation(
             Dictionary<string, IEnumerable<string>> fileContentsMap, 
             IMarkdownAssetRenderer assetLocator, 
-            IConversationFormatter exporter, 
+            IConversationFormatter formatter, 
             Conversation conversation, 
             string filename)
         {
             try
             {
-                fileContentsMap[filename] = exporter.Format(assetLocator, conversation);
+                fileContentsMap[filename] = formatter.Format(assetLocator, conversation);
             }
             catch (Exception ex)
             {

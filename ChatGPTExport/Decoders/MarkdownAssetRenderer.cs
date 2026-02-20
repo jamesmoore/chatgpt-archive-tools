@@ -1,10 +1,10 @@
 ﻿using ChatGPTExport.Assets;
 
-namespace ChatGPTExport.Formatters.Markdown
+namespace ChatGPTExport.Decoders
 {
     public class MarkdownAssetRenderer(IAssetLocator assetLocator) : IMarkdownAssetRenderer
     {
-        public IEnumerable<string> RenderAsset(ContentVisitorContext context, string asset_pointer)
+        public IEnumerable<string> RenderAsset(MessageContext context, string asset_pointer)
         {
             var searchPattern = GetSearchPattern(asset_pointer);
             var markdownAsset = GetMediaAsset(context, searchPattern);
@@ -26,7 +26,7 @@ namespace ChatGPTExport.Formatters.Markdown
             return assetPointer.Replace("sediment://", string.Empty).Replace("file-service://", string.Empty);
         }
 
-        private Asset? GetMediaAsset(ContentVisitorContext context, string searchPattern)
+        private Asset? GetMediaAsset(MessageContext context, string searchPattern)
         {
             return assetLocator.GetMarkdownMediaAsset(new AssetRequest(
                 searchPattern,
