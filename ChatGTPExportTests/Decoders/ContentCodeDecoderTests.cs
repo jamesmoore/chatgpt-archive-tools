@@ -19,7 +19,7 @@ public class ContentCodeDecoderTests
         var content = new ContentCode { language = "csharp", text = "Console.WriteLine();" };
         var context = CreateContext(recipient: "not-all");
 
-        var result = decoder.DecodeTo(content, context);
+        var result = decoder.Decode(content, context);
 
         Assert.Empty(result.Lines);
     }
@@ -31,7 +31,7 @@ public class ContentCodeDecoderTests
         var content = new ContentCode { language = "unknown", text = "search(\"kittens\")" };
         var context = CreateContext();
 
-        var result = decoder.DecodeTo(content, context);
+        var result = decoder.Decode(content, context);
 
         var line = Assert.Single(result.Lines);
         Assert.Equal("> 🔍 **Web search:** kittens.", line);
@@ -44,7 +44,7 @@ public class ContentCodeDecoderTests
         var content = new ContentCode { language = "unknown", text = "{\"a\":1}" };
         var context = CreateContext();
 
-        var result = decoder.DecodeTo(content, context);
+        var result = decoder.Decode(content, context);
 
         var line = Assert.Single(result.Lines);
         var expected = $"```json{Environment.NewLine}{content.text}{Environment.NewLine}```";

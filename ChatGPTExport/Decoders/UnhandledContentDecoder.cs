@@ -2,9 +2,9 @@
 
 namespace ChatGPTExport.Decoders
 {
-    public class UnhandledContentDecoder : IDecodeTo<ContentBase, MarkdownContentResult>
+    public class UnhandledContentDecoder : IDecoder<ContentBase, MarkdownContentResult>
     {
-        public MarkdownContentResult DecodeTo(ContentBase content, MessageContext context)
+        public MarkdownContentResult Decode(ContentBase content, MessageContext context)
         {
             string name = content.GetType().Name;
             Console.WriteLine("\tUnhandled content type: " + name);

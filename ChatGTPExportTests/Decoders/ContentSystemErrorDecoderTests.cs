@@ -18,7 +18,7 @@ public class ContentSystemErrorDecoderTests
         var decoder = CreateDecoder(showHidden: false);
         var content = new ContentSystemError { name = "Error", text = "Details" };
 
-        var result = decoder.DecodeTo(content, CreateContext());
+        var result = decoder.Decode(content, CreateContext());
 
         Assert.Empty(result.Lines);
     }
@@ -29,7 +29,7 @@ public class ContentSystemErrorDecoderTests
         var decoder = CreateDecoder(showHidden: true);
         var content = new ContentSystemError { name = "Error", text = "Details" };
 
-        var result = decoder.DecodeTo(content, CreateContext());
+        var result = decoder.Decode(content, CreateContext());
 
         var line = Assert.Single(result.Lines);
         Assert.Equal("🔴 Error: Details", line);

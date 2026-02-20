@@ -18,7 +18,7 @@ public class ContentExecutionOutputDecoderTests
         var decoder = CreateDecoder(showHidden: false);
         var content = new ContentExecutionOutput { text = "output" };
 
-        var result = decoder.DecodeTo(content, CreateContext());
+        var result = decoder.Decode(content, CreateContext());
 
         Assert.Empty(result.Lines);
     }
@@ -29,7 +29,7 @@ public class ContentExecutionOutputDecoderTests
         var decoder = CreateDecoder(showHidden: true);
         var content = new ContentExecutionOutput { text = "output" };
 
-        var result = decoder.DecodeTo(content, CreateContext());
+        var result = decoder.Decode(content, CreateContext());
 
         var line = Assert.Single(result.Lines);
         var expected = $"```{Environment.NewLine}{content.text}{Environment.NewLine}```";

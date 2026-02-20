@@ -18,7 +18,7 @@ public class ContentTetherBrowsingDisplayDecoderTests
         var decoder = CreateDecoder(showHidden: false);
         var content = new ContentTetherBrowsingDisplay { result = "Result", summary = "Summary" };
 
-        var result = decoder.DecodeTo(content, CreateContext());
+        var result = decoder.Decode(content, CreateContext());
 
         Assert.Empty(result.Lines);
     }
@@ -29,7 +29,7 @@ public class ContentTetherBrowsingDisplayDecoderTests
         var decoder = CreateDecoder(showHidden: true);
         var content = new ContentTetherBrowsingDisplay { result = "Line1\nLine2", summary = "Summary" };
 
-        var result = decoder.DecodeTo(content, CreateContext());
+        var result = decoder.Decode(content, CreateContext());
 
         Assert.Equal(["Line1  \nLine2", "Summary"], result.Lines.ToArray());
     }

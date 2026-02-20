@@ -46,7 +46,7 @@ public class ContentMultimodalTextDecoderTests
             ]
         };
 
-        var result = decoder.DecodeTo(content, CreateContext());
+        var result = decoder.Decode(content, CreateContext());
 
         var output = result.Lines.ToArray();
         Assert.Contains("Intro", output);

@@ -22,17 +22,17 @@ namespace ChatGPTExport.Visitor
 
         public MarkdownContentResult Visit(ContentBase content, MessageContext context) => content switch
         {
-            ContentText ct => _contentTextDecoder.Value.DecodeTo(ct, context),
-            ContentMultimodalText cmt => _contentMultimodalTextDecoder.Value.DecodeTo(cmt, context),
-            ContentCode cc => _contentCodeDecoder.Value.DecodeTo(cc, context),
-            ContentThoughts ct => _contentThoughtsDecoder.Value.DecodeTo(ct, context),
-            ContentExecutionOutput ceo => _contentExecutionOutputDecoder.Value.DecodeTo(ceo, context),
-            ContentReasoningRecap crr => _contentReasoningRecapDecoder.Value.DecodeTo(crr, context),
-            ContentUserEditableContext cuec => _contentUserEditableContextDecoder.Value.DecodeTo(cuec, context),
-            ContentTetherBrowsingDisplay ctbd => _contentTetherBrowsingDisplayDecoder.Value.DecodeTo(ctbd, context),
-            ContentComputerOutput cco => _contentComputerOutputDecoder.Value.DecodeTo(cco, context),
-            ContentSystemError cse => _contentSystemErrorDecoder.Value.DecodeTo(cse, context),
-            _ => _unhandledContentDecoder.Value.DecodeTo(content, context)
+            ContentText ct => _contentTextDecoder.Value.Decode(ct, context),
+            ContentMultimodalText cmt => _contentMultimodalTextDecoder.Value.Decode(cmt, context),
+            ContentCode cc => _contentCodeDecoder.Value.Decode(cc, context),
+            ContentThoughts ct => _contentThoughtsDecoder.Value.Decode(ct, context),
+            ContentExecutionOutput ceo => _contentExecutionOutputDecoder.Value.Decode(ceo, context),
+            ContentReasoningRecap crr => _contentReasoningRecapDecoder.Value.Decode(crr, context),
+            ContentUserEditableContext cuec => _contentUserEditableContextDecoder.Value.Decode(cuec, context),
+            ContentTetherBrowsingDisplay ctbd => _contentTetherBrowsingDisplayDecoder.Value.Decode(ctbd, context),
+            ContentComputerOutput cco => _contentComputerOutputDecoder.Value.Decode(cco, context),
+            ContentSystemError cse => _contentSystemErrorDecoder.Value.Decode(cse, context),
+            _ => _unhandledContentDecoder.Value.Decode(content, context)
         };
     }
 }

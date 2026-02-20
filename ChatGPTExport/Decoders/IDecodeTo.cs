@@ -1,7 +1,7 @@
 namespace ChatGPTExport.Decoders
 {
-    public interface IDecodeTo<T, R>
+    public interface IDecoder<T, R>
     {
-        R DecodeTo(T content, MessageContext context);
+        R Decode(T content, MessageContext context);
     }
 }
