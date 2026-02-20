@@ -14,9 +14,7 @@ namespace ChatGPTExport.Formatters.Markdown
 
             var strings = new List<string>();
 
-            var visitor = new MarkdownContentVisitor(
-                new MarkdownDecoderFactory(assetLocator, new ConversationContext(), showHidden)
-            );
+            var visitor = new MarkdownContentVisitor(assetLocator, new ConversationContext(), showHidden);
 
             strings.AddRange(GetYamlHeader(conversation));
 

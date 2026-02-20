@@ -18,7 +18,7 @@ public class ContentReasoningRecapDecoderTests
         var decoder = CreateDecoder(showHidden: false);
         var content = new ContentReasoningRecap { content = "summary" };
 
-        var result = decoder.DecodeToMarkdown(content, CreateContext());
+        var result = decoder.Decode(content, CreateContext());
 
         Assert.Empty(result.Lines);
     }
@@ -29,7 +29,7 @@ public class ContentReasoningRecapDecoderTests
         var decoder = CreateDecoder(showHidden: true);
         var content = new ContentReasoningRecap { content = "summary" };
 
-        var result = decoder.DecodeToMarkdown(content, CreateContext());
+        var result = decoder.Decode(content, CreateContext());
 
         var line = Assert.Single(result.Lines);
         Assert.Equal("summary", line);

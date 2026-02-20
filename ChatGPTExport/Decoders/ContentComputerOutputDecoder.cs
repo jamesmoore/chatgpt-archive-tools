@@ -2,9 +2,9 @@ using ChatGPTExport.Models;
 
 namespace ChatGPTExport.Decoders
 {
-    public class ContentComputerOutputDecoder
+    public class ContentComputerOutputDecoder : IDecoder<ContentComputerOutput, MarkdownContentResult>
     {
-        public MarkdownContentResult DecodeToMarkdown(ContentComputerOutput content, MessageContext context)
+        public MarkdownContentResult Decode(ContentComputerOutput content, MessageContext context)
         {
             return new MarkdownContentResult();
         }

@@ -120,22 +120,6 @@ namespace ChatGPTExport.Models
             return update_time ?? create_time;
         }
 
-        public T? Accept<T>(IContentVisitor<T> visitor)
-        {
-            if (this.content != null &&
-                this.author?.role != null &&
-                this.metadata != null &&
-                this.recipient != null
-                )
-            {
-                return this.content.Accept(visitor, new MessageContext(this.author, GetCreateTime(), GetUpdateTime(), metadata, this.recipient));
-            }
-            else
-            {
-                return default;
-            }
-        }
-
         public DateTimeOffset? GetCreateTime() => create_time.HasValue ? create_time.Value.ToDateTimeOffset() : null;
 
         public DateTimeOffset? GetUpdateTime() => update_time.HasValue ? update_time.Value.ToDateTimeOffset() : null;
@@ -183,21 +167,11 @@ namespace ChatGPTExport.Models
     {
         [JsonExtensionData]
         public Dictionary<string, JsonElement>? ExtraData { get; set; }
-
-        public virtual T Accept<T>(IContentVisitor<T> visitor, MessageContext context)
-        {
-            return visitor.Visit(this, context);
-        }
     }
 
     public class ContentText : ContentBase
     {
         public List<string>? parts { get; set; }
-
-        public override T Accept<T>(IContentVisitor<T> visitor, MessageContext context)
-        {
-            return visitor.Visit(this, context);
-        }
     }
 
     public class ContentMultimodalText : ContentBase
@@ -279,11 +253,6 @@ namespace ChatGPTExport.Models
                 public Dictionary<string, JsonElement>? ExtraData { get; set; }
             }
         }
-
-        public override T Accept<T>(IContentVisitor<T> visitor, MessageContext context)
-        {
-            return visitor.Visit(this, context);
-        }
     }
 
     public class ContentThoughts : ContentBase
@@ -298,21 +267,11 @@ namespace ChatGPTExport.Models
             public object? chunks { get; set; }
             public bool? finished { get; set; }
         }
-
-        public override T Accept<T>(IContentVisitor<T> visitor, MessageContext context)
-        {
-            return visitor.Visit(this, context);
-        }
     }
 
     public class ContentReasoningRecap : ContentBase
     {
         public string? content { get; set; }
-
-        public override T Accept<T>(IContentVisitor<T> visitor, MessageContext context)
-        {
-            return visitor.Visit(this, context);
-        }
     }
 
     public class ContentCode : ContentBase
@@ -320,59 +279,32 @@ namespace ChatGPTExport.Models
         public string? language { get; set; }
         public string? response_format_name { get; set; }
         public string? text { get; set; }
-
-        public override T Accept<T>(IContentVisitor<T> visitor, MessageContext context)
-        {
-            return visitor.Visit(this, context);
-        }
     }
 
     public class ContentExecutionOutput : ContentBase
     {
         public string? text { get; set; }
-
-        public override T Accept<T>(IContentVisitor<T> visitor, MessageContext context)
-        {
-            return visitor.Visit(this, context);
-        }
     }
 
     public class ContentUserEditableContext : ContentBase
     {
         public string? user_profile { get; set; }
         public string? user_instructions { get; set; }
-
-        public override T Accept<T>(IContentVisitor<T> visitor, MessageContext context)
-        {
-            return visitor.Visit(this, context);
-        }
     }
 
     public class ContentTetherBrowsingDisplay : ContentBase
     {
         public string? result { get; set; }
         public string? summary { get; set; }
-        public override T Accept<T>(IContentVisitor<T> visitor, MessageContext context)
-        {
-            return visitor.Visit(this, context);
-        }
     }
 
     public class ContentComputerOutput : ContentBase
     {
-        public override T Accept<T>(IContentVisitor<T> visitor, MessageContext context)
-        {
-            return visitor.Visit(this, context);
-        }
     }
 
     public class ContentSystemError : ContentBase
     {
         public string? name { get; set; }
         public string? text { get; set; }
-        public override T Accept<T>(IContentVisitor<T> visitor, MessageContext context)
-        {
-            return visitor.Visit(this, context);
-        }
     }
 }

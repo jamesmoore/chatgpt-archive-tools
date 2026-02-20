@@ -12,7 +12,7 @@ public class ContentComputerOutputDecoderTests
         var content = new ContentComputerOutput();
         var context = new MessageContext(new Author { role = "assistant" }, null, null, new MessageMetadata(), "all");
 
-        var result = decoder.DecodeToMarkdown(content, context);
+        var result = decoder.Decode(content, context);
 
         Assert.Empty(result.Lines);
     }

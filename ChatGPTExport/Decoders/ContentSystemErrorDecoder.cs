@@ -2,9 +2,9 @@ using ChatGPTExport.Models;
 
 namespace ChatGPTExport.Decoders
 {
-    public class ContentSystemErrorDecoder(bool showHidden)
+    public class ContentSystemErrorDecoder(bool showHidden) : IDecoder<ContentSystemError, MarkdownContentResult>
     {
-        public MarkdownContentResult DecodeToMarkdown(ContentSystemError content, MessageContext context)
+        public MarkdownContentResult Decode(ContentSystemError content, MessageContext context)
         {
             if (!showHidden)
             {

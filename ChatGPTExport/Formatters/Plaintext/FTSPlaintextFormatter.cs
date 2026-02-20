@@ -1,3 +1,4 @@
+using ChatGPTExport.Decoders;
 using ChatGPTExport.Models;
 using ChatGPTExport.Visitor;
 
@@ -7,7 +8,7 @@ namespace ChatGPTExport.Formatters.Plaintext
     {
         private readonly string LineBreak = Environment.NewLine;
 
-        public IEnumerable<string> FormatMessage(Message message, MarkdownContentVisitor visitor)
+        public IEnumerable<string> FormatMessage(Message message, IContentVisitor<MarkdownContentResult> visitor)
         {
             var strings = new List<string>();
             try

@@ -2,9 +2,9 @@ using ChatGPTExport.Models;
 
 namespace ChatGPTExport.Decoders
 {
-    public class ContentThoughtsDecoder(bool showHidden)
+    public class ContentThoughtsDecoder(bool showHidden) : IDecoder<ContentThoughts, MarkdownContentResult>
     {
-        public MarkdownContentResult DecodeToMarkdown(ContentThoughts content, MessageContext context)
+        public MarkdownContentResult Decode(ContentThoughts content, MessageContext context)
         {
             if (!showHidden)
             {

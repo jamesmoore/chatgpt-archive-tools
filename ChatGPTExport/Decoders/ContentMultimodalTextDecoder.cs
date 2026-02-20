@@ -2,11 +2,11 @@
 
 namespace ChatGPTExport.Decoders
 {
-    public class ContentMultimodalTextDecoder(IMarkdownAssetRenderer markdownAssetRenderer)
+    public class ContentMultimodalTextDecoder(IMarkdownAssetRenderer markdownAssetRenderer) : IDecoder<ContentMultimodalText, MarkdownContentResult>
     {
         private const string ImageAssetPointer = "image_asset_pointer";
 
-        public MarkdownContentResult DecodeToMarkdown(ContentMultimodalText content, MessageContext context)
+        public MarkdownContentResult Decode(ContentMultimodalText content, MessageContext context)
         {
             var markdownContent = new List<string>();
             bool hasImage = false;

@@ -14,9 +14,7 @@ namespace ChatGPTExport.Formatters.Plaintext
 
             var strings = new List<string>();
 
-            var visitor = new MarkdownContentVisitor(
-                new MarkdownDecoderFactory(assetLocator, new ConversationContext(), showHidden)
-                );
+            var visitor = new MarkdownContentVisitor(assetLocator, new ConversationContext(), showHidden);
 
             // Add conversation header
             strings.Add($"Title: {conversation.title ?? "No title"}");
@@ -42,7 +40,7 @@ namespace ChatGPTExport.Formatters.Plaintext
             return strings;
         }
 
-        private IEnumerable<string> FormatMessage(Message message, MarkdownContentVisitor visitor)
+        private IEnumerable<string> FormatMessage(Message message, IContentVisitor<MarkdownContentResult> visitor)
         {
             var strings = new List<string>();
             try

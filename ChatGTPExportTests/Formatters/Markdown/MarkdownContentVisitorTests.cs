@@ -9,11 +9,10 @@ public class MarkdownContentVisitorTests
     [Fact]
     public void Visitor_DelegatesToCorrectDecoder_ForContentText()
     {
-        var factory = new MarkdownDecoderFactory(
+        var visitor = new MarkdownContentVisitor(
             new NullAssetRenderer(),
             new ConversationContext(),
             showHidden: false);
-        var visitor = new MarkdownContentVisitor(factory);
         
         var content = new ContentText { parts = ["test"] };
         var context = new MessageContext(
