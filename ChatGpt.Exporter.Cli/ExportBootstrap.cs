@@ -2,7 +2,6 @@
 using ChatGPTExport;
 using ChatGPTExport.Assets;
 using ChatGPTExport.Decoders;
-using ChatGPTExport.Formatters.Markdown;
 using ChatGPTExport.Models;
 using System.IO.Abstractions;
 

@@ -1,4 +1,4 @@
-using ChatGPTExport.Exporters;
+using ChatGPTExport.Formatters.Markdown;
 using ChatGPTExport.Models;
 
 namespace ChatGPTExport.Formatters.Plaintext

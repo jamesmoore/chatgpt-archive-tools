@@ -1,6 +1,7 @@
-﻿using ChatGPTExport.Decoders;
-using ChatGPTExport.Exporters;
+﻿using ChatGPTExport.Assets;
+using ChatGPTExport.Decoders;
 using ChatGPTExport.Formatters;
+using ChatGPTExport.Formatters.Markdown;
 using ChatGPTExport.Formatters.Plaintext;
 using ChatGPTExport.Models;
 
@@ -9,10 +10,10 @@ namespace ChatGpt.Archive.Api.Services
     public class PlaintextExtractor
     {
         private readonly FTSPlaintextMessageFormatter plaintextFormatter = new();
+        private static readonly NullAssetRenerer markdownAssetRenderer = new NullAssetRenerer();
         private readonly MarkdownContentVisitor visitor = new(
-            new ContentTextDecoder(new ConversationContext(), false),
-            new ContentMultimodalTextDecoder(new NullAssetLocator()),
-            false);
+            new MarkdownDecoderFactory(markdownAssetRenderer, new ConversationContext(), false)
+            );
 
         public string ExtractPlaintext(Message message)
         {
@@ -20,7 +21,7 @@ namespace ChatGpt.Archive.Api.Services
             return string.Join(Environment.NewLine, results);
         }
 
-        private class NullAssetLocator : IMarkdownAssetRenderer
+        private class NullAssetRenerer : IMarkdownAssetRenderer
         {
             public IEnumerable<string> RenderAsset(MessageContext context, string asset_pointer)
             {

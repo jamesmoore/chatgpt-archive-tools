@@ -2,6 +2,7 @@
 using ChatGPTExport.Formatters;
 using ChatGPTExport.Formatters.Html;
 using ChatGPTExport.Formatters.Html.Headers;
+using ChatGPTExport.Formatters.Markdown;
 using ChatGPTExport.Models;
 using Markdig;
 using System.Net;
@@ -24,9 +25,8 @@ namespace ChatGPTExport.Exporters.Html
             var strings = new List<(string MessageId, Author Author, string Content, bool HasImage)>();
 
             var visitor = new MarkdownContentVisitor(
-                new ContentTextDecoder(new ConversationContext(), showHidden),
-                new ContentMultimodalTextDecoder(assetLocator), 
-                showHidden);
+                new MarkdownDecoderFactory(assetLocator, new ConversationContext(), showHidden)
+                );
 
             foreach (var message in messages)
             {
