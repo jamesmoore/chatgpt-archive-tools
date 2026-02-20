@@ -7,12 +7,12 @@ namespace ChatGPTExport.Decoders
 {
     public class ContentTextDecoder(
         ConversationContext conversationContext,
-        bool showHidden)
+        bool showHidden) : IDecodeTo<ContentText, MarkdownContentResult>
     {
         private const string trackingSource = "?utm_source=chatgpt.com";
         private readonly string LineBreak = Environment.NewLine;
 
-        public MarkdownContentResult DecodeToMarkdown(ContentText content, MessageContext context)
+        public MarkdownContentResult DecodeTo(ContentText content, MessageContext context)
         {
             if (context.Author.role == "tool" && context.Author.name == "personalized_context" && showHidden == false)
             {

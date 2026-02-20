@@ -24,9 +24,7 @@ namespace ChatGPTExport.Exporters.Html
 
             var strings = new List<(string MessageId, Author Author, string Content, bool HasImage)>();
 
-            var visitor = new MarkdownContentVisitor(
-                new MarkdownDecoderFactory(assetLocator, new ConversationContext(), showHidden)
-                );
+            var visitor = new MarkdownContentVisitor(assetLocator, new ConversationContext(), showHidden);
 
             foreach (var message in messages)
             {

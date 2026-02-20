@@ -23,7 +23,7 @@ public class ContentTextDecoderTests
         var content = new ContentText { parts = ["<script>alert('x')</script>"] };
         var context = CreateContext("user");
 
-        var result = decoder.DecodeToMarkdown(content, context);
+        var result = decoder.DecodeTo(content, context);
 
         var line = Assert.Single(result.Lines);
         Assert.Equal("&lt;script&gt;alert('x')&lt;/script&gt;", line);
@@ -36,7 +36,7 @@ public class ContentTextDecoderTests
         var content = new ContentText { parts = ["<script>alert('x')</script>"] };
         var context = CreateContext("assistant");
 
-        var result = decoder.DecodeToMarkdown(content, context);
+        var result = decoder.DecodeTo(content, context);
 
         var line = Assert.Single(result.Lines);
         Assert.Equal("<script>alert('x')</script>", line);
@@ -85,7 +85,7 @@ public class ContentTextDecoderTests
 
         var context = CreateContext("assistant", metadata);
 
-        var result = decoder.DecodeToMarkdown(content, context);
+        var result = decoder.DecodeTo(content, context);
 
         var lines = result.Lines.ToArray();
         // Verify that zero-index references are inserted at the beginning
@@ -148,7 +148,7 @@ public class ContentTextDecoderTests
 
         var context = CreateContext("assistant", metadata);
 
-        var result = decoder.DecodeToMarkdown(content, context);
+        var result = decoder.DecodeTo(content, context);
 
         var output = string.Join("\n", result.Lines);
 
@@ -206,7 +206,7 @@ public class ContentTextDecoderTests
 
         var context = CreateContext("assistant", metadata);
 
-        var result = decoder.DecodeToMarkdown(content, context);
+        var result = decoder.DecodeTo(content, context);
 
         var lines = result.Lines.ToArray();
         var output = string.Join("\n", lines);
@@ -235,7 +235,7 @@ public class ContentTextDecoderTests
             new MessageMetadata(),
             string.Empty);
 
-        var result = decoder.DecodeToMarkdown(content, context);
+        var result = decoder.DecodeTo(content, context);
 
         Assert.Empty(result.Lines);
     }
@@ -252,7 +252,7 @@ public class ContentTextDecoderTests
             new MessageMetadata(),
             string.Empty);
 
-        var result = decoder.DecodeToMarkdown(content, context);
+        var result = decoder.DecodeTo(content, context);
 
         Assert.NotEmpty(result.Lines);
         Assert.Contains("Personalized context content", string.Join("\n", result.Lines));

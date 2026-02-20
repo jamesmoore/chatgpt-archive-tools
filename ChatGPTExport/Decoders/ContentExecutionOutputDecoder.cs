@@ -2,11 +2,11 @@ using ChatGPTExport.Models;
 
 namespace ChatGPTExport.Decoders
 {
-    public class ContentExecutionOutputDecoder(bool showHidden)
+    public class ContentExecutionOutputDecoder(bool showHidden) : IDecodeTo<ContentExecutionOutput, MarkdownContentResult>
     {
         private readonly string LineBreak = Environment.NewLine;
 
-        public MarkdownContentResult DecodeToMarkdown(ContentExecutionOutput content, MessageContext context)
+        public MarkdownContentResult DecodeTo(ContentExecutionOutput content, MessageContext context)
         {
             if (!showHidden)
             {

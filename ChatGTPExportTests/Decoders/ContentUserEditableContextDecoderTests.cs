@@ -18,7 +18,7 @@ public class ContentUserEditableContextDecoderTests
         var decoder = CreateDecoder(showHidden: false);
         var content = new ContentUserEditableContext { user_profile = "profile", user_instructions = "instructions" };
 
-        var result = decoder.DecodeToMarkdown(content, CreateContext());
+        var result = decoder.DecodeTo(content, CreateContext());
 
         Assert.Empty(result.Lines);
     }
@@ -29,7 +29,7 @@ public class ContentUserEditableContextDecoderTests
         var decoder = CreateDecoder(showHidden: true);
         var content = new ContentUserEditableContext { user_profile = "profile", user_instructions = "instructions" };
 
-        var result = decoder.DecodeToMarkdown(content, CreateContext());
+        var result = decoder.DecodeTo(content, CreateContext());
 
         Assert.Equal([
             "**User profile:** profile  ",

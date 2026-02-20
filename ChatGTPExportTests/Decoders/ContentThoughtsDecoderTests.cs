@@ -21,7 +21,7 @@ public class ContentThoughtsDecoderTests
             thoughts = [new ContentThoughts.Thoughts { summary = "Summary", content = "Detail" }]
         };
 
-        var result = decoder.DecodeToMarkdown(content, CreateContext());
+        var result = decoder.DecodeTo(content, CreateContext());
 
         Assert.Empty(result.Lines);
     }
@@ -35,7 +35,7 @@ public class ContentThoughtsDecoderTests
             thoughts = [new ContentThoughts.Thoughts { summary = "Summary", content = "Detail" }]
         };
 
-        var result = decoder.DecodeToMarkdown(content, CreateContext());
+        var result = decoder.DecodeTo(content, CreateContext());
 
         Assert.Equal(["Summary  ", "Detail  "], result.Lines.ToArray());
         Assert.Equal(" 💭", result.Suffix);

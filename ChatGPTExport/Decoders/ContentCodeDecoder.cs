@@ -3,11 +3,11 @@ using System.Text.RegularExpressions;
 
 namespace ChatGPTExport.Decoders
 {
-    public partial class ContentCodeDecoder(bool showHidden)
+    public partial class ContentCodeDecoder(bool showHidden) : IDecodeTo<ContentCode, MarkdownContentResult>
     {
         private readonly string LineBreak = Environment.NewLine;
 
-        public MarkdownContentResult DecodeToMarkdown(ContentCode content, MessageContext context)
+        public MarkdownContentResult DecodeTo(ContentCode content, MessageContext context)
         {
             if (showHidden == false && context.Recipient != "all")
             {
