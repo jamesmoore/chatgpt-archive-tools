@@ -1,5 +1,4 @@
 ﻿using ChatGPTExport.Decoders;
-using ChatGPTExport.Formatters;
 using ChatGPTExport.Models;
 
 namespace ChatGTPExportTests.Decoders;
