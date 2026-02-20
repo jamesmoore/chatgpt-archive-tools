@@ -103,13 +103,13 @@ namespace ChatGpt.Exporter.Cli
         private static void ExportConversation(
             Dictionary<string, IEnumerable<string>> fileContentsMap, 
             IMarkdownAssetRenderer assetLocator, 
-            IConversationFormatter exporter, 
+            IConversationFormatter formatter, 
             Conversation conversation, 
             string filename)
         {
             try
             {
-                fileContentsMap[filename] = exporter.Format(assetLocator, conversation);
+                fileContentsMap[filename] = formatter.Format(assetLocator, conversation);
             }
             catch (Exception ex)
             {
