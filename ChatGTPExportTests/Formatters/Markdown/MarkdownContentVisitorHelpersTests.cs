@@ -1,4 +1,4 @@
-using ChatGPTExport.Formatters.Markdown;
+using ChatGPTExport.Decoders;
 
 namespace ChatGTPExportTests.Formatters.Markdown;
 

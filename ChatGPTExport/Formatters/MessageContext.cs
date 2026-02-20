@@ -1,14 +1,14 @@
-﻿using ChatGPTExport.Models;
+﻿using ChatGPTExport.Formatters.Markdown;
+using ChatGPTExport.Models;
 
 namespace ChatGPTExport.Formatters
 {
-    public record ContentVisitorContext(
-        Author Author, 
+    public record MessageContext(
+        Author Author,
         DateTimeOffset? CreatedDate,
         DateTimeOffset? UpdatedDate,
         MessageMetadata MessageMetadata,
-        string Recipient
-        )
+        string Recipient)
     {
         public string Role => Author.role ?? string.Empty;
     };

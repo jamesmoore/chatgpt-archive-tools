@@ -1,4 +1,5 @@
-﻿using ChatGPTExport.Exporters;
+﻿using ChatGPTExport.Decoders;
+using ChatGPTExport.Exporters;
 using ChatGPTExport.Models;
 
 namespace ChatGPTExport.Formatters.Markdown
@@ -13,7 +14,10 @@ namespace ChatGPTExport.Formatters.Markdown
 
             var strings = new List<string>();
 
-            var visitor = new MarkdownContentVisitor(assetLocator, showHidden);
+            var visitor = new MarkdownContentVisitor(
+                new ContentTextDecoder(new ConversationContext(), showHidden),
+                new ContentMultimodalTextDecoder(assetLocator),
+                showHidden);
 
             strings.AddRange(GetYamlHeader(conversation));
 

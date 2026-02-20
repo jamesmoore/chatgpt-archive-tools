@@ -2,8 +2,8 @@ using System.Buffers;
 using System.IO.Abstractions;
 using System.Text;
 using ChatGPTExport;
+using ChatGPTExport.Decoders;
 using ChatGPTExport.Formatters;
-using ChatGPTExport.Formatters.Markdown;
 using ChatGPTExport.Models;
 
 namespace ChatGpt.Exporter.Cli

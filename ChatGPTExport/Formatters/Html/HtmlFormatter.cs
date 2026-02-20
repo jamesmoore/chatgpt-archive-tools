@@ -1,11 +1,11 @@
-﻿using System.Net;
-using System.Text.RegularExpressions;
+﻿using ChatGPTExport.Decoders;
 using ChatGPTExport.Formatters;
 using ChatGPTExport.Formatters.Html;
 using ChatGPTExport.Formatters.Html.Headers;
-using ChatGPTExport.Formatters.Markdown;
 using ChatGPTExport.Models;
 using Markdig;
+using System.Net;
+using System.Text.RegularExpressions;
 
 namespace ChatGPTExport.Exporters.Html
 {
@@ -23,7 +23,10 @@ namespace ChatGPTExport.Exporters.Html
 
             var strings = new List<(string MessageId, Author Author, string Content, bool HasImage)>();
 
-            var visitor = new MarkdownContentVisitor(assetLocator, showHidden);
+            var visitor = new MarkdownContentVisitor(
+                new ContentTextDecoder(new ConversationContext(), showHidden),
+                new ContentMultimodalTextDecoder(assetLocator), 
+                showHidden);
 
             foreach (var message in messages)
             {

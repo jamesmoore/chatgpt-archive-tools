@@ -1,7 +1,7 @@
 using ChatGPTExport.Assets;
+using ChatGPTExport.Decoders;
 using ChatGPTExport.Exporters;
 using ChatGPTExport.Formatters;
-using ChatGPTExport.Formatters.Markdown;
 using ChatGPTExport.Models;
 
 namespace ChatGTPExportTests.Formatters.Markdown;
@@ -12,12 +12,16 @@ public class MarkdownContentVisitorTests
     {
         NullAssetLocator nullAssetLocator = new();
         MarkdownAssetRenderer markdownAssetRenderer = new(nullAssetLocator);
-        return new MarkdownContentVisitor(markdownAssetRenderer, showHidden: false);
+        var showHidden = false;
+        return new MarkdownContentVisitor(
+            new ContentTextDecoder(new ConversationContext(), showHidden),
+            new ContentMultimodalTextDecoder(markdownAssetRenderer),
+            showHidden);
     }
-      
-    private static ContentVisitorContext CreateContext(string role)
+
+    private static MessageContext CreateContext(string role)
     {
-        return new ContentVisitorContext(new Author() { role = role }, null, null, new MessageMetadata(), string.Empty);
+        return new MessageContext(new Author() { role = role }, null, null, new MessageMetadata(), string.Empty);
     }
 
     [Fact]
@@ -51,7 +55,7 @@ public class MarkdownContentVisitorTests
     {
         var visitor = CreateVisitor();
         var content = new ContentText { parts = ["Some text with references"] };
-        
+
         var metadata = new MessageMetadata
         {
             content_references =
@@ -86,8 +90,8 @@ public class MarkdownContentVisitorTests
                 }
             ]
         };
-        
-        var context = new ContentVisitorContext(new Author() { role = "assistant" }, null, null, metadata, string.Empty);
+
+        var context = new MessageContext(new Author() { role = "assistant" }, null, null, metadata, string.Empty);
 
         var result = visitor.Visit(content, context);
 
@@ -104,7 +108,7 @@ public class MarkdownContentVisitorTests
     {
         var visitor = CreateVisitor();
         var content = new ContentText { parts = ["Text with references"] };
-        
+
         var metadata = new MessageMetadata
         {
             content_references =
@@ -149,20 +153,20 @@ public class MarkdownContentVisitorTests
                 }
             ]
         };
-        
-        var context = new ContentVisitorContext(new Author() { role = "assistant" }, null, null, metadata, string.Empty);
+
+        var context = new MessageContext(new Author() { role = "assistant" }, null, null, metadata, string.Empty);
 
         var result = visitor.Visit(content, context);
 
         var output = string.Join("\n", result.Lines);
-        
+
         // Verify that duplicate source appears only once
         var duplicateCount = System.Text.RegularExpressions.Regex.Matches(output, @"\[Duplicate Source\]").Count;
         Assert.Equal(1, duplicateCount);
-        
+
         // Verify that fallback-only source is included
         Assert.Contains("[Fallback Only Source](https://example.com/fallback)", output);
-        
+
         // Verify that main source is included
         Assert.Contains("[Main Source](https://example.com/main)", output);
     }
@@ -172,7 +176,7 @@ public class MarkdownContentVisitorTests
     {
         var visitor = CreateVisitor();
         var content = new ContentText { parts = ["Reference one and reference two"] };
-        
+
         var metadata = new MessageMetadata
         {
             content_references =
@@ -207,22 +211,22 @@ public class MarkdownContentVisitorTests
                 }
             ]
         };
-        
-        var context = new ContentVisitorContext(new Author() { role = "assistant" }, null, null, metadata, string.Empty);
+
+        var context = new MessageContext(new Author() { role = "assistant" }, null, null, metadata, string.Empty);
 
         var result = visitor.Visit(content, context);
 
         var lines = result.Lines.ToArray();
         var output = string.Join("\n", lines);
-        
+
         // Verify footnote numbering is sequential starting from 1
         Assert.Contains("[^1]: [First Source](https://example.com/first)", output);
         Assert.Contains("[^2]: [Second Source](https://example.com/second)", output);
-        
+
         // Verify the references in the text use the same numbers
         Assert.Contains("[^1]", lines[0]);
         Assert.Contains("[^2]", lines[0]);
-        
+
         // Verify no gaps in numbering
         Assert.DoesNotContain("[^3]", output);
     }

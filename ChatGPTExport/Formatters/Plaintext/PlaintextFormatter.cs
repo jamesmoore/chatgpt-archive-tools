@@ -1,5 +1,5 @@
+using ChatGPTExport.Decoders;
 using ChatGPTExport.Exporters;
-using ChatGPTExport.Formatters.Markdown;
 using ChatGPTExport.Models;
 
 namespace ChatGPTExport.Formatters.Plaintext
@@ -14,7 +14,10 @@ namespace ChatGPTExport.Formatters.Plaintext
 
             var strings = new List<string>();
 
-            var visitor = new MarkdownContentVisitor(assetLocator, showHidden);
+            var visitor = new MarkdownContentVisitor(
+                new ContentTextDecoder(new ConversationContext(), showHidden), 
+                new ContentMultimodalTextDecoder( assetLocator), 
+                showHidden);
 
             // Add conversation header
             strings.Add($"Title: {conversation.title ?? "No title"}");
