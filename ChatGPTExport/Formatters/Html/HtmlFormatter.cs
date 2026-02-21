@@ -125,7 +125,7 @@ namespace ChatGPTExport.Exporters.Html
             return pipeline;
         }
 
-        public static MarkdownPipelineBuilder GetMarkdownPipelineBuilder()
+        private static MarkdownPipelineBuilder GetMarkdownPipelineBuilder()
         {
             var pipelineBuilder = new MarkdownPipelineBuilder()
                 //.UseAlertBlocks()
