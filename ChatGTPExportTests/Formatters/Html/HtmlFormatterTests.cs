@@ -30,7 +30,7 @@ public class HtmlFormatterTests
         Assert.Contains("Assistant message", html);
         Assert.Contains("User message", html);
         Assert.Contains("meta name='test'", html);
-        Assert.Contains("tailwindcss", html);
+        Assert.Contains("styles/compiled.css", html);
         Assert.Contains("<!doctype html>", html, StringComparison.OrdinalIgnoreCase);
     }
 
