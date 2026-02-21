@@ -57,16 +57,18 @@ namespace ChatGpt.Archive.Api.Database
 
             foreach (var conversation in conversationList)
             {
-                var plaintextExtractor = new PlaintextExtractor();
-
-                if (conversation.mapping == null)
+                if (conversation.mapping == null || string.IsNullOrWhiteSpace(conversation.id))
+                {
                     continue;
-
-                var conversationId = conversation.id ?? string.Empty;
+                }
 
                 var mapping = conversation.GetLastestConversation().mapping;
                 if (mapping == null)
+                {
                     continue;
+                }
+                
+                var plaintextExtractor = new PlaintextExtractor();
 
                 foreach (var messageContainerEntry in mapping)
                 {
@@ -84,7 +86,7 @@ namespace ChatGpt.Archive.Api.Database
                     messageParams.Add(new
                     {
                         id = messageId,
-                        conversation_id = conversationId,
+                        conversation_id = conversation.id,
                         role,
                         content = plaintext,
                         create_time = messageCreateTime
