@@ -2,7 +2,6 @@
 using ChatGpt.Exporter.Cli.Assets;
 using ChatGpt.Exporter.Cli.Validators;
 using ChatGPTExport;
-using ChatGPTExport.Formatters.Html;
 using ChatGPTExport.Validators;
 using System.CommandLine;
 using System.CommandLine.Parsing;
@@ -95,13 +94,6 @@ var textOption = new Option<bool>("--text")
     DefaultValueFactory = (ArgumentResult ar) => false,
 };
 
-var htmlFormatOption = new Option<HtmlFormat>("-hf", "--htmlformat")
-{
-    Description = "Specify format for html exports.",
-    Required = false,
-    DefaultValueFactory = (ArgumentResult ar) => HtmlFormat.Tailwind,
-};
-
 var validateOption = new Option<bool>("--validate")
 {
     Description = "Validate the json against the known and expected schema.",
@@ -125,7 +117,6 @@ var rootCommand = new RootCommand("ChatGPT export reformatter")
     markdownOption,
     htmlOption,
     textOption,
-    htmlFormatOption,
     validateOption,
     showHiddenOption,
 };
@@ -149,7 +140,6 @@ rootCommand.SetAction(parseResult =>
         var markdown = parseResult.GetRequiredValue(markdownOption);
         var html = parseResult.GetRequiredValue(htmlOption);
         var text = parseResult.GetRequiredValue(textOption);
-        var htmlFormat = parseResult.GetRequiredValue(htmlFormatOption);
         var showHidden = parseResult.GetRequiredValue(showHiddenOption);
 
 
@@ -178,9 +168,8 @@ rootCommand.SetAction(parseResult =>
             destination,
             exportMode,
             exportTypes,
-            htmlFormat,
             showHidden);
-        var formatters = new ConversationFormatterFactory().GetFormatters(exportArgs.ExportTypes, exportArgs.HtmlFormat, exportArgs.ShowHidden);
+        var formatters = new ConversationFormatterFactory().GetFormatters(exportArgs.ExportTypes, exportArgs.ShowHidden);
 
         var validators = new List<IConversationsValidator>();
         if (validate)

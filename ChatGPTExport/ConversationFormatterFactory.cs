@@ -13,7 +13,6 @@ namespace ChatGPTExport
     {
         public IEnumerable<IConversationFormatter> GetFormatters(
             IEnumerable<ExportType> exportTypes,
-            HtmlFormat htmlFormat,
             bool showHidden
             )
         {
@@ -37,8 +36,7 @@ namespace ChatGPTExport
                     ]
                 );
 
-                var formatter = htmlFormat == HtmlFormat.Bootstrap ? new BootstrapHtmlFormatter() as IHtmlFormatter : new TailwindHtmlFormatter();
-                exporters.Add(new HtmlFormatter(formatter, headerProvider, showHidden));
+                exporters.Add(new HtmlFormatter(new TailwindHtmlFormatter(), headerProvider, showHidden));
             }
             if (exportTypes.Contains(ExportType.Text))
             {
