@@ -89,8 +89,6 @@ namespace ChatGPTExport.Exporters.Html
 
         private HtmlFragment GetHtmlFragment(string messageId, Author author, string markdown, bool hasImage, MarkdownPipeline markdownPipeline)
         {
-            var doc = Markdown.Parse(markdown, markdownPipeline);
-
             var hasMath = false;
 
             if (markdown.Contains(@"\(") && markdown.Contains(@"\)") ||
@@ -119,6 +117,16 @@ namespace ChatGPTExport.Exporters.Html
 
         private static MarkdownPipeline CreatePipeline(IHtmlFormatter formatter)
         {
+            MarkdownPipelineBuilder pipelineBuilder = GetMarkdownPipelineBuilder();
+
+            formatter.ApplyMarkdownPipelineBuilder(pipelineBuilder);
+
+            var pipeline = pipelineBuilder.Build();
+            return pipeline;
+        }
+
+        public static MarkdownPipelineBuilder GetMarkdownPipelineBuilder()
+        {
             var pipelineBuilder = new MarkdownPipelineBuilder()
                 //.UseAlertBlocks()
                 //.UseAbbreviations()
@@ -140,11 +148,7 @@ namespace ChatGPTExport.Exporters.Html
                 .UseAutoLinks()
                 .DisableHtml();
             //.UseGenericAttributes(); 
-
-            formatter.ApplyMarkdownPipelineBuilder(pipelineBuilder);
-
-            var pipeline = pipelineBuilder.Build();
-            return pipeline;
+            return pipelineBuilder;
         }
 
         public string GetExtension() => ".html";
