@@ -8,7 +8,7 @@ namespace ChatGPTExport.Formatters.Markdown
     {
         private readonly string LineBreak = Environment.NewLine;
 
-        public IEnumerable<string> Format(IMarkdownAssetRenderer assetLocator, Conversation conversation)
+        public FormattedConversation Format(IMarkdownAssetRenderer assetLocator, Conversation conversation)
         {
             var messages = conversation.GetMessagesWithContent();
 
@@ -38,7 +38,7 @@ namespace ChatGPTExport.Formatters.Markdown
                 }
             }
 
-            return strings;
+            return new FormattedConversation(string.Join(Environment.NewLine, strings), [], ".md");
         }
 
         private static IEnumerable<string> GetYamlHeader(Conversation conversation)
@@ -54,7 +54,5 @@ namespace ChatGPTExport.Formatters.Markdown
                 "---",
             ];
         }
-
-        public string GetExtension() => ".md";
     }
 }

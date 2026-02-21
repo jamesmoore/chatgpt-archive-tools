@@ -21,7 +21,7 @@ namespace ChatGpt.Exporter.Cli
         {
             try
             {
-                var fileContentsMap = new Dictionary<string, IEnumerable<string>>();
+                var fileContentsMap = new Dictionary<string, FormattedConversation>();
 
                 Console.WriteLine(conversation.title);
 
@@ -31,7 +31,7 @@ namespace ChatGpt.Exporter.Cli
                 foreach (var exporter in exporters)
                 {
                     Console.Write($"\t\t{exporter.GetType().Name}");
-                    var exportFilename = GetFilename(conversationToExport, "", exporter.GetExtension());
+                    var exportFilename = GetFilename(conversationToExport, "");
                     ExportConversation(fileContentsMap, assetLocator, exporter, conversationToExport, exportFilename);
                     Console.WriteLine($"...Done");
                 }
@@ -39,7 +39,7 @@ namespace ChatGpt.Exporter.Cli
                 foreach (var kv in fileContentsMap)
                 {
                     var destinationFilename = fileSystem.Path.Join(destination.FullName, kv.Key);
-                    var contents = string.Join(Environment.NewLine, kv.Value);
+                    var contents = kv.Value.Contents;
                     var destinationExists = fileSystem.File.Exists(destinationFilename);
                     if (destinationExists == false || destinationExists && FileStringMismatch(destinationFilename, contents))
                     {
@@ -101,7 +101,7 @@ namespace ChatGpt.Exporter.Cli
         }
 
         private static void ExportConversation(
-            Dictionary<string, IEnumerable<string>> fileContentsMap, 
+            Dictionary<string, FormattedConversation> fileContentsMap, 
             IMarkdownAssetRenderer assetLocator, 
             IConversationFormatter formatter, 
             Conversation conversation, 
@@ -109,7 +109,8 @@ namespace ChatGpt.Exporter.Cli
         {
             try
             {
-                fileContentsMap[filename] = formatter.Format(assetLocator, conversation);
+                var formattedConversation = formatter.Format(assetLocator, conversation);
+                fileContentsMap[filename + formattedConversation.Extension] = formattedConversation;
             }
             catch (Exception ex)
             {
@@ -117,12 +118,12 @@ namespace ChatGpt.Exporter.Cli
             }
         }
 
-        private string GetFilename(Conversation conversation, string modifier, string extension)
+        private string GetFilename(Conversation conversation, string modifier)
         {
             var createtime = conversation.GetCreateTime();
             var value = $"{createtime:yyyy-MM-ddTHH-mm-ss} - {conversation.title}{(string.IsNullOrWhiteSpace(modifier) ? "" : $" - {modifier}")}";
             value = new string(value.Where(p => fileSystem.Path.GetInvalidFileNameChars().Contains(p) == false).ToArray());
-            return value.Trim() + extension;
+            return value.Trim();
         }
     }
 }

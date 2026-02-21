@@ -8,7 +8,7 @@ namespace ChatGPTExport.Formatters.Plaintext
     {
         private readonly string LineBreak = Environment.NewLine;
 
-        public IEnumerable<string> Format(IMarkdownAssetRenderer assetLocator, Conversation conversation)
+        public FormattedConversation Format(IMarkdownAssetRenderer assetLocator, Conversation conversation)
         {
             var messages = conversation.GetMessagesWithContent();
 
@@ -37,7 +37,7 @@ namespace ChatGPTExport.Formatters.Plaintext
                 strings.AddRange(FormatMessage(message, visitor));
             }
 
-            return strings;
+            return new FormattedConversation(string.Join(Environment.NewLine, strings), [], ".txt");
         }
 
         private IEnumerable<string> FormatMessage(Message message, IContentVisitor<MarkdownContentResult> visitor)
@@ -67,7 +67,5 @@ namespace ChatGPTExport.Formatters.Plaintext
             }
             return strings;
         }
-
-        public string GetExtension() => ".txt";
     }
 }

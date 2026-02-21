@@ -5,7 +5,6 @@ namespace ChatGPTExport.Formatters
 {
     public interface IConversationFormatter
     {
-        IEnumerable<string> Format(IMarkdownAssetRenderer assetLocator, Conversation conversation);
-        string GetExtension();
+        FormattedConversation Format(IMarkdownAssetRenderer assetLocator, Conversation conversation);
     }
 }
