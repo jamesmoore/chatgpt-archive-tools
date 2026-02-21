@@ -18,7 +18,7 @@ namespace ChatGPTExport.Exporters.Html
         private readonly string LineBreak = Environment.NewLine;
         private readonly MarkdownPipeline MarkdownPipeline = CreatePipeline(formatter);
 
-        public IEnumerable<string> Format(IMarkdownAssetRenderer assetLocator, Conversation conversation)
+        public FormattedConversation Format(IMarkdownAssetRenderer assetLocator, Conversation conversation)
         {
             var messages = conversation.GetMessagesWithContent();
 
@@ -69,7 +69,7 @@ namespace ChatGPTExport.Exporters.Html
             string html = formatter.FormatHtmlPage(
                 new HtmlPage(titleString, [headers], htmlFragments));
 
-            return [html];
+            return new FormattedConversation(html, [], ".html");
         }
 
         [GeneratedRegex("```(.*)")]
@@ -150,7 +150,5 @@ namespace ChatGPTExport.Exporters.Html
             //.UseGenericAttributes(); 
             return pipelineBuilder;
         }
-
-        public string GetExtension() => ".html";
     }
 }
