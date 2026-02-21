@@ -1,0 +1,13 @@
+{
+  "name": "tailwind-styles",
+  "type": "module",
+  "scripts": {
+    "build": "tailwindcss -i styles/input.css -o styles/compiled.css --minify",
+    "watch": "tailwindcss -i styles/input.css -o styles/compiled.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.2.0",
+    "@tailwindcss/typography": "0.5.19",
+    "tailwindcss": "4.2.0"
+  }
+}
