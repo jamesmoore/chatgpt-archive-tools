@@ -17,7 +17,7 @@ This tool enables you to extract and reformat your conversations from the offici
 ## Features
 * Convert ChatGPT exports into smaller, viewable: 
   * markdown files
-  * html (Tailwind or Bootstrap formatted)
+  * html files
   * json files
 * Process multiple exports in one sweep, detecting the latest version of each conversation.
 * Include uploaded and generated image assets in the markdown (thanks to [GLightbox](https://biati-digital.github.io/glightbox/)).
@@ -176,7 +176,6 @@ You can export from multiple sources. For bare metal, pass `-s`/`--source` multi
 |`-m`<br>`--markdown`||Export to markdown files (`true` or `false`).|`true`|
 |`--html`||Export to html files (`true` or `false`).|`true`|
 |`--text`||Export to plaintext files (`true` or `false`).|`false`|
-|`-hf`<br>`--htmlformat`||Specify format for html exports (`bootstrap` or `tailwind`).|`tailwind`|
 |`--showhidden`||Includes hidden content in markdown and html exports.<br>Enabling this will include thinking, web searches, image prompts in the export.|`false`|
 |`--validate`||Validate the json against the known and expected schema.|`false`|
 
