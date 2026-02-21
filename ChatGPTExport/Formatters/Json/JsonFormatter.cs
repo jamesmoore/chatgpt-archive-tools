@@ -13,11 +13,9 @@ namespace ChatGPTExport.Formatters.Json
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         };
 
-        public IEnumerable<string> Format(IMarkdownAssetRenderer assetLocator, Conversation conversation)
+        public FormattedConversation Format(IMarkdownAssetRenderer assetLocator, Conversation conversation)
         {
-            return [JsonSerializer.Serialize(conversation, options)];
+            return new FormattedConversation(JsonSerializer.Serialize(conversation, options), [], ".json");
         }
-
-        public string GetExtension() => ".json";
     }
 }

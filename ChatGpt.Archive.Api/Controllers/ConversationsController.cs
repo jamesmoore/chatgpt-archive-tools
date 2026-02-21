@@ -91,7 +91,7 @@ namespace ChatGpt.Archive.Api.Controllers
                 return null;
             }
             var formatted = formatter.First().Format(markdownAssetRenderer, conversation.GetLastestConversation());
-            string content = string.Join(Environment.NewLine, formatted);
+            string content = formatted.Contents;
             return content;
         }
     }
