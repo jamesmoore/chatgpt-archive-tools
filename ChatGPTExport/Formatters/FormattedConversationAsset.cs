@@ -23,7 +23,7 @@ namespace ChatGPTExport.Formatters
         public Stream GetStream()
         {
             return Assembly.GetManifestResourceStream(resourceName) ??
-                throw new InvalidOperationException("Stream unavailable"); ;
+                throw new InvalidOperationException("Stream unavailable");
         }
     }
 }
