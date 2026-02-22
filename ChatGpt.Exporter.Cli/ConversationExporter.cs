@@ -2,6 +2,7 @@ using System.Buffers;
 using System.IO.Abstractions;
 using System.Text;
 using ChatGPTExport;
+using ChatGPTExport.Assets;
 using ChatGPTExport.Decoders;
 using ChatGPTExport.Formatters;
 using ChatGPTExport.Models;
@@ -15,9 +16,9 @@ namespace ChatGpt.Exporter.Cli
         /// </summary>
         /// <param name="conversation">Conversation.</param>
         /// <param name="destination">Destination directory.</param>
-        /// <param name="assetLocator">The asset locator.</param>
+        /// <param name="assetRenderer">The asset locator.</param>
         /// <exception cref="ApplicationException"></exception>
-        public void Process(Conversation conversation, IDirectoryInfo destination, IMarkdownAssetRenderer assetLocator)
+        public void Process(Conversation conversation, IDirectoryInfo destination, IAssetLocator assetLocator, IMarkdownAssetRenderer assetRenderer)
         {
             try
             {
@@ -32,7 +33,7 @@ namespace ChatGpt.Exporter.Cli
                 {
                     Console.Write($"\t\t{exporter.GetType().Name}");
                     var exportFilename = GetFilename(conversationToExport, "");
-                    ExportConversation(fileContentsMap, assetLocator, exporter, conversationToExport, exportFilename);
+                    ExportConversation(fileContentsMap, assetLocator, assetRenderer, exporter, conversationToExport, exportFilename);
                     Console.WriteLine($"...Done");
                 }
 
@@ -53,7 +54,7 @@ namespace ChatGpt.Exporter.Cli
                         Console.WriteLine($"\t{filename}...No change");
                     }
 
-                    foreach(var asset in formattedConversation.Assets)
+                    foreach (var asset in formattedConversation.Assets)
                     {
                         var assetDestinationFilename = fileSystem.Path.Join(destination.FullName, asset.Name);
                         if (fileSystem.File.Exists(assetDestinationFilename) == false)
@@ -123,15 +124,16 @@ namespace ChatGpt.Exporter.Cli
         }
 
         private static void ExportConversation(
-            Dictionary<string, FormattedConversation> fileContentsMap, 
-            IMarkdownAssetRenderer assetLocator, 
-            IConversationFormatter formatter, 
-            Conversation conversation, 
+            Dictionary<string, FormattedConversation> fileContentsMap,
+            IAssetLocator assetLocator,
+            IMarkdownAssetRenderer assetRenderer,
+            IConversationFormatter formatter,
+            Conversation conversation,
             string filename)
         {
             try
             {
-                var formattedConversation = formatter.Format(assetLocator, conversation, ".");
+                var formattedConversation = formatter.Format(assetLocator, assetRenderer, conversation, ".");
                 fileContentsMap[filename + formattedConversation.Extension] = formattedConversation;
             }
             catch (Exception ex)

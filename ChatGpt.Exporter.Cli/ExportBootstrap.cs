@@ -53,7 +53,8 @@ namespace ChatGpt.Exporter.Cli
                 .ToList();
 
             var conversationAssetsList = successfulConversations.OrderByDescending(p => p.Conversations.GetUpdateTime()).Select(p => p.ConversationAssets);
-            var assetLocator = new MarkdownAssetRenderer(exportAssetLocatorFactory.GetAssetLocator(conversationAssetsList, destination));
+            var assetLocator = exportAssetLocatorFactory.GetAssetLocator(conversationAssetsList, destination);
+            var assetRenderer = new MarkdownAssetRenderer();
 
             var count = conversations.Count;
             var position = 0;
@@ -61,7 +62,7 @@ namespace ChatGpt.Exporter.Cli
             {
                 var percent = (int)(position++ * 100.0 / count);
                 ConsoleFeatures.SetProgress(percent);
-                exporter.Process(conversation, destination, assetLocator);
+                exporter.Process(conversation, destination, assetLocator, assetRenderer);
             }
 
             return 0;

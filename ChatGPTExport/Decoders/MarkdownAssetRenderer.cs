@@ -2,13 +2,10 @@
 
 namespace ChatGPTExport.Decoders
 {
-    public class MarkdownAssetRenderer(IAssetLocator assetLocator) : IMarkdownAssetRenderer
+    public class MarkdownAssetRenderer : IMarkdownAssetRenderer
     {
-        public IEnumerable<string> RenderAsset(MessageContext context, string asset_pointer)
+        public IEnumerable<string> RenderAsset(Asset? markdownAsset, string asset_pointer)
         {
-            var searchPattern = GetSearchPattern(asset_pointer);
-            var markdownAsset = GetMediaAsset(context, searchPattern);
-
             if (markdownAsset != null)
             {
                 yield return markdownAsset.GetMarkdownLink();
@@ -21,19 +18,6 @@ namespace ChatGPTExport.Decoders
             }
         }
 
-        private static string GetSearchPattern(string assetPointer)
-        {
-            return assetPointer.Replace("sediment://", string.Empty).Replace("file-service://", string.Empty);
-        }
 
-        private Asset? GetMediaAsset(MessageContext context, string searchPattern)
-        {
-            return assetLocator.GetMarkdownMediaAsset(new AssetRequest(
-                searchPattern,
-                context.Role,
-                context.CreatedDate,
-                context.UpdatedDate)
-                );
-        }
     }
 }
