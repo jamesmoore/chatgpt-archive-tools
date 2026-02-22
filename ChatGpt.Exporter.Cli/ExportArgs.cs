@@ -1,6 +1,5 @@
 ﻿using System.IO.Abstractions;
 using ChatGPTExport;
-using ChatGPTExport.Formatters.Html;
 
 namespace ChatGpt.Exporter.Cli
 {
@@ -9,6 +8,5 @@ namespace ChatGpt.Exporter.Cli
         IDirectoryInfo DestinationDirectory, 
         ExportMode ExportMode, 
         IEnumerable<ExportType> ExportTypes, 
-        HtmlFormat HtmlFormat, 
         bool ShowHidden);
 }

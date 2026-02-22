@@ -2,7 +2,6 @@
 using ChatGpt.Archive.Api.Services;
 using ChatGPTExport;
 using ChatGPTExport.Decoders;
-using ChatGPTExport.Formatters.Html;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChatGpt.Archive.Api.Controllers
@@ -84,7 +83,7 @@ namespace ChatGpt.Archive.Api.Controllers
 
         private string? GetContent(string id, ExportType exportType)
         {
-            var formatter = conversationFormatterFactory.GetFormatters([exportType], HtmlFormat.Tailwind, false);
+            var formatter = conversationFormatterFactory.GetFormatters([exportType], false);
             var conversation = conversationsService.GetConversation(id);
             if (conversation == null)
             {
