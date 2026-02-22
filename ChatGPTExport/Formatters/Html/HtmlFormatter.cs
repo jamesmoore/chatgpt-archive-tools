@@ -17,9 +17,9 @@ namespace ChatGPTExport.Exporters.Html
     {
         private readonly string LineBreak = Environment.NewLine;
         private readonly MarkdownPipeline MarkdownPipeline = CreatePipeline(formatter);
-        private readonly EmbeddedResourceAsset CssAsset = new("/styles/tailwindcompiled.css", "ChatGPTExport.Formatters.Html.Templates.Styles.tailwindcompiled.css");
+        private readonly EmbeddedResourceAsset CssAsset = new("/styles/tailwindcompiled.css", "ChatGPTExport.Formatters.Html.Templates.Styles.tailwindcompiled.css", "text/css");
 
-        public FormattedConversation Format(IMarkdownAssetRenderer assetLocator, Conversation conversation)
+        public FormattedConversation Format(IMarkdownAssetRenderer assetLocator, Conversation conversation, string pathPrefix)
         {
             var messages = conversation.GetMessagesWithContent();
 
@@ -68,7 +68,8 @@ namespace ChatGPTExport.Exporters.Html
             var headers = headerProvider.GetHeaders(body);
 
             string html = formatter.FormatHtmlPage(
-                new HtmlPage(titleString, [headers], htmlFragments));
+                new HtmlPage(titleString, [headers], htmlFragments), 
+                pathPrefix);
 
             return new FormattedConversation(html, [CssAsset], ".html");
         }
@@ -118,10 +119,7 @@ namespace ChatGPTExport.Exporters.Html
 
         private static MarkdownPipeline CreatePipeline(IHtmlFormatter formatter)
         {
-            MarkdownPipelineBuilder pipelineBuilder = GetMarkdownPipelineBuilder();
-
-            formatter.ApplyMarkdownPipelineBuilder(pipelineBuilder);
-
+            var pipelineBuilder = GetMarkdownPipelineBuilder();
             var pipeline = pipelineBuilder.Build();
             return pipeline;
         }

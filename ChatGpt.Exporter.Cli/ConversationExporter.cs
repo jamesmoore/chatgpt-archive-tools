@@ -131,7 +131,7 @@ namespace ChatGpt.Exporter.Cli
         {
             try
             {
-                var formattedConversation = formatter.Format(assetLocator, conversation);
+                var formattedConversation = formatter.Format(assetLocator, conversation, ".");
                 fileContentsMap[filename + formattedConversation.Extension] = formattedConversation;
             }
             catch (Exception ex)

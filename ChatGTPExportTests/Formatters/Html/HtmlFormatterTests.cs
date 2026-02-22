@@ -11,18 +11,17 @@ public class HtmlFormatterTests
         // Arrange
         var page = new HtmlPage(
             "Test Title",
-            new[] { "<meta name='test' content='value'>" },
-            new[]
-            {
-                new HtmlFragment(false, "<p>Assistant message</p>", false, false, false, Array.Empty<string>()),
-                new HtmlFragment(true, "<p>User message</p>", false, false, false, Array.Empty<string>())
-            }
+            ["<meta name='test' content='value'>"],
+            [
+                new HtmlFragment(false, "<p>Assistant message</p>", false, false, false, []),
+                new HtmlFragment(true, "<p>User message</p>", false, false, false, [])
+            ]
         );
 
         var formatter = new TailwindHtmlFormatter();
 
         // Act
-        var html = formatter.FormatHtmlPage(page);
+        var html = formatter.FormatHtmlPage(page, string.Empty);
 
         // Assert
         Assert.NotEmpty(html);
@@ -40,18 +39,17 @@ public class HtmlFormatterTests
         // Arrange
         var page = new HtmlPage(
             "Test",
-            Array.Empty<string>(),
-            new[]
-            {
-                new HtmlFragment(false, "<p>Assistant</p>", false, false, false, Array.Empty<string>()),
-                new HtmlFragment(true, "<p>User</p>", false, false, false, Array.Empty<string>())
-            }
+            [],
+            [
+                new HtmlFragment(false, "<p>Assistant</p>", false, false, false, []),
+                new HtmlFragment(true, "<p>User</p>", false, false, false, [])
+            ]
         );
 
         var formatter = new TailwindHtmlFormatter();
 
         // Act
-        var html = formatter.FormatHtmlPage(page);
+        var html = formatter.FormatHtmlPage(page, string.Empty);
 
         // Assert - Tailwind uses specific classes for user messages
         Assert.Contains("justify-end", html);

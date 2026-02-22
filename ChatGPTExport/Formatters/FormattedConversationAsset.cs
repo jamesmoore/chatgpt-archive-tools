@@ -3,27 +3,22 @@ using System.Reflection;
 
 namespace ChatGPTExport.Formatters
 {
-    // Include mime type?
     public interface IFormattedConversationAsset
     {
         public string Name { get; }
 
         public Stream GetStream();
+
+        public string MimeType { get; }
     }
 
-    public class EmbeddedResourceAsset : IFormattedConversationAsset
+    public class EmbeddedResourceAsset(string name, string resourceName, string mimeType) : IFormattedConversationAsset
     {
         private static readonly Assembly Assembly = typeof(EmbeddedResourceAsset).Assembly;
 
-        public EmbeddedResourceAsset(string name, string resourceName)
-        {
-            Name = name;
-            this.resourceName = resourceName;
-        }
+        public string Name { get; } = name;
 
-        private string resourceName;
-
-        public string Name { get; private set; }
+        public string MimeType { get; } = mimeType;
 
         public Stream GetStream()
         {

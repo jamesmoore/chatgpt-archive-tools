@@ -5,6 +5,6 @@ namespace ChatGPTExport.Formatters
 {
     public interface IConversationFormatter
     {
-        FormattedConversation Format(IMarkdownAssetRenderer assetLocator, Conversation conversation);
+        FormattedConversation Format(IMarkdownAssetRenderer assetLocator, Conversation conversation, string pathPrefix);
     }
 }

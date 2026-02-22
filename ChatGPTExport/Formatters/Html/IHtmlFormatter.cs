@@ -4,7 +4,6 @@ namespace ChatGPTExport.Formatters.Html
 {
     internal interface IHtmlFormatter
     {
-        void ApplyMarkdownPipelineBuilder(MarkdownPipelineBuilder markdownPipelineBuilder);
-        string FormatHtmlPage(HtmlPage page);
+        string FormatHtmlPage(HtmlPage page, string pathPrefix);
     }
 }
