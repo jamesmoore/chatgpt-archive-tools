@@ -6,7 +6,7 @@
   <title>{{ title }}</title>
 
   <!-- Tailwind (with Typography plugin) -->
-  <link rel="stylesheet" href="{{ pathprefix }}/styles/tailwindcompiled.css"/>
+  <link rel="stylesheet" href="{{ pathprefix }}{{ cssname }}"/>
 
 {{ for header in headers }}
 {{ header }}

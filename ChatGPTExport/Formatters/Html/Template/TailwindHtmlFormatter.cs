@@ -14,6 +14,7 @@
                     html = fragment.Html,
                 }),
                 pathprefix = pathPrefix,
+                cssname = page.CssName,
             };
 
             return TemplateRenderer.RenderTemplate("Tailwind", model);
