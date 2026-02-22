@@ -2,8 +2,8 @@
   "name": "tailwind-styles",
   "type": "module",
   "scripts": {
-    "build": "tailwindcss -i styles/input.css -o styles/compiled.css --minify",
-    "watch": "tailwindcss -i styles/input.css -o styles/compiled.css --watch"
+    "build": "tailwindcss -i styles/input.css -o ../ChatGPTExport/Formatters/Html/Templates/Styles/compiled.css --minify",
+    "watch": "tailwindcss -i styles/input.css -o ../ChatGPTExport/Formatters/Html/Templates/Styles/compiled.css --watch"
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.2.0",

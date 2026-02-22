@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Formatters\Html\Templates\*.scriban" />
+    <EmbeddedResource Include="Formatters\Html\Templates\Styles\compiled.css" />
   </ItemGroup>
 
 </Project>

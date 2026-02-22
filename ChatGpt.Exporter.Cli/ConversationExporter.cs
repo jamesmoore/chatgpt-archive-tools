@@ -36,21 +36,43 @@ namespace ChatGpt.Exporter.Cli
                     Console.WriteLine($"...Done");
                 }
 
-                foreach (var kv in fileContentsMap)
+                foreach (var (filename, formattedConversation) in fileContentsMap)
                 {
-                    var destinationFilename = fileSystem.Path.Join(destination.FullName, kv.Key);
-                    var contents = kv.Value.Contents;
+                    var destinationFilename = fileSystem.Path.Join(destination.FullName, filename);
+                    var contents = formattedConversation.Contents;
                     var destinationExists = fileSystem.File.Exists(destinationFilename);
                     if (destinationExists == false || destinationExists && FileStringMismatch(destinationFilename, contents))
                     {
                         fileSystem.File.WriteAllText(destinationFilename, contents);
                         fileSystem.File.SetCreationTimeUtcIfPossible(destinationFilename, conversation.GetCreateTime().DateTime);
                         fileSystem.File.SetLastWriteTimeUtc(destinationFilename, conversation.GetUpdateTime().DateTime);
-                        Console.WriteLine($"\t{kv.Key}...Saved");
+                        Console.WriteLine($"\t{filename}...Saved");
                     }
                     else
                     {
-                        Console.WriteLine($"\t{kv.Key}...No change");
+                        Console.WriteLine($"\t{filename}...No change");
+                    }
+
+                    foreach(var asset in formattedConversation.Assets)
+                    {
+                        var assetDestinationFilename = fileSystem.Path.Join(destination.FullName, asset.Name);
+                        if (fileSystem.File.Exists(assetDestinationFilename) == false)
+                        {
+                            var assetDestinationDirectory = fileSystem.Path.GetDirectoryName(assetDestinationFilename);
+                            if (string.IsNullOrEmpty(assetDestinationDirectory) == false)
+                            {
+                                fileSystem.Directory.CreateDirectory(assetDestinationDirectory);
+                            }
+
+                            using var stream = asset.GetStream();
+                            using var fileStream = fileSystem.File.Create(assetDestinationFilename);
+                            stream.CopyTo(fileStream);
+                            Console.WriteLine($"\t\t{asset.Name}...Saved");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"\t\t{asset.Name}...Exists");
+                        }
                     }
                 }
             }

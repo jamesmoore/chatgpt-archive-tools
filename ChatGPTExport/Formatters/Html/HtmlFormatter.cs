@@ -17,6 +17,7 @@ namespace ChatGPTExport.Exporters.Html
     {
         private readonly string LineBreak = Environment.NewLine;
         private readonly MarkdownPipeline MarkdownPipeline = CreatePipeline(formatter);
+        private readonly EmbeddedResourceAsset CssAsset = new("/styles/compiled.css", "ChatGPTExport.Formatters.Html.Templates.Styles.compiled.css");
 
         public FormattedConversation Format(IMarkdownAssetRenderer assetLocator, Conversation conversation)
         {
@@ -69,7 +70,7 @@ namespace ChatGPTExport.Exporters.Html
             string html = formatter.FormatHtmlPage(
                 new HtmlPage(titleString, [headers], htmlFragments));
 
-            return new FormattedConversation(html, [], ".html");
+            return new FormattedConversation(html, [CssAsset], ".html");
         }
 
         [GeneratedRegex("```(.*)")]
