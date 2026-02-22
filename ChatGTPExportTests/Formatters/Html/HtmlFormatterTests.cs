@@ -15,7 +15,8 @@ public class HtmlFormatterTests
             [
                 new HtmlFragment(false, "<p>Assistant message</p>", false, false, false, []),
                 new HtmlFragment(true, "<p>User message</p>", false, false, false, [])
-            ]
+            ],
+            "styles/tailwindcompiled.css"
         );
 
         var formatter = new TailwindHtmlFormatter();
@@ -43,7 +44,8 @@ public class HtmlFormatterTests
             [
                 new HtmlFragment(false, "<p>Assistant</p>", false, false, false, []),
                 new HtmlFragment(true, "<p>User</p>", false, false, false, [])
-            ]
+            ],
+            "styles/tailwindcompiled.css"
         );
 
         var formatter = new TailwindHtmlFormatter();

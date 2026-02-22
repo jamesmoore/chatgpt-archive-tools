@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Concurrent;
+using System.IO;
 using System.Reflection;
 using System.Security.Cryptography;
 
@@ -16,7 +17,7 @@ namespace ChatGPTExport.Formatters
     public class EmbeddedResourceAsset(string name, string resourceName, string mimeType) : IFormattedConversationAsset
     {
         private static readonly Assembly Assembly = typeof(EmbeddedResourceAsset).Assembly;
-        private static readonly Dictionary<string, string> HashedNameCache = [];
+        private static readonly ConcurrentDictionary<string, string> HashedNameCache = [];
 
         public string Name { get; } = GetOrComputeHashedName(name, resourceName);
 

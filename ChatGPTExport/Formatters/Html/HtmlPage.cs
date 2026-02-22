@@ -5,7 +5,7 @@
         string Title,
         IEnumerable<string> Headers,
         IEnumerable<HtmlFragment> Body,
-        string CssName = "/styles/tailwindcompiled.css");
+        string CssName);
 
     public record HtmlFragment(
         bool IsUser,
