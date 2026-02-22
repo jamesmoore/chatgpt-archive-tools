@@ -1,4 +1,5 @@
-﻿using ChatGPTExport.Decoders;
+﻿using ChatGPTExport.Assets;
+using ChatGPTExport.Decoders;
 using ChatGPTExport.Models;
 using ChatGPTExport.Visitor;
 
@@ -8,13 +9,13 @@ namespace ChatGPTExport.Formatters.Markdown
     {
         private readonly string LineBreak = Environment.NewLine;
 
-        public FormattedConversation Format(IMarkdownAssetRenderer assetLocator, Conversation conversation, string pathPrefix)
+        public FormattedConversation Format(IAssetLocator assetLocator, IMarkdownAssetRenderer assetRenderer, Conversation conversation, string pathPrefix)
         {
             var messages = conversation.GetMessagesWithContent();
 
             var strings = new List<string>();
 
-            var visitor = new MarkdownContentVisitor(assetLocator, new ConversationContext(), showHidden);
+            var visitor = new MarkdownContentVisitor(assetLocator, assetRenderer, new ConversationContext(), showHidden);
 
             strings.AddRange(GetYamlHeader(conversation));
 

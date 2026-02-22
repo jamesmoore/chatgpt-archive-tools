@@ -1,3 +1,4 @@
+using ChatGPTExport.Assets;
 using ChatGPTExport.Decoders;
 using ChatGPTExport.Models;
 
@@ -7,10 +8,15 @@ public class ContentMultimodalTextDecoderTests
 {
     private sealed class TestAssetRenderer : IMarkdownAssetRenderer
     {
-        public IEnumerable<string> RenderAsset(MessageContext context, string asset_pointer)
+        public IEnumerable<string> RenderAsset(Asset? asset, string asset_pointer)
         {
             return [$"![asset]({asset_pointer})"];
         }
+    }
+
+    private class AssetLocator : IAssetLocator
+    {
+        public Asset? GetMarkdownMediaAsset(AssetRequest assetRequest) => null;
     }
 
     private static MessageContext CreateContext()
@@ -26,7 +32,7 @@ public class ContentMultimodalTextDecoderTests
     [Fact]
     public void ImageParts_AreRenderedWithMetadataAndHasImage()
     {
-        var decoder = new ContentMultimodalTextDecoder(new TestAssetRenderer());
+        var decoder = new ContentMultimodalTextDecoder(new AssetLocator(), new TestAssetRenderer());
         var content = new ContentMultimodalText
         {
             parts =

@@ -1,4 +1,5 @@
-﻿using ChatGPTExport.Decoders;
+﻿using ChatGPTExport.Assets;
+using ChatGPTExport.Decoders;
 using ChatGPTExport.Formatters;
 using ChatGPTExport.Formatters.Html;
 using ChatGPTExport.Formatters.Html.Headers;
@@ -19,13 +20,13 @@ namespace ChatGPTExport.Exporters.Html
         private readonly MarkdownPipeline MarkdownPipeline = CreatePipeline(formatter);
         private readonly EmbeddedResourceAsset CssAsset = new("/styles/tailwindcompiled.css", "ChatGPTExport.Formatters.Html.Templates.Styles.tailwindcompiled.css", "text/css");
 
-        public FormattedConversation Format(IMarkdownAssetRenderer assetLocator, Conversation conversation, string pathPrefix)
+        public FormattedConversation Format(IAssetLocator assetLocator, IMarkdownAssetRenderer assetRenderer, Conversation conversation, string pathPrefix)
         {
             var messages = conversation.GetMessagesWithContent();
 
             var strings = new List<(string MessageId, Author Author, string Content, bool HasImage)>();
 
-            var visitor = new MarkdownContentVisitor(assetLocator, new ConversationContext(), showHidden);
+            var visitor = new MarkdownContentVisitor(assetLocator, assetRenderer, new ConversationContext(), showHidden);
 
             foreach (var message in messages)
             {

@@ -1,6 +1,5 @@
 ﻿using ChatGPTExport.Exporters.Html;
 using ChatGPTExport.Formatters;
-using ChatGPTExport.Formatters.Html;
 using ChatGPTExport.Formatters.Html.Headers;
 using ChatGPTExport.Formatters.Html.Template;
 using ChatGPTExport.Formatters.Json;

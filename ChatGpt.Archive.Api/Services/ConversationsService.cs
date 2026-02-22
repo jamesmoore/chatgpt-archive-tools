@@ -1,5 +1,6 @@
 ﻿using ChatGpt.Archive.Api.Database;
 using ChatGPTExport;
+using ChatGPTExport.Assets;
 using ChatGPTExport.Decoders;
 using ChatGPTExport.Models;
 using System.IO.Abstractions;
@@ -12,6 +13,7 @@ namespace ChatGpt.Archive.Api.Services
         IConversationAssetsCache conversationAssetsCache,
         ConversationFinder conversationFinder,
         ArchiveSourcesOptions options,
+        IAssetLocator assetLocator,
         IMarkdownAssetRenderer markdownAssetRenderer,
         ConversationFormatterFactory conversationFormatterFactory,
         AssetsCache assetsCache) : IConversationsService
@@ -81,7 +83,7 @@ namespace ChatGpt.Archive.Api.Services
             {
                 return null;
             }
-            var formatted = formatter.First().Format(markdownAssetRenderer, conversation.GetLastestConversation(), string.Empty);
+            var formatted = formatter.First().Format(assetLocator, markdownAssetRenderer, conversation.GetLastestConversation(), string.Empty);
 
             if (formatted != null)
             {

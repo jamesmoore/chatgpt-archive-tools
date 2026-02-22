@@ -1,3 +1,4 @@
+using ChatGPTExport.Assets;
 using ChatGPTExport.Decoders;
 using ChatGPTExport.Models;
 using ChatGPTExport.Visitor;
@@ -10,6 +11,7 @@ public class MarkdownContentVisitorTests
     public void Visitor_DelegatesToCorrectDecoder_ForContentText()
     {
         var visitor = new MarkdownContentVisitor(
+            new AssetLocator(),
             new NullAssetRenderer(),
             new ConversationContext(),
             showHidden: false);
@@ -29,6 +31,11 @@ public class MarkdownContentVisitorTests
 
     private class NullAssetRenderer : IMarkdownAssetRenderer
     {
-        public IEnumerable<string> RenderAsset(MessageContext context, string asset_pointer) => [];
+        public IEnumerable<string> RenderAsset(Asset? asset, string asset_pointer) => [];
+    }
+
+    private class AssetLocator : IAssetLocator
+    {
+        public Asset? GetMarkdownMediaAsset(AssetRequest assetRequest) => null;
     }
 }
