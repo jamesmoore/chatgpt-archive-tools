@@ -4,7 +4,8 @@
     public record HtmlPage(
         string Title,
         IEnumerable<string> Headers,
-        IEnumerable<HtmlFragment> Body);
+        IEnumerable<HtmlFragment> Body,
+        string CssName);
 
     public record HtmlFragment(
         bool IsUser,

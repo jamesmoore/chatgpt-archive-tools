@@ -1,0 +1,39 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+@source "../../ChatGPTExport/Formatters/Html/Templates/Tailwind.scriban";
+
+/* === Custom Overrides === */
+
+@layer components {
+  .prose pre code {
+    background-color: transparent;
+    padding: 0;
+    border-radius: 0;
+    color: inherit;
+  }
+}
+
+/* Scrollbars */
+@layer base {
+  :root {
+    --scrollbar-thumb: rgb(163 163 163);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --scrollbar-thumb: rgb(82 82 82);
+    }
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb);
+  }
+
+  * {
+    scrollbar-color: var(--scrollbar-thumb) transparent;
+  }
+}

@@ -1,5 +1,6 @@
 ﻿using ChatGpt.Archive.Api.Database;
 using ChatGPTExport;
+using ChatGPTExport.Decoders;
 using ChatGPTExport.Models;
 using System.IO.Abstractions;
 
@@ -10,7 +11,10 @@ namespace ChatGpt.Archive.Api.Services
         IArchiveRepository archiveRepository,
         IConversationAssetsCache conversationAssetsCache,
         ConversationFinder conversationFinder,
-        ArchiveSourcesOptions options) : IConversationsService
+        ArchiveSourcesOptions options,
+        IMarkdownAssetRenderer markdownAssetRenderer,
+        ConversationFormatterFactory conversationFormatterFactory,
+        AssetsCache assetsCache) : IConversationsService
     {
         private readonly Lock _loadLock = new();
 
@@ -67,6 +71,31 @@ namespace ChatGpt.Archive.Api.Services
             });
 
             return consolidatedResults;
+        }
+
+        public string? GetContent(string conversationId, ExportType exportType)
+        {
+            var formatter = conversationFormatterFactory.GetFormatters([exportType], false);
+            var conversation = GetConversation(conversationId);
+            if (conversation == null)
+            {
+                return null;
+            }
+            var formatted = formatter.First().Format(markdownAssetRenderer, conversation.GetLastestConversation(), string.Empty);
+
+            if (formatted != null)
+            {
+                var assets = formatted.Assets;
+                if (assets != null)
+                {
+                    foreach (var asset in assets)
+                    {
+                        assetsCache.Set(asset.Name, asset);
+                    }
+                }
+            }
+
+            return formatted?.Contents;
         }
 
         public void ClearAll()

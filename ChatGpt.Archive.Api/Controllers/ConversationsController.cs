@@ -1,7 +1,6 @@
 ﻿using ChatGpt.Archive.Api.Database;
 using ChatGpt.Archive.Api.Services;
 using ChatGPTExport;
-using ChatGPTExport.Decoders;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChatGpt.Archive.Api.Controllers
@@ -9,9 +8,7 @@ namespace ChatGpt.Archive.Api.Controllers
     [ApiController]
     [Route("[controller]")]
     public class ConversationsController(
-        IConversationsService conversationsService,
-        IMarkdownAssetRenderer markdownAssetRenderer,
-        ConversationFormatterFactory conversationFormatterFactory
+        IConversationsService conversationsService
         ) : ControllerBase
     {
         /// <summary>
@@ -73,25 +70,8 @@ namespace ChatGpt.Archive.Api.Controllers
 
         private IActionResult GetActionResult(string id, ExportType exportType, string contentType)
         {
-            var content = GetContent(id, exportType);
-            if (content == null)
-            {
-                return NotFound();
-            }
-            return Content(content, contentType);
-        }
-
-        private string? GetContent(string id, ExportType exportType)
-        {
-            var formatter = conversationFormatterFactory.GetFormatters([exportType], false);
-            var conversation = conversationsService.GetConversation(id);
-            if (conversation == null)
-            {
-                return null;
-            }
-            var formatted = formatter.First().Format(markdownAssetRenderer, conversation.GetLastestConversation());
-            string content = formatted.Contents;
-            return content;
+            var content = conversationsService.GetContent(id, exportType);
+            return content == null ? NotFound() : Content(content, contentType);
         }
     }
 

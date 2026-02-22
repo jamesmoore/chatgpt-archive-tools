@@ -77,6 +77,7 @@ builder.Services.AddSingleton<IConversationAssetsCache, ConversationAssetsCache>
 builder.Services.AddSingleton<IAssetLocator, ApiAssetLocator>();
 builder.Services.AddSingleton<IMarkdownAssetRenderer, MarkdownAssetRenderer>();
 builder.Services.AddSingleton<ConversationFormatterFactory>();
+builder.Services.AddSingleton<AssetsCache>();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 

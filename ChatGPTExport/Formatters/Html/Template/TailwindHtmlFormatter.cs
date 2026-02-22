@@ -1,14 +1,8 @@
-﻿using Markdig;
-
-namespace ChatGPTExport.Formatters.Html.Template
+﻿namespace ChatGPTExport.Formatters.Html.Template
 {
     internal class TailwindHtmlFormatter : IHtmlFormatter
     {
-        public void ApplyMarkdownPipelineBuilder(MarkdownPipelineBuilder markdownPipelineBuilder)
-        {
-        }
-
-        public string FormatHtmlPage(HtmlPage page)
+        public string FormatHtmlPage(HtmlPage page, string pathPrefix)
         {
             var model = new
             {
@@ -18,7 +12,9 @@ namespace ChatGPTExport.Formatters.Html.Template
                 {
                     is_user = fragment.IsUser,
                     html = fragment.Html,
-                })
+                }),
+                pathprefix = pathPrefix,
+                cssname = page.CssName,
             };
 
             return TemplateRenderer.RenderTemplate("Tailwind", model);

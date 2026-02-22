@@ -1,0 +1,14 @@
+{
+  "name": "tailwind-styles",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tailwindcss -i styles/input.css -o ../ChatGPTExport/Formatters/Html/Templates/Styles/tailwindcompiled.css --minify",
+    "watch": "tailwindcss -i styles/input.css -o ../ChatGPTExport/Formatters/Html/Templates/Styles/tailwindcompiled.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "4.2.0",
+    "@tailwindcss/typography": "0.5.19",
+    "tailwindcss": "4.2.0"
+  }
+}

@@ -6,46 +6,7 @@
   <title>{{ title }}</title>
 
   <!-- Tailwind (with Typography plugin) -->
-  <script>
-    window.tailwind = { config: { darkMode: 'class' } };
-  </script>
-  <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
-
-  <style>
-  /* Remove inline-code styling when code is inside a pre block */
-  .prose pre code {
-      background-color: transparent !important;
-      padding: 0 !important;
-      border-radius: 0 !important;
-      color: inherit !important;
-  }
-  </style>
-
-<style>
-:root {
-  --scrollbar-thumb: rgb(163 163 163); /* neutral-400 */
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --scrollbar-thumb: rgb(82 82 82); /* neutral-600 */
-  }
-}
-
-/* WebKit */
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: var(--scrollbar-thumb);
-}
-
-/* Firefox */
-* {
-  scrollbar-color: var(--scrollbar-thumb) transparent;
-}
-</style>
+  <link rel="stylesheet" href="{{ pathprefix }}{{ cssname }}"/>
 
 {{ for header in headers }}
 {{ header }}

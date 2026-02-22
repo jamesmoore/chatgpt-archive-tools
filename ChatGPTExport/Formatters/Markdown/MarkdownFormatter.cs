@@ -8,7 +8,7 @@ namespace ChatGPTExport.Formatters.Markdown
     {
         private readonly string LineBreak = Environment.NewLine;
 
-        public FormattedConversation Format(IMarkdownAssetRenderer assetLocator, Conversation conversation)
+        public FormattedConversation Format(IMarkdownAssetRenderer assetLocator, Conversation conversation, string pathPrefix)
         {
             var messages = conversation.GetMessagesWithContent();
 
