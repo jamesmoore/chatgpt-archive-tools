@@ -18,7 +18,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Formatters\Html\Templates\*.scriban" />
-    <EmbeddedResource Include="Formatters\Html\Templates\Styles\compiled.css" />
+    <EmbeddedResource Include="Formatters\Html\Templates\Styles\tailwindcompiled.css" />
   </ItemGroup>
 
 </Project>

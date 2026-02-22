@@ -17,7 +17,7 @@ namespace ChatGPTExport.Exporters.Html
     {
         private readonly string LineBreak = Environment.NewLine;
         private readonly MarkdownPipeline MarkdownPipeline = CreatePipeline(formatter);
-        private readonly EmbeddedResourceAsset CssAsset = new("/styles/compiled.css", "ChatGPTExport.Formatters.Html.Templates.Styles.compiled.css");
+        private readonly EmbeddedResourceAsset CssAsset = new("/styles/tailwindcompiled.css", "ChatGPTExport.Formatters.Html.Templates.Styles.tailwindcompiled.css");
 
         public FormattedConversation Format(IMarkdownAssetRenderer assetLocator, Conversation conversation)
         {
