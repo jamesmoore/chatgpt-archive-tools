@@ -1,5 +1,6 @@
 {
   "name": "tailwind-styles",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "build": "tailwindcss -i styles/input.css -o ../ChatGPTExport/Formatters/Html/Templates/Styles/tailwindcompiled.css --minify",
