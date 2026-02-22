@@ -6,9 +6,6 @@
   <title>{{ title }}</title>
 
   <!-- Tailwind (with Typography plugin) -->
-  <script>
-    window.tailwind = { config: { darkMode: 'class' } };
-  </script>
   <link rel="stylesheet" href="{{ pathprefix }}/styles/tailwindcompiled.css"/>
 
 {{ for header in headers }}
