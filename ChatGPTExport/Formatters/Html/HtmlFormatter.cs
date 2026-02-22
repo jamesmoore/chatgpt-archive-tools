@@ -68,7 +68,7 @@ namespace ChatGPTExport.Exporters.Html
             var headers = headerProvider.GetHeaders(body);
 
             string html = formatter.FormatHtmlPage(
-                new HtmlPage(titleString, [headers], htmlFragments), 
+                new HtmlPage(titleString, [headers], htmlFragments, CssAsset.Name), 
                 pathPrefix);
 
             return new FormattedConversation(html, [CssAsset], ".html");
