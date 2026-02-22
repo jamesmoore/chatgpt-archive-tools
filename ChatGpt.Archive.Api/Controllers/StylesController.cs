@@ -16,7 +16,13 @@ namespace ChatGpt.Archive.Api.Controllers
             var safePath = path?.Replace("\r", string.Empty).Replace("\n", string.Empty);
             _logger.LogInformation("StylesController received request for path: {Path}", safePath);
             var foundAsset = assetsCache.Get($"/styles/{path}");
-            return foundAsset == null ? NotFound() : File(foundAsset.GetStream(), foundAsset.MimeType);
+            if (foundAsset == null)
+            {
+                return NotFound();
+            }
+
+            Response.Headers.CacheControl = "public,max-age=31536000,immutable";
+            return File(foundAsset.GetStream(), foundAsset.MimeType);
         }
     }
 }
