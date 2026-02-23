@@ -15,7 +15,7 @@ namespace ChatGPTExport.Assets
                 throw new ArgumentException("The provided file must be named 'conversations.json' and must exist.", nameof(conversationsFile));
 
             }
-            if(conversationsFile.Directory == null)
+            if (conversationsFile.Directory == null)
             {
                 throw new ArgumentException("The provided file must have a valid parent directory.", nameof(conversationsFile));
             }
