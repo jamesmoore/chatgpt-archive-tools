@@ -9,7 +9,7 @@ public class ContentCodeDecoderTests
 
     private static MessageContext CreateContext(string recipient = "all")
     {
-        return new MessageContext(new Author { role = "assistant" }, null, null, new MessageMetadata(), recipient);
+        return new MessageContext(new Author { role = "assistant" }, null, null, new MessageMetadata(), recipient, new ConversationContext());
     }
 
     [Fact]

@@ -7,10 +7,9 @@ namespace ChatGPTExport.Visitor
     public class MarkdownContentVisitor(
         IAssetLocator assetLocator,
         IMarkdownAssetRenderer assetRenderer,
-        ConversationContext conversationContext,
         bool showHidden) : IContentVisitor<MarkdownContentResult>
     {
-        private readonly Lazy<ContentTextDecoder> _contentTextDecoder = new(() => new ContentTextDecoder(conversationContext, showHidden));
+        private readonly Lazy<ContentTextDecoder> _contentTextDecoder = new(() => new ContentTextDecoder(showHidden));
         private readonly Lazy<ContentMultimodalTextDecoder> _contentMultimodalTextDecoder = new(() => new ContentMultimodalTextDecoder(assetLocator, assetRenderer));
         private readonly Lazy<ContentCodeDecoder> _contentCodeDecoder = new(() => new ContentCodeDecoder(showHidden));
         private readonly Lazy<ContentThoughtsDecoder> _contentThoughtsDecoder = new(() => new ContentThoughtsDecoder(showHidden));

@@ -15,7 +15,8 @@ namespace ChatGPTExport.Formatters.Plaintext
 
             var strings = new List<string>();
 
-            var visitor = new MarkdownContentVisitor(assetLocator, assetRenderer, new ConversationContext(), showHidden);
+            ConversationContext conversationContext = new();
+            var visitor = new MarkdownContentVisitor(assetLocator, assetRenderer, showHidden);
 
             // Add conversation header
             strings.Add($"Title: {conversation.title ?? "No title"}");
@@ -35,18 +36,18 @@ namespace ChatGPTExport.Formatters.Plaintext
 
             foreach (var message in messages)
             {
-                strings.AddRange(FormatMessage(message, visitor));
+                strings.AddRange(FormatMessage(message, visitor, conversationContext));
             }
 
             return new FormattedConversation(string.Join(Environment.NewLine, strings), [], ".txt");
         }
 
-        private IEnumerable<string> FormatMessage(Message message, IContentVisitor<MarkdownContentResult> visitor)
+        private IEnumerable<string> FormatMessage(Message message, IContentVisitor<MarkdownContentResult> visitor, ConversationContext conversationContext)
         {
             var strings = new List<string>();
             try
             {
-                var visitResult = message.Accept(visitor);
+                var visitResult = message.Accept(visitor, conversationContext);
 
                 if (message.author != null && visitResult != null && visitResult.Lines.Any())
                 {

@@ -7,13 +7,13 @@ public class ContentTextDecoderTests
 {
     private static ContentTextDecoder CreateDecoder(bool showHidden = false)
     {
-        return new ContentTextDecoder(new ConversationContext(), showHidden);
+        return new ContentTextDecoder(showHidden);
     }
 
     private static MessageContext CreateContext(string role, MessageMetadata? metadata = null)
     {
         metadata ??= new MessageMetadata();
-        return new MessageContext(new Author() { role = role }, null, null, metadata, string.Empty);
+        return new MessageContext(new Author() { role = role }, null, null, metadata, string.Empty, new ConversationContext());
     }
 
     [Fact]
@@ -233,7 +233,8 @@ public class ContentTextDecoderTests
             null,
             null,
             new MessageMetadata(),
-            string.Empty);
+            string.Empty,
+            new ConversationContext());
 
         var result = decoder.Decode(content, context);
 
@@ -250,7 +251,8 @@ public class ContentTextDecoderTests
             null,
             null,
             new MessageMetadata(),
-            string.Empty);
+            string.Empty,
+            new ConversationContext());
 
         var result = decoder.Decode(content, context);
 

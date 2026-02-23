@@ -10,7 +10,7 @@ public class ContentComputerOutputDecoderTests
     {
         var decoder = new ContentComputerOutputDecoder();
         var content = new ContentComputerOutput();
-        var context = new MessageContext(new Author { role = "assistant" }, null, null, new MessageMetadata(), "all");
+        var context = new MessageContext(new Author { role = "assistant" }, null, null, new MessageMetadata(), "all", new ConversationContext());
 
         var result = decoder.Decode(content, context);
 

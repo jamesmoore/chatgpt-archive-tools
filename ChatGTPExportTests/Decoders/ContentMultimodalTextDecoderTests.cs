@@ -26,7 +26,8 @@ public class ContentMultimodalTextDecoderTests
             null,
             null,
             new MessageMetadata { image_gen_title = "Generated Title" },
-            "all");
+            "all",
+            new ConversationContext());
     }
 
     [Fact]

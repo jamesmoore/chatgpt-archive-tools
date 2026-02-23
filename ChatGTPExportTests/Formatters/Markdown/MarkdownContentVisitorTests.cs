@@ -10,10 +10,10 @@ public class MarkdownContentVisitorTests
     [Fact]
     public void Visitor_DelegatesToCorrectDecoder_ForContentText()
     {
+        ConversationContext conversationContext = new();
         var visitor = new MarkdownContentVisitor(
             new AssetLocator(),
             new NullAssetRenderer(),
-            new ConversationContext(),
             showHidden: false);
         
         var content = new ContentText { parts = ["test"] };
@@ -22,7 +22,9 @@ public class MarkdownContentVisitorTests
             null,
             null,
             new MessageMetadata(),
-            string.Empty);
+            string.Empty,
+            conversationContext
+            );
 
         var result = visitor.Visit(content, context);
 

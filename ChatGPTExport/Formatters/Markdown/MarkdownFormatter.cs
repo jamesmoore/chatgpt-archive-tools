@@ -15,7 +15,8 @@ namespace ChatGPTExport.Formatters.Markdown
 
             var strings = new List<string>();
 
-            var visitor = new MarkdownContentVisitor(assetLocator, assetRenderer, new ConversationContext(), showHidden);
+            ConversationContext conversationContext = new();
+            var visitor = new MarkdownContentVisitor(assetLocator, assetRenderer, showHidden);
 
             strings.AddRange(GetYamlHeader(conversation));
 
@@ -23,7 +24,7 @@ namespace ChatGPTExport.Formatters.Markdown
             {
                 try
                 {
-                    var visitResult = message.Accept(visitor);
+                    var visitResult = message.Accept(visitor, conversationContext);
 
                     if (message.author != null && visitResult != null && visitResult.Lines.Any())
                     {

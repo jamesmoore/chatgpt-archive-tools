@@ -8,12 +8,12 @@ namespace ChatGPTExport.Formatters.Plaintext
     {
         private readonly string LineBreak = Environment.NewLine;
 
-        public IEnumerable<string> FormatMessage(Message message, IContentVisitor<MarkdownContentResult> visitor)
+        public IEnumerable<string> FormatMessage(Message message, IContentVisitor<MarkdownContentResult> visitor, ConversationContext conversationContext)
         {
             var strings = new List<string>();
             try
             {
-                var visitResult = message.Accept(visitor);
+                var visitResult = message.Accept(visitor, conversationContext);
 
                 if (message.author != null && visitResult != null && visitResult.Lines.Any())
                 {

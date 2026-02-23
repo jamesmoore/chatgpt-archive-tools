@@ -9,7 +9,7 @@ public class ContentReasoningRecapDecoderTests
 
     private static MessageContext CreateContext()
     {
-        return new MessageContext(new Author { role = "assistant" }, null, null, new MessageMetadata(), "all");
+        return new MessageContext(new Author { role = "assistant" }, null, null, new MessageMetadata(), "all", new ConversationContext());
     }
 
     [Fact]

@@ -10,11 +10,11 @@ namespace ChatGpt.Archive.Api.Services
     {
         private readonly FTSPlaintextMessageFormatter plaintextFormatter = new();
         private static readonly NullAssetRenderer markdownAssetRenderer = new();
-        private readonly MarkdownContentVisitor visitor = new(new NullAssetLocator(),  markdownAssetRenderer, new ConversationContext(), false);
+        private readonly MarkdownContentVisitor visitor = new(new NullAssetLocator(),  markdownAssetRenderer, false);
 
-        public string ExtractPlaintext(Message message)
+        public string ExtractPlaintext(Message message, ConversationContext conversationContext)
         {
-            var results = plaintextFormatter.FormatMessage(message, visitor).Where(p => string.IsNullOrWhiteSpace(p) == false);
+            var results = plaintextFormatter.FormatMessage(message, visitor, conversationContext).Where(p => string.IsNullOrWhiteSpace(p) == false);
             return string.Join(Environment.NewLine, results);
         }
 

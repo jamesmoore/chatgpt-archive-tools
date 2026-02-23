@@ -1,4 +1,5 @@
 using ChatGpt.Archive.Api.Services;
+using ChatGPTExport.Decoders;
 using ChatGPTExport.Models;
 using Dapper;
 using Microsoft.Data.Sqlite;
@@ -67,7 +68,8 @@ namespace ChatGpt.Archive.Api.Database
                 {
                     continue;
                 }
-                
+
+                var conversationContext = new ConversationContext();
                 var plaintextExtractor = new PlaintextExtractor();
 
                 foreach (var messageContainerEntry in mapping)
@@ -80,7 +82,7 @@ namespace ChatGpt.Archive.Api.Database
 
                     var messageId = message.id ?? messageContainer.id ?? string.Empty;
                     var role = message.author?.role ?? string.Empty;
-                    var plaintext = plaintextExtractor.ExtractPlaintext(message);
+                    var plaintext = plaintextExtractor.ExtractPlaintext(message, conversationContext);
                     var messageCreateTime = message.create_time.HasValue ? (long)message.create_time.Value : 0;
 
                     messageParams.Add(new

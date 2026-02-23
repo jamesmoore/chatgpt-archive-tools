@@ -5,14 +5,15 @@ namespace ChatGPTExport.Visitor
 {
     public static class VisitorExtensions
     {
-        public static T? Accept<T>(this Message message, IContentVisitor<T> visitor)
+        public static T? Accept<T>(this Message message, IContentVisitor<T> visitor, ConversationContext conversationContext)
         {
             if (message.content != null &&
                 message.author?.role != null &&
                 message.metadata != null &&
                 message.recipient != null)
             {
-                return message.content.Accept(visitor, new MessageContext(message.author, message.GetCreateTime(), message.GetUpdateTime(), message.metadata, message.recipient));
+                MessageContext context = new(message.author, message.GetCreateTime(), message.GetUpdateTime(), message.metadata, message.recipient, conversationContext);
+                return message.content.Accept(visitor, context);
             }
             else
             {
@@ -20,7 +21,7 @@ namespace ChatGPTExport.Visitor
             }
         }
 
-        public static T Accept<T>(this ContentBase content, IContentVisitor<T> visitor, MessageContext context)
+        private static T Accept<T>(this ContentBase content, IContentVisitor<T> visitor, MessageContext context)
         {
             return visitor.Visit(content, context);
         }

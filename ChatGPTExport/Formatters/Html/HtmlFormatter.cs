@@ -26,13 +26,14 @@ namespace ChatGPTExport.Exporters.Html
 
             var strings = new List<(string MessageId, Author Author, string Content, bool HasImage)>();
 
-            var visitor = new MarkdownContentVisitor(assetLocator, assetRenderer, new ConversationContext(), showHidden);
+            ConversationContext conversationContext = new();
+            var visitor = new MarkdownContentVisitor(assetLocator, assetRenderer, showHidden);
 
             foreach (var message in messages)
             {
                 try
                 {
-                    var visitResult = message.Accept(visitor);
+                    var visitResult = message.Accept(visitor, conversationContext);
 
                     if (message.author != null && visitResult != null && visitResult.Lines.Any() && message.id != null)
                     {

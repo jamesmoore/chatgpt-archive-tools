@@ -18,7 +18,7 @@ public class UnhandledContentDecoderTests
             }
         };
         var decoder = new UnhandledContentDecoder();
-        var context = new MessageContext(new Author { role = "assistant" }, null, null, new MessageMetadata(), "all");
+        var context = new MessageContext(new Author { role = "assistant" }, null, null, new MessageMetadata(), "all", new ConversationContext());
 
         var result = decoder.Decode(content, context);
 
