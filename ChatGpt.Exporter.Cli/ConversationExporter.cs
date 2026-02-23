@@ -13,8 +13,9 @@ namespace ChatGpt.Exporter.Cli
         /// Processes an instance of a conversation.
         /// </summary>
         /// <param name="conversation">Conversation.</param>
+        /// <param name="formatters">The conversation formatters.</param>
         /// <param name="destination">Destination directory.</param>
-        /// <param name="assetRenderer">The asset locator.</param>
+        /// <param name="showHidden">Whether to show hidden messages.</param>
         /// <exception cref="ApplicationException"></exception>
         public void Process(
             Conversation conversation,
