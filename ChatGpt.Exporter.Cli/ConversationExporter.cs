@@ -9,7 +9,7 @@ using ChatGPTExport.Models;
 
 namespace ChatGpt.Exporter.Cli
 {
-    public class ConversationExporter(IFileSystem fileSystem, IEnumerable<IConversationFormatter> exporters, ExportMode exportMode)
+    public class ConversationExporter(IFileSystem fileSystem, IEnumerable<IConversationFormatter> formatters, ExportMode exportMode)
     {
         /// <summary>
         /// Processes an instance of a conversation.
@@ -29,11 +29,11 @@ namespace ChatGpt.Exporter.Cli
                 Console.WriteLine($"\tMessages: {conversation.mapping!.Count}\tLeaves: {conversation.mapping.Count(p => p.Value.IsLeaf())}");
 
                 var conversationToExport = exportMode == ExportMode.Complete ? conversation : conversation.GetLastestConversation();
-                foreach (var exporter in exporters)
+                foreach (var formatter in formatters)
                 {
-                    Console.Write($"\t\t{exporter.GetType().Name}");
+                    Console.Write($"\t\t{formatter.GetType().Name}");
                     var exportFilename = GetFilename(conversationToExport, "");
-                    ExportConversation(fileContentsMap, assetLocator, assetRenderer, exporter, conversationToExport, exportFilename);
+                    ExportConversation(fileContentsMap, assetLocator, assetRenderer, formatter, conversationToExport, exportFilename);
                     Console.WriteLine($"...Done");
                 }
 
