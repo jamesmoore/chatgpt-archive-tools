@@ -38,3 +38,15 @@ updates:
         update-types:
           - "minor"
           - "patch"
+
+  - package-ecosystem: "npm"
+    directory: "/tailwind-styles"
+    schedule:
+      interval: "daily"
+    groups:
+      npm-version-updates:
+        applies-to: version-updates
+        patterns: ["*"]
+        update-types:
+          - "minor"
+          - "patch"
