@@ -15,10 +15,9 @@ namespace ChatGpt.Exporter.Cli
     {
         public int RunExport(IEnumerable<IFileInfo> conversationFiles, IDirectoryInfo destination)
         {
-            var directoryConversationsMap = conversationFiles.Where(p => p.Directory != null)
+            var directoryConversationsMap = conversationFiles
                 .Select(file => (
                     File: file,
-                    ParentDirectory: file.Directory!,
                     ConversationParseResult: conversationsParser.GetConversations(file)
                 )).ToList();
 
@@ -44,7 +43,7 @@ namespace ChatGpt.Exporter.Cli
 
             var successfulConversations = directoryConversationsMap
                 .Where(p => p.ConversationParseResult.Status == ConversationParseResult.Success)
-                .Select(p => (Conversations: p.ConversationParseResult.Conversations!, ConversationAssets: ConversationAssets.FromDirectory(p.ParentDirectory)))
+                .Select(p => (Conversations: p.ConversationParseResult.Conversations!, ConversationAssets: ConversationAssets.FromConversationsFile(p.File)))
                 .ToList();
 
             var conversations = successfulConversations

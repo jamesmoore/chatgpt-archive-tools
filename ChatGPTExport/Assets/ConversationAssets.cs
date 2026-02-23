@@ -3,11 +3,23 @@ using System.IO.Abstractions;
 
 namespace ChatGPTExport.Assets
 {
+    /// <summary>
+    /// Represents the assets for a given conversations file.
+    /// </summary>
     public class ConversationAssets
     {
-        public static ConversationAssets FromDirectory(IDirectoryInfo parentDirectory)
+        public static ConversationAssets FromConversationsFile(IFileInfo conversationsFile)
         {
-            return new ConversationAssets(parentDirectory);
+            if (conversationsFile.Name != "conversations.json" || conversationsFile.Exists == false)
+            {
+                throw new ArgumentException("The provided file must be named 'conversations.json' and must exist.", nameof(conversationsFile));
+
+            }
+            if(conversationsFile.Directory == null)
+            {
+                throw new ArgumentException("The provided file must have a valid parent directory.", nameof(conversationsFile));
+            }
+            return new ConversationAssets(conversationsFile.Directory);
         }
 
         private readonly IDirectoryInfo parentDirectory;

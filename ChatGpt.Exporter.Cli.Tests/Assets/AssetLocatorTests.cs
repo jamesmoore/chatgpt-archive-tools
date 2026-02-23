@@ -11,14 +11,15 @@ namespace ChatGpt.Exporter.Cli.Tests.Assets
         {
             var fs = new MockFileSystem(new Dictionary<string, MockFileData>
             {
+                { MockUnixSupport.Path(@"c:\source\conversations.json"), new MockFileData("{ somedata: somevalue }") },
                 { MockUnixSupport.Path(@"c:\source\img.png"), new MockFileData("data") }
             });
             fs.AddDirectory(MockUnixSupport.Path(@"c:\dest"));
 
-            var sourceDir = fs.DirectoryInfo.New(MockUnixSupport.Path(@"c:\source"));
+            var conversationsFile = fs.FileInfo.New(MockUnixSupport.Path(@"c:\source\conversations.json"));
             var destDir = fs.DirectoryInfo.New(MockUnixSupport.Path(@"c:\dest"));
             var existing = new ExistingAssetLocator(destDir);
-            var locator = new AssetLocator(ConversationAssets.FromDirectory(sourceDir), destDir, existing);
+            var locator = new AssetLocator(ConversationAssets.FromConversationsFile(conversationsFile), destDir, existing);
 
             var request = new AssetRequest("img.png", "../evil", null, null);
 
