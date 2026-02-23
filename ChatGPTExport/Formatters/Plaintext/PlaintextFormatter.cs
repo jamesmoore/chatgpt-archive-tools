@@ -1,22 +1,20 @@
-using ChatGPTExport.Assets;
 using ChatGPTExport.Decoders;
 using ChatGPTExport.Models;
 using ChatGPTExport.Visitor;
 
 namespace ChatGPTExport.Formatters.Plaintext
 {
-    public class PlaintextFormatter(bool showHidden) : IConversationFormatter
+    public class PlaintextFormatter(MarkdownContentVisitor markdownContentVisitor ) : IConversationFormatter
     {
         private readonly string LineBreak = Environment.NewLine;
 
-        public FormattedConversation Format(IAssetLocator assetLocator, IMarkdownAssetRenderer assetRenderer, Conversation conversation, string pathPrefix)
+        public FormattedConversation Format(Conversation conversation, string pathPrefix)
         {
             var messages = conversation.GetMessagesWithContent();
 
             var strings = new List<string>();
 
             ConversationContext conversationContext = new();
-            var visitor = new MarkdownContentVisitor(assetLocator, assetRenderer, showHidden);
 
             // Add conversation header
             strings.Add($"Title: {conversation.title ?? "No title"}");
@@ -36,18 +34,18 @@ namespace ChatGPTExport.Formatters.Plaintext
 
             foreach (var message in messages)
             {
-                strings.AddRange(FormatMessage(message, visitor, conversationContext));
+                strings.AddRange(FormatMessage(message, conversationContext));
             }
 
             return new FormattedConversation(string.Join(Environment.NewLine, strings), [], ".txt");
         }
 
-        private IEnumerable<string> FormatMessage(Message message, IContentVisitor<MarkdownContentResult> visitor, ConversationContext conversationContext)
+        private IEnumerable<string> FormatMessage(Message message, ConversationContext conversationContext)
         {
             var strings = new List<string>();
             try
             {
-                var visitResult = message.Accept(visitor, conversationContext);
+                var visitResult = message.Accept(markdownContentVisitor, conversationContext);
 
                 if (message.author != null && visitResult != null && visitResult.Lines.Any())
                 {

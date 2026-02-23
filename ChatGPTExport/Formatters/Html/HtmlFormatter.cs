@@ -1,5 +1,4 @@
-﻿using ChatGPTExport.Assets;
-using ChatGPTExport.Decoders;
+﻿using ChatGPTExport.Decoders;
 using ChatGPTExport.Formatters;
 using ChatGPTExport.Formatters.Html;
 using ChatGPTExport.Formatters.Html.Headers;
@@ -14,26 +13,26 @@ namespace ChatGPTExport.Exporters.Html
     internal partial class HtmlFormatter(
         IHtmlFormatter formatter,
         IHeaderProvider headerProvider,
-        bool showHidden) : IConversationFormatter
+        MarkdownContentVisitor markdownContentVisitor
+        ) : IConversationFormatter
     {
         private readonly string LineBreak = Environment.NewLine;
         private readonly MarkdownPipeline MarkdownPipeline = CreatePipeline(formatter);
         private readonly EmbeddedResourceAsset CssAsset = new("/styles/tailwindcompiled.css", "ChatGPTExport.Formatters.Html.Templates.Styles.tailwindcompiled.css", "text/css");
 
-        public FormattedConversation Format(IAssetLocator assetLocator, IMarkdownAssetRenderer assetRenderer, Conversation conversation, string pathPrefix)
+        public FormattedConversation Format(Conversation conversation, string pathPrefix)
         {
             var messages = conversation.GetMessagesWithContent();
 
             var strings = new List<(string MessageId, Author Author, string Content, bool HasImage)>();
 
             ConversationContext conversationContext = new();
-            var visitor = new MarkdownContentVisitor(assetLocator, assetRenderer, showHidden);
 
             foreach (var message in messages)
             {
                 try
                 {
-                    var visitResult = message.Accept(visitor, conversationContext);
+                    var visitResult = message.Accept(markdownContentVisitor, conversationContext);
 
                     if (message.author != null && visitResult != null && visitResult.Lines.Any() && message.id != null)
                     {

@@ -1,22 +1,20 @@
-﻿using ChatGPTExport.Assets;
-using ChatGPTExport.Decoders;
+﻿using ChatGPTExport.Decoders;
 using ChatGPTExport.Models;
 using ChatGPTExport.Visitor;
 
 namespace ChatGPTExport.Formatters.Markdown
 {
-    internal class MarkdownFormatter(bool showHidden) : IConversationFormatter
+    internal class MarkdownFormatter(MarkdownContentVisitor markdownContentVisitor) : IConversationFormatter
     {
         private readonly string LineBreak = Environment.NewLine;
 
-        public FormattedConversation Format(IAssetLocator assetLocator, IMarkdownAssetRenderer assetRenderer, Conversation conversation, string pathPrefix)
+        public FormattedConversation Format(Conversation conversation, string pathPrefix)
         {
             var messages = conversation.GetMessagesWithContent();
 
             var strings = new List<string>();
 
             ConversationContext conversationContext = new();
-            var visitor = new MarkdownContentVisitor(assetLocator, assetRenderer, showHidden);
 
             strings.AddRange(GetYamlHeader(conversation));
 
@@ -24,7 +22,7 @@ namespace ChatGPTExport.Formatters.Markdown
             {
                 try
                 {
-                    var visitResult = message.Accept(visitor, conversationContext);
+                    var visitResult = message.Accept(markdownContentVisitor, conversationContext);
 
                     if (message.author != null && visitResult != null && visitResult.Lines.Any())
                     {

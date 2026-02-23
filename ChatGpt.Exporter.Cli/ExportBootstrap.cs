@@ -3,6 +3,7 @@ using ChatGPTExport;
 using ChatGPTExport.Assets;
 using ChatGPTExport.Decoders;
 using ChatGPTExport.Models;
+using ChatGPTExport.Visitor;
 using System.IO.Abstractions;
 
 namespace ChatGpt.Exporter.Cli
@@ -10,7 +11,9 @@ namespace ChatGpt.Exporter.Cli
     internal class ExportBootstrap(
         ConversationsParser conversationsParser,
         ExportAssetLocatorFactory exportAssetLocatorFactory,
-        ConversationExporter exporter
+        ConversationExporter exporter,
+        IEnumerable<ExportType> exportTypes,
+        bool showHidden
         )
     {
         public int RunExport(IEnumerable<IFileInfo> conversationFiles, IDirectoryInfo destination)
@@ -55,13 +58,17 @@ namespace ChatGpt.Exporter.Cli
             var assetLocator = exportAssetLocatorFactory.GetAssetLocator(conversationAssetsList, destination);
             var assetRenderer = new MarkdownAssetRenderer();
 
+            var markdownContentVisitor = new MarkdownContentVisitor(assetLocator, assetRenderer, showHidden);
+
+            var formatters = new ConversationFormatterFactory().GetFormatters(exportTypes, markdownContentVisitor);
+
             var count = conversations.Count;
             var position = 0;
             foreach (var conversation in conversations)
             {
                 var percent = (int)(position++ * 100.0 / count);
                 ConsoleFeatures.SetProgress(percent);
-                exporter.Process(conversation, destination, assetLocator, assetRenderer);
+                exporter.Process(conversation, formatters, destination);
             }
 
             return 0;

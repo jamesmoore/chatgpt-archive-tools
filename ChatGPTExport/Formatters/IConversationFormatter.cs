@@ -1,11 +1,9 @@
-﻿using ChatGPTExport.Assets;
-using ChatGPTExport.Decoders;
-using ChatGPTExport.Models;
+﻿using ChatGPTExport.Models;
 
 namespace ChatGPTExport.Formatters
 {
     public interface IConversationFormatter
     {
-        FormattedConversation Format(IAssetLocator assetLocator, IMarkdownAssetRenderer assetRenderer, Conversation conversation, string pathPrefix);
+        FormattedConversation Format(Conversation conversation, string pathPrefix);
     }
 }

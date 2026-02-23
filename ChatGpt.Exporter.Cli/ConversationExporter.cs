@@ -2,14 +2,12 @@ using System.Buffers;
 using System.IO.Abstractions;
 using System.Text;
 using ChatGPTExport;
-using ChatGPTExport.Assets;
-using ChatGPTExport.Decoders;
 using ChatGPTExport.Formatters;
 using ChatGPTExport.Models;
 
 namespace ChatGpt.Exporter.Cli
 {
-    public class ConversationExporter(IFileSystem fileSystem, IEnumerable<IConversationFormatter> formatters, ExportMode exportMode)
+    public class ConversationExporter(IFileSystem fileSystem, ExportMode exportMode)
     {
         /// <summary>
         /// Processes an instance of a conversation.
@@ -18,7 +16,10 @@ namespace ChatGpt.Exporter.Cli
         /// <param name="destination">Destination directory.</param>
         /// <param name="assetRenderer">The asset locator.</param>
         /// <exception cref="ApplicationException"></exception>
-        public void Process(Conversation conversation, IDirectoryInfo destination, IAssetLocator assetLocator, IMarkdownAssetRenderer assetRenderer)
+        public void Process(
+            Conversation conversation,
+            IEnumerable<IConversationFormatter> formatters,
+            IDirectoryInfo destination)
         {
             try
             {
@@ -33,7 +34,7 @@ namespace ChatGpt.Exporter.Cli
                 {
                     Console.Write($"\t\t{formatter.GetType().Name}");
                     var exportFilename = GetFilename(conversationToExport, "");
-                    ExportConversation(fileContentsMap, assetLocator, assetRenderer, formatter, conversationToExport, exportFilename);
+                    ExportConversation(fileContentsMap, formatter, conversationToExport, exportFilename);
                     Console.WriteLine($"...Done");
                 }
 
@@ -125,15 +126,13 @@ namespace ChatGpt.Exporter.Cli
 
         private static void ExportConversation(
             Dictionary<string, FormattedConversation> fileContentsMap,
-            IAssetLocator assetLocator,
-            IMarkdownAssetRenderer assetRenderer,
             IConversationFormatter formatter,
             Conversation conversation,
             string filename)
         {
             try
             {
-                var formattedConversation = formatter.Format(assetLocator, assetRenderer, conversation, ".");
+                var formattedConversation = formatter.Format(conversation, ".");
                 fileContentsMap[filename + formattedConversation.Extension] = formattedConversation;
             }
             catch (Exception ex)

@@ -3,6 +3,7 @@ using ChatGPTExport;
 using ChatGPTExport.Assets;
 using ChatGPTExport.Decoders;
 using ChatGPTExport.Models;
+using ChatGPTExport.Visitor;
 using System.IO.Abstractions;
 
 namespace ChatGpt.Archive.Api.Services
@@ -73,13 +74,14 @@ namespace ChatGpt.Archive.Api.Services
 
         public string? GetContent(string conversationId, ExportType exportType)
         {
-            var formatter = conversationFormatterFactory.GetFormatters([exportType], false);
+            var markdownContentVisitor = new MarkdownContentVisitor(assetLocator, markdownAssetRenderer, false);
+            var formatter = conversationFormatterFactory.GetFormatters([exportType], markdownContentVisitor);
             var conversation = GetConversation(conversationId);
             if (conversation == null)
             {
                 return null;
             }
-            var formatted = formatter.First().Format(assetLocator, markdownAssetRenderer, conversation.GetLastestConversation(), string.Empty);
+            var formatted = formatter.First().Format(conversation.GetLastestConversation(), string.Empty);
 
             if (formatted != null)
             {
