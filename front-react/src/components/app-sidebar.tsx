@@ -1,6 +1,7 @@
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -10,15 +11,26 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { useConversations } from '../hooks/use-conversations'
-import { Search } from "lucide-react";
+import { ChevronRight, Search, Settings } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { getWrapStatus, setWrapStatus } from "@/getWrapStatus";
 
 export function AppSidebar() {
   const { id, format } = useParams();
   const location = useLocation();
   const { setOpenMobile } = useSidebar();
+  const [isWrapped, setIsWrapped] = useState(() => getWrapStatus());
+  const isTextFormat = format === 'markdown' || format === 'json';
 
   const {
     data: conversations = []
@@ -27,6 +39,12 @@ export function AppSidebar() {
   useEffect(() => {
     setOpenMobile(false);
   }, [location.pathname, setOpenMobile]);
+
+  const toggleWrap = (checked: boolean) => {
+    setIsWrapped(checked);
+    setWrapStatus(checked);
+    window.dispatchEvent(new Event('storage'));
+  };
 
   return (
     <Sidebar className="h-full">
@@ -70,6 +88,48 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton isActive={location.pathname === '/admin' || isTextFormat}>
+                  <Settings />
+                  <span>Settings</span>
+                  <ChevronRight className="ml-auto" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="right" align="start" className="w-48">
+                <DropdownMenuItem asChild>
+                  <Link to="/admin">Admin</Link>
+                </DropdownMenuItem>
+                {isTextFormat && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onSelect={(event) => {
+                        event.preventDefault();
+                        toggleWrap(!isWrapped);
+                      }}
+                      className="flex items-center justify-between"
+                    >
+                      <span>Word wrap</span>
+                      <Switch
+                        checked={isWrapped}
+                        onCheckedChange={toggleWrap}
+                        onClick={(event) => event.stopPropagation()}
+                        className="pointer-events-none"
+                        aria-label="Toggle word wrap"
+                      />
+                    </DropdownMenuItem>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   )
 }

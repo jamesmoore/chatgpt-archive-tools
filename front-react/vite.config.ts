@@ -31,7 +31,12 @@ export default defineConfig({
         target: 'https://localhost:7181',
         changeOrigin: true,
         secure: false,
-      },      
+      },
+      '/styles': {
+        target: 'https://localhost:7181',
+        changeOrigin: true,
+        secure: false,
+      },               
     },
   },
 })

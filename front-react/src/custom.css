@@ -30,3 +30,12 @@
   border: 2px solid transparent;
   background-clip: padding-box;
 }
+
+@layer utilities {
+  [data-slot="dropdown-menu-item"]:not([data-disabled]),
+  [data-slot="dropdown-menu-checkbox-item"]:not([data-disabled]),
+  [data-slot="dropdown-menu-radio-item"]:not([data-disabled]),
+  [data-slot="dropdown-menu-sub-trigger"]:not([data-disabled]) {
+    cursor: pointer !important;
+  }
+}
