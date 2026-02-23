@@ -4,7 +4,7 @@ using ChatGPTExport.Visitor;
 
 namespace ChatGPTExport.Formatters.Plaintext
 {
-    public class PlaintextFormatter(MarkdownContentVisitor markdownContentVisitor ) : IConversationFormatter
+    public class PlaintextFormatter(MarkdownContentVisitor markdownContentVisitor) : IConversationFormatter
     {
         private readonly string LineBreak = Environment.NewLine;
 
