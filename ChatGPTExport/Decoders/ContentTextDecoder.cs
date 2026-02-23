@@ -5,14 +5,14 @@ using static ChatGPTExport.Models.MessageMetadata;
 
 namespace ChatGPTExport.Decoders
 {
-    public class ContentTextDecoder(bool showHidden) : IDecoder<ContentText, MarkdownContentResult>
+    public class ContentTextDecoder : IDecoder<ContentText, MarkdownContentResult>
     {
         private const string trackingSource = "?utm_source=chatgpt.com";
         private readonly string LineBreak = Environment.NewLine;
 
         public MarkdownContentResult Decode(ContentText content, MessageContext context)
         {
-            if (context.Author.role == "tool" && context.Author.name == "personalized_context" && showHidden == false)
+            if (context.Author.role == "tool" && context.Author.name == "personalized_context" && context.ShowHidden == false)
             {
                 return new MarkdownContentResult();
             }

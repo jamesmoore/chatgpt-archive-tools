@@ -5,20 +5,20 @@ namespace ChatGTPExportTests.Decoders;
 
 public class ContentSystemErrorDecoderTests
 {
-    private static ContentSystemErrorDecoder CreateDecoder(bool showHidden = false) => new(showHidden);
+    private static ContentSystemErrorDecoder CreateDecoder() => new();
 
-    private static MessageContext CreateContext()
+    private static MessageContext CreateContext(bool showHidden)
     {
-        return new MessageContext(new Author { role = "assistant" }, null, null, new MessageMetadata(), "all", new ConversationContext());
+        return new MessageContext(new Author { role = "assistant" }, null, null, new MessageMetadata(), "all", new ConversationContext(), showHidden);
     }
 
     [Fact]
     public void SystemErrors_AreFilteredWhenShowHiddenIsFalse()
     {
-        var decoder = CreateDecoder(showHidden: false);
+        var decoder = CreateDecoder();
         var content = new ContentSystemError { name = "Error", text = "Details" };
 
-        var result = decoder.Decode(content, CreateContext());
+        var result = decoder.Decode(content, CreateContext(showHidden: false));
 
         Assert.Empty(result.Lines);
     }
@@ -26,10 +26,10 @@ public class ContentSystemErrorDecoderTests
     [Fact]
     public void SystemErrors_AreRenderedWhenShowHiddenIsTrue()
     {
-        var decoder = CreateDecoder(showHidden: true);
+        var decoder = CreateDecoder();
         var content = new ContentSystemError { name = "Error", text = "Details" };
 
-        var result = decoder.Decode(content, CreateContext());
+        var result = decoder.Decode(content, CreateContext(showHidden: true));
 
         var line = Assert.Single(result.Lines);
         Assert.Equal("🔴 Error: Details", line);

@@ -13,8 +13,7 @@ public class MarkdownContentVisitorTests
         ConversationContext conversationContext = new();
         var visitor = new MarkdownContentVisitor(
             new AssetLocator(),
-            new NullAssetRenderer(),
-            showHidden: false);
+            new NullAssetRenderer());
         
         var content = new ContentText { parts = ["test"] };
         var context = new MessageContext(
@@ -23,7 +22,8 @@ public class MarkdownContentVisitorTests
             null,
             new MessageMetadata(),
             string.Empty,
-            conversationContext
+            conversationContext,
+            ShowHidden: false
             );
 
         var result = visitor.Visit(content, context);

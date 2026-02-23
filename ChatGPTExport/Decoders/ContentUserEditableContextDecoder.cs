@@ -2,11 +2,11 @@ using ChatGPTExport.Models;
 
 namespace ChatGPTExport.Decoders
 {
-    public class ContentUserEditableContextDecoder(bool showHidden) : IDecoder<ContentUserEditableContext, MarkdownContentResult>
+    public class ContentUserEditableContextDecoder : IDecoder<ContentUserEditableContext, MarkdownContentResult>
     {
         public MarkdownContentResult Decode(ContentUserEditableContext content, MessageContext context)
         {
-            if (!showHidden)
+            if (!context.ShowHidden)
             {
                 return new MarkdownContentResult();
             }

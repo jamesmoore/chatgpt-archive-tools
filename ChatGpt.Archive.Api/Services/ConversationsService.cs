@@ -74,14 +74,14 @@ namespace ChatGpt.Archive.Api.Services
 
         public string? GetContent(string conversationId, ExportType exportType)
         {
-            var markdownContentVisitor = new MarkdownContentVisitor(assetLocator, markdownAssetRenderer, false);
+            var markdownContentVisitor = new MarkdownContentVisitor(assetLocator, markdownAssetRenderer);
             var formatter = conversationFormatterFactory.GetFormatters([exportType], markdownContentVisitor);
             var conversation = GetConversation(conversationId);
             if (conversation == null)
             {
                 return null;
             }
-            var formatted = formatter.First().Format(conversation.GetLastestConversation(), string.Empty);
+            var formatted = formatter.First().Format(conversation.GetLastestConversation(), string.Empty, false);
 
             if (formatted != null)
             {

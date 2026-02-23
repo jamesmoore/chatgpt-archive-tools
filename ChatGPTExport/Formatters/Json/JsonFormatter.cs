@@ -12,7 +12,7 @@ namespace ChatGPTExport.Formatters.Json
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         };
 
-        public FormattedConversation Format(Conversation conversation, string pathPrefix)
+        public FormattedConversation Format(Conversation conversation, string pathPrefix, bool showHidden)
         {
             return new FormattedConversation(JsonSerializer.Serialize(conversation, options), [], ".json");
         }

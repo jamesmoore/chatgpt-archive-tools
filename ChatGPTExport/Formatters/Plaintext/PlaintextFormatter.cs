@@ -8,7 +8,7 @@ namespace ChatGPTExport.Formatters.Plaintext
     {
         private readonly string LineBreak = Environment.NewLine;
 
-        public FormattedConversation Format(Conversation conversation, string pathPrefix)
+        public FormattedConversation Format(Conversation conversation, string pathPrefix, bool showHidden)
         {
             var messages = conversation.GetMessagesWithContent();
 
@@ -34,18 +34,18 @@ namespace ChatGPTExport.Formatters.Plaintext
 
             foreach (var message in messages)
             {
-                strings.AddRange(FormatMessage(message, conversationContext));
+                strings.AddRange(FormatMessage(message, conversationContext, showHidden));
             }
 
             return new FormattedConversation(string.Join(Environment.NewLine, strings), [], ".txt");
         }
 
-        private IEnumerable<string> FormatMessage(Message message, ConversationContext conversationContext)
+        private IEnumerable<string> FormatMessage(Message message, ConversationContext conversationContext, bool showHidden)
         {
             var strings = new List<string>();
             try
             {
-                var visitResult = message.Accept(markdownContentVisitor, conversationContext);
+                var visitResult = message.Accept(markdownContentVisitor, conversationContext, showHidden);
 
                 if (message.author != null && visitResult != null && visitResult.Lines.Any())
                 {

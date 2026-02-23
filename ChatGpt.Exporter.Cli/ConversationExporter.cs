@@ -19,7 +19,8 @@ namespace ChatGpt.Exporter.Cli
         public void Process(
             Conversation conversation,
             IEnumerable<IConversationFormatter> formatters,
-            IDirectoryInfo destination)
+            IDirectoryInfo destination,
+            bool showHidden)
         {
             try
             {
@@ -34,7 +35,7 @@ namespace ChatGpt.Exporter.Cli
                 {
                     Console.Write($"\t\t{formatter.GetType().Name}");
                     var exportFilename = GetFilename(conversationToExport, "");
-                    ExportConversation(fileContentsMap, formatter, conversationToExport, exportFilename);
+                    ExportConversation(fileContentsMap, formatter, conversationToExport, exportFilename, showHidden);
                     Console.WriteLine($"...Done");
                 }
 
@@ -128,11 +129,12 @@ namespace ChatGpt.Exporter.Cli
             Dictionary<string, FormattedConversation> fileContentsMap,
             IConversationFormatter formatter,
             Conversation conversation,
-            string filename)
+            string filename,
+            bool showHidden)
         {
             try
             {
-                var formattedConversation = formatter.Format(conversation, ".");
+                var formattedConversation = formatter.Format(conversation, ".", showHidden);
                 fileContentsMap[filename + formattedConversation.Extension] = formattedConversation;
             }
             catch (Exception ex)

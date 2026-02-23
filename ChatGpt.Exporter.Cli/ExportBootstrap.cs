@@ -13,8 +13,7 @@ namespace ChatGpt.Exporter.Cli
         ExportAssetLocatorFactory exportAssetLocatorFactory,
         ConversationExporter exporter,
         IEnumerable<ExportType> exportTypes,
-        bool showHidden
-        )
+        bool showHidden)
     {
         public int RunExport(IEnumerable<IFileInfo> conversationFiles, IDirectoryInfo destination)
         {
@@ -58,7 +57,7 @@ namespace ChatGpt.Exporter.Cli
             var assetLocator = exportAssetLocatorFactory.GetAssetLocator(conversationAssetsList, destination);
             var assetRenderer = new MarkdownAssetRenderer();
 
-            var markdownContentVisitor = new MarkdownContentVisitor(assetLocator, assetRenderer, showHidden);
+            var markdownContentVisitor = new MarkdownContentVisitor(assetLocator, assetRenderer);
 
             var formatters = new ConversationFormatterFactory().GetFormatters(exportTypes, markdownContentVisitor);
 
@@ -68,7 +67,7 @@ namespace ChatGpt.Exporter.Cli
             {
                 var percent = (int)(position++ * 100.0 / count);
                 ConsoleFeatures.SetProgress(percent);
-                exporter.Process(conversation, formatters, destination);
+                exporter.Process(conversation, formatters, destination, showHidden);
             }
 
             return 0;

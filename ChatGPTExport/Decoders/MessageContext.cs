@@ -8,7 +8,8 @@ namespace ChatGPTExport.Decoders
         DateTimeOffset? UpdatedDate,
         MessageMetadata MessageMetadata,
         string Recipient,
-        ConversationContext ConversationContext
+        ConversationContext ConversationContext,
+        bool ShowHidden
         )
     {
         public string Role => Author.role ?? string.Empty;

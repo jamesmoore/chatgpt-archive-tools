@@ -13,7 +13,7 @@ namespace ChatGPTExport.Formatters.Plaintext
             var strings = new List<string>();
             try
             {
-                var visitResult = message.Accept(visitor, conversationContext);
+                var visitResult = message.Accept(visitor, conversationContext, false);
 
                 if (message.author != null && visitResult != null && visitResult.Lines.Any())
                 {

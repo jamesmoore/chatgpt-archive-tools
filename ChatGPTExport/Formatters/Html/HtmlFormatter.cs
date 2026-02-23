@@ -20,7 +20,7 @@ namespace ChatGPTExport.Exporters.Html
         private readonly MarkdownPipeline MarkdownPipeline = CreatePipeline(formatter);
         private readonly EmbeddedResourceAsset CssAsset = new("/styles/tailwindcompiled.css", "ChatGPTExport.Formatters.Html.Templates.Styles.tailwindcompiled.css", "text/css");
 
-        public FormattedConversation Format(Conversation conversation, string pathPrefix)
+        public FormattedConversation Format(Conversation conversation, string pathPrefix, bool showHidden)
         {
             var messages = conversation.GetMessagesWithContent();
 
@@ -32,7 +32,7 @@ namespace ChatGPTExport.Exporters.Html
             {
                 try
                 {
-                    var visitResult = message.Accept(markdownContentVisitor, conversationContext);
+                    var visitResult = message.Accept(markdownContentVisitor, conversationContext, showHidden);
 
                     if (message.author != null && visitResult != null && visitResult.Lines.Any() && message.id != null)
                     {

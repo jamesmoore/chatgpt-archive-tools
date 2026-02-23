@@ -8,7 +8,7 @@ namespace ChatGPTExport.Formatters.Markdown
     {
         private readonly string LineBreak = Environment.NewLine;
 
-        public FormattedConversation Format(Conversation conversation, string pathPrefix)
+        public FormattedConversation Format(Conversation conversation, string pathPrefix, bool showHidden)
         {
             var messages = conversation.GetMessagesWithContent();
 
@@ -22,7 +22,7 @@ namespace ChatGPTExport.Formatters.Markdown
             {
                 try
                 {
-                    var visitResult = message.Accept(markdownContentVisitor, conversationContext);
+                    var visitResult = message.Accept(markdownContentVisitor, conversationContext, showHidden);
 
                     if (message.author != null && visitResult != null && visitResult.Lines.Any())
                     {

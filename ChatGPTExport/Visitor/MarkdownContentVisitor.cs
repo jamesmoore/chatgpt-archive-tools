@@ -6,19 +6,18 @@ namespace ChatGPTExport.Visitor
 {
     public class MarkdownContentVisitor(
         IAssetLocator assetLocator,
-        IMarkdownAssetRenderer assetRenderer,
-        bool showHidden) : IContentVisitor<MarkdownContentResult>
+        IMarkdownAssetRenderer assetRenderer) : IContentVisitor<MarkdownContentResult>
     {
-        private readonly Lazy<ContentTextDecoder> _contentTextDecoder = new(() => new ContentTextDecoder(showHidden));
+        private readonly Lazy<ContentTextDecoder> _contentTextDecoder = new(() => new ContentTextDecoder());
         private readonly Lazy<ContentMultimodalTextDecoder> _contentMultimodalTextDecoder = new(() => new ContentMultimodalTextDecoder(assetLocator, assetRenderer));
-        private readonly Lazy<ContentCodeDecoder> _contentCodeDecoder = new(() => new ContentCodeDecoder(showHidden));
-        private readonly Lazy<ContentThoughtsDecoder> _contentThoughtsDecoder = new(() => new ContentThoughtsDecoder(showHidden));
-        private readonly Lazy<ContentExecutionOutputDecoder> _contentExecutionOutputDecoder = new(() => new ContentExecutionOutputDecoder(showHidden));
-        private readonly Lazy<ContentReasoningRecapDecoder> _contentReasoningRecapDecoder = new(() => new ContentReasoningRecapDecoder(showHidden));
-        private readonly Lazy<ContentUserEditableContextDecoder> _contentUserEditableContextDecoder = new(() => new ContentUserEditableContextDecoder(showHidden));
-        private readonly Lazy<ContentTetherBrowsingDisplayDecoder> _contentTetherBrowsingDisplayDecoder = new(() => new ContentTetherBrowsingDisplayDecoder(showHidden));
+        private readonly Lazy<ContentCodeDecoder> _contentCodeDecoder = new(() => new ContentCodeDecoder());
+        private readonly Lazy<ContentThoughtsDecoder> _contentThoughtsDecoder = new(() => new ContentThoughtsDecoder());
+        private readonly Lazy<ContentExecutionOutputDecoder> _contentExecutionOutputDecoder = new(() => new ContentExecutionOutputDecoder());
+        private readonly Lazy<ContentReasoningRecapDecoder> _contentReasoningRecapDecoder = new(() => new ContentReasoningRecapDecoder());
+        private readonly Lazy<ContentUserEditableContextDecoder> _contentUserEditableContextDecoder = new(() => new ContentUserEditableContextDecoder());
+        private readonly Lazy<ContentTetherBrowsingDisplayDecoder> _contentTetherBrowsingDisplayDecoder = new(() => new ContentTetherBrowsingDisplayDecoder());
         private readonly Lazy<ContentComputerOutputDecoder> _contentComputerOutputDecoder = new(() => new ContentComputerOutputDecoder());
-        private readonly Lazy<ContentSystemErrorDecoder> _contentSystemErrorDecoder = new(() => new ContentSystemErrorDecoder(showHidden));
+        private readonly Lazy<ContentSystemErrorDecoder> _contentSystemErrorDecoder = new(() => new ContentSystemErrorDecoder());
         private readonly Lazy<UnhandledContentDecoder> _unhandledContentDecoder = new(() => new UnhandledContentDecoder());
 
         public MarkdownContentResult Visit(ContentBase content, MessageContext context) => content switch

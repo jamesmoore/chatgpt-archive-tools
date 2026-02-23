@@ -10,7 +10,7 @@ namespace ChatGpt.Archive.Api.Services
     {
         private readonly FTSPlaintextMessageFormatter plaintextFormatter = new();
         private static readonly NullAssetRenderer markdownAssetRenderer = new();
-        private readonly MarkdownContentVisitor visitor = new(new NullAssetLocator(),  markdownAssetRenderer, false);
+        private readonly MarkdownContentVisitor visitor = new(new NullAssetLocator(),  markdownAssetRenderer);
 
         public string ExtractPlaintext(Message message, ConversationContext conversationContext)
         {
