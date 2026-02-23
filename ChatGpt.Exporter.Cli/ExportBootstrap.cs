@@ -3,6 +3,7 @@ using ChatGPTExport;
 using ChatGPTExport.Assets;
 using ChatGPTExport.Decoders;
 using ChatGPTExport.Models;
+using ChatGPTExport.Visitor;
 using System.IO.Abstractions;
 
 namespace ChatGpt.Exporter.Cli
@@ -10,15 +11,15 @@ namespace ChatGpt.Exporter.Cli
     internal class ExportBootstrap(
         ConversationsParser conversationsParser,
         ExportAssetLocatorFactory exportAssetLocatorFactory,
-        ConversationExporter exporter
-        )
+        ConversationExporter exporter,
+        IEnumerable<ExportType> exportTypes,
+        bool showHidden)
     {
         public int RunExport(IEnumerable<IFileInfo> conversationFiles, IDirectoryInfo destination)
         {
-            var directoryConversationsMap = conversationFiles.Where(p => p.Directory != null)
+            var directoryConversationsMap = conversationFiles
                 .Select(file => (
                     File: file,
-                    ParentDirectory: file.Directory!,
                     ConversationParseResult: conversationsParser.GetConversations(file)
                 )).ToList();
 
@@ -44,7 +45,7 @@ namespace ChatGpt.Exporter.Cli
 
             var successfulConversations = directoryConversationsMap
                 .Where(p => p.ConversationParseResult.Status == ConversationParseResult.Success)
-                .Select(p => (Conversations: p.ConversationParseResult.Conversations!, ConversationAssets: ConversationAssets.FromDirectory(p.ParentDirectory)))
+                .Select(p => (Conversations: p.ConversationParseResult.Conversations!, ConversationAssets: ConversationAssets.FromConversationsFile(p.File)))
                 .ToList();
 
             var conversations = successfulConversations
@@ -53,7 +54,12 @@ namespace ChatGpt.Exporter.Cli
                 .ToList();
 
             var conversationAssetsList = successfulConversations.OrderByDescending(p => p.Conversations.GetUpdateTime()).Select(p => p.ConversationAssets);
-            var assetLocator = new MarkdownAssetRenderer(exportAssetLocatorFactory.GetAssetLocator(conversationAssetsList, destination));
+            var assetLocator = exportAssetLocatorFactory.GetAssetLocator(conversationAssetsList, destination);
+            var assetRenderer = new MarkdownAssetRenderer();
+
+            var markdownContentVisitor = new MarkdownContentVisitor(assetLocator, assetRenderer);
+
+            var formatters = new ConversationFormatterFactory().GetFormatters(exportTypes, markdownContentVisitor);
 
             var count = conversations.Count;
             var position = 0;
@@ -61,7 +67,7 @@ namespace ChatGpt.Exporter.Cli
             {
                 var percent = (int)(position++ * 100.0 / count);
                 ConsoleFeatures.SetProgress(percent);
-                exporter.Process(conversation, destination, assetLocator);
+                exporter.Process(conversation, formatters, destination, showHidden);
             }
 
             return 0;

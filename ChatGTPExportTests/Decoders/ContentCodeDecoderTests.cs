@@ -5,19 +5,19 @@ namespace ChatGTPExportTests.Decoders;
 
 public class ContentCodeDecoderTests
 {
-    private static ContentCodeDecoder CreateDecoder(bool showHidden = false) => new(showHidden);
+    private static ContentCodeDecoder CreateDecoder() => new();
 
-    private static MessageContext CreateContext(string recipient = "all")
+    private static MessageContext CreateContext(string recipient = "all", bool showHidden = true)
     {
-        return new MessageContext(new Author { role = "assistant" }, null, null, new MessageMetadata(), recipient);
+        return new MessageContext(new Author { role = "assistant" }, null, null, new MessageMetadata(), recipient, new ConversationContext(), showHidden);
     }
 
     [Fact]
     public void HiddenCode_IsFilteredWhenRecipientIsNotAll()
     {
-        var decoder = CreateDecoder(showHidden: false);
+        var decoder = CreateDecoder();
         var content = new ContentCode { language = "csharp", text = "Console.WriteLine();" };
-        var context = CreateContext(recipient: "not-all");
+        var context = CreateContext(recipient: "not-all", showHidden: false);
 
         var result = decoder.Decode(content, context);
 
@@ -27,9 +27,9 @@ public class ContentCodeDecoderTests
     [Fact]
     public void UnknownLanguageSearch_IsRenderedAsWebSearch()
     {
-        var decoder = CreateDecoder(showHidden: true);
+        var decoder = CreateDecoder();
         var content = new ContentCode { language = "unknown", text = "search(\"kittens\")" };
-        var context = CreateContext();
+        var context = CreateContext(showHidden: true);
 
         var result = decoder.Decode(content, context);
 
@@ -40,9 +40,9 @@ public class ContentCodeDecoderTests
     [Fact]
     public void UnknownLanguageJson_IsRenderedAsJsonCodeBlock()
     {
-        var decoder = CreateDecoder(showHidden: true);
+        var decoder = CreateDecoder();
         var content = new ContentCode { language = "unknown", text = "{\"a\":1}" };
-        var context = CreateContext();
+        var context = CreateContext(showHidden: true);
 
         var result = decoder.Decode(content, context);
 

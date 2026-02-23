@@ -5,20 +5,20 @@ namespace ChatGTPExportTests.Decoders;
 
 public class ContentTetherBrowsingDisplayDecoderTests
 {
-    private static ContentTetherBrowsingDisplayDecoder CreateDecoder(bool showHidden = false) => new(showHidden);
+    private static ContentTetherBrowsingDisplayDecoder CreateDecoder() => new();
 
-    private static MessageContext CreateContext()
+    private static MessageContext CreateContext(bool showHidden)
     {
-        return new MessageContext(new Author { role = "assistant" }, null, null, new MessageMetadata(), "all");
+        return new MessageContext(new Author { role = "assistant" }, null, null, new MessageMetadata(), "all", new ConversationContext(), showHidden);
     }
 
     [Fact]
     public void TetherBrowsingDisplay_IsFilteredWhenShowHiddenIsFalse()
     {
-        var decoder = CreateDecoder(showHidden: false);
+        var decoder = CreateDecoder();
         var content = new ContentTetherBrowsingDisplay { result = "Result", summary = "Summary" };
 
-        var result = decoder.Decode(content, CreateContext());
+        var result = decoder.Decode(content, CreateContext(showHidden: false));
 
         Assert.Empty(result.Lines);
     }
@@ -26,10 +26,10 @@ public class ContentTetherBrowsingDisplayDecoderTests
     [Fact]
     public void TetherBrowsingDisplay_IsRenderedWhenShowHiddenIsTrue()
     {
-        var decoder = CreateDecoder(showHidden: true);
+        var decoder = CreateDecoder();
         var content = new ContentTetherBrowsingDisplay { result = "Line1\nLine2", summary = "Summary" };
 
-        var result = decoder.Decode(content, CreateContext());
+        var result = decoder.Decode(content, CreateContext(showHidden: true));
 
         Assert.Equal(["Line1  \nLine2", "Summary"], result.Lines.ToArray());
     }

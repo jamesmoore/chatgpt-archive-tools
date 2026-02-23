@@ -169,7 +169,6 @@ rootCommand.SetAction(parseResult =>
             exportMode,
             exportTypes,
             showHidden);
-        var formatters = new ConversationFormatterFactory().GetFormatters(exportArgs.ExportTypes, exportArgs.ShowHidden);
 
         var validators = new List<IConversationsValidator>();
         if (validate)
@@ -179,12 +178,14 @@ rootCommand.SetAction(parseResult =>
         }
         var conversationFiles = conversationFinder.GetConversationFiles(sources);
 
-        var exporter = new ConversationExporter(fileSystem, formatters, exportMode);
+        var exporter = new ConversationExporter(fileSystem, exportMode);
 
         var result = new ExportBootstrap(
             new ConversationsParser(validators),
             new ExportAssetLocatorFactory(),
-            exporter
+            exporter,
+            exportTypes,
+            showHidden
             ).RunExport(conversationFiles, destination);
         return result;
     }

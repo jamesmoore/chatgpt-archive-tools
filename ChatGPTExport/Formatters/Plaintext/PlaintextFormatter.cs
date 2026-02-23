@@ -4,17 +4,17 @@ using ChatGPTExport.Visitor;
 
 namespace ChatGPTExport.Formatters.Plaintext
 {
-    public class PlaintextFormatter(bool showHidden) : IConversationFormatter
+    public class PlaintextFormatter(MarkdownContentVisitor markdownContentVisitor) : IConversationFormatter
     {
         private readonly string LineBreak = Environment.NewLine;
 
-        public FormattedConversation Format(IMarkdownAssetRenderer assetLocator, Conversation conversation, string pathPrefix)
+        public FormattedConversation Format(Conversation conversation, string pathPrefix, bool showHidden)
         {
             var messages = conversation.GetMessagesWithContent();
 
             var strings = new List<string>();
 
-            var visitor = new MarkdownContentVisitor(assetLocator, new ConversationContext(), showHidden);
+            ConversationContext conversationContext = new();
 
             // Add conversation header
             strings.Add($"Title: {conversation.title ?? "No title"}");
@@ -34,18 +34,18 @@ namespace ChatGPTExport.Formatters.Plaintext
 
             foreach (var message in messages)
             {
-                strings.AddRange(FormatMessage(message, visitor));
+                strings.AddRange(FormatMessage(message, conversationContext, showHidden));
             }
 
             return new FormattedConversation(string.Join(Environment.NewLine, strings), [], ".txt");
         }
 
-        private IEnumerable<string> FormatMessage(Message message, IContentVisitor<MarkdownContentResult> visitor)
+        private IEnumerable<string> FormatMessage(Message message, ConversationContext conversationContext, bool showHidden)
         {
             var strings = new List<string>();
             try
             {
-                var visitResult = message.Accept(visitor);
+                var visitResult = message.Accept(markdownContentVisitor, conversationContext, showHidden);
 
                 if (message.author != null && visitResult != null && visitResult.Lines.Any())
                 {

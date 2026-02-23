@@ -1,7 +1,9 @@
 ﻿using ChatGpt.Archive.Api.Database;
 using ChatGPTExport;
+using ChatGPTExport.Assets;
 using ChatGPTExport.Decoders;
 using ChatGPTExport.Models;
+using ChatGPTExport.Visitor;
 using System.IO.Abstractions;
 
 namespace ChatGpt.Archive.Api.Services
@@ -12,6 +14,7 @@ namespace ChatGpt.Archive.Api.Services
         IConversationAssetsCache conversationAssetsCache,
         ConversationFinder conversationFinder,
         ArchiveSourcesOptions options,
+        IAssetLocator assetLocator,
         IMarkdownAssetRenderer markdownAssetRenderer,
         ConversationFormatterFactory conversationFormatterFactory,
         AssetsCache assetsCache) : IConversationsService
@@ -38,13 +41,9 @@ namespace ChatGpt.Archive.Api.Services
             var directories = options.SourceDirectories.Select(fileSystem.DirectoryInfo.New);
             var conversationFiles = conversationFinder.GetConversationFiles(directories);
             var conversationsParser = new ConversationsParser([]);
-            var conversations = conversationFiles.Select(p => new
-            {
-                ParsedConversations = conversationsParser.GetConversations(p),
-                ParentDirectory = p.Directory
-            }).ToList();
-            var successfulConversations = conversations.Where(p => p.ParsedConversations.Status == ConversationParseResult.Success && p.ParsedConversations.Conversations != null).ToList();
-            var latestConversations = successfulConversations.Select(p => p.ParsedConversations.Conversations!).GetLatestConversations();
+            var conversations = conversationFiles.Select(conversationsParser.GetConversations).ToList();
+            var successfulConversations = conversations.Where(p => p.Status == ConversationParseResult.Success && p.Conversations != null).ToList();
+            var latestConversations = successfulConversations.Select(p => p.Conversations!).GetLatestConversations();
             return latestConversations;
         }
 
@@ -75,13 +74,14 @@ namespace ChatGpt.Archive.Api.Services
 
         public string? GetContent(string conversationId, ExportType exportType)
         {
-            var formatter = conversationFormatterFactory.GetFormatters([exportType], false);
+            var markdownContentVisitor = new MarkdownContentVisitor(assetLocator, markdownAssetRenderer);
+            var formatter = conversationFormatterFactory.GetFormatters([exportType], markdownContentVisitor);
             var conversation = GetConversation(conversationId);
             if (conversation == null)
             {
                 return null;
             }
-            var formatted = formatter.First().Format(markdownAssetRenderer, conversation.GetLastestConversation(), string.Empty);
+            var formatted = formatter.First().Format(conversation.GetLastestConversation(), string.Empty, false);
 
             if (formatted != null)
             {

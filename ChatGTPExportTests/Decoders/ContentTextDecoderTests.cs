@@ -5,15 +5,15 @@ namespace ChatGTPExportTests.Decoders;
 
 public class ContentTextDecoderTests
 {
-    private static ContentTextDecoder CreateDecoder(bool showHidden = false)
+    private static ContentTextDecoder CreateDecoder()
     {
-        return new ContentTextDecoder(new ConversationContext(), showHidden);
+        return new ContentTextDecoder();
     }
 
-    private static MessageContext CreateContext(string role, MessageMetadata? metadata = null)
+    private static MessageContext CreateContext(string role, MessageMetadata? metadata = null, bool showHidden = true)
     {
         metadata ??= new MessageMetadata();
-        return new MessageContext(new Author() { role = role }, null, null, metadata, string.Empty);
+        return new MessageContext(new Author() { role = role }, null, null, metadata, string.Empty, new ConversationContext(), showHidden);
     }
 
     [Fact]
@@ -226,14 +226,16 @@ public class ContentTextDecoderTests
     [Fact]
     public void PersonalizedContextMessages_AreHiddenWhenShowHiddenIsFalse()
     {
-        var decoder = CreateDecoder(showHidden: false);
+        var decoder = CreateDecoder();
         var content = new ContentText { parts = ["Personalized context content"] };
         var context = new MessageContext(
             new Author() { role = "tool", name = "personalized_context" },
             null,
             null,
             new MessageMetadata(),
-            string.Empty);
+            string.Empty,
+            new ConversationContext(),
+            ShowHidden: false);
 
         var result = decoder.Decode(content, context);
 
@@ -243,14 +245,16 @@ public class ContentTextDecoderTests
     [Fact]
     public void PersonalizedContextMessages_AreShownWhenShowHiddenIsTrue()
     {
-        var decoder = CreateDecoder(showHidden: true);
+        var decoder = CreateDecoder();
         var content = new ContentText { parts = ["Personalized context content"] };
         var context = new MessageContext(
             new Author() { role = "tool", name = "personalized_context" },
             null,
             null,
             new MessageMetadata(),
-            string.Empty);
+            string.Empty,
+            new ConversationContext(),
+            ShowHidden: true);
 
         var result = decoder.Decode(content, context);
 

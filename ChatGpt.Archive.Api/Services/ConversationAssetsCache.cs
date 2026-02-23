@@ -27,7 +27,7 @@ namespace ChatGpt.Archive.Api.Services
         {
             var sourceDirectories = options.SourceDirectories.Select(fileSystem.DirectoryInfo.New);
             var conversationAssets = conversationFinder.GetConversationFiles(sourceDirectories).OrderByDescending(p => p.LastWriteTimeUtc);
-            var assetsDirectries = conversationAssets.Select(p => p.Directory).Select(p => ConversationAssets.FromDirectory(p!));
+            var assetsDirectries = conversationAssets.Select(ConversationAssets.FromConversationsFile);
             return assetsDirectries;
         }
 

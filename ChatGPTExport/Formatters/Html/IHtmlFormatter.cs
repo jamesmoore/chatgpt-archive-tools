@@ -1,6 +1,4 @@
-﻿using Markdig;
-
-namespace ChatGPTExport.Formatters.Html
+﻿namespace ChatGPTExport.Formatters.Html
 {
     internal interface IHtmlFormatter
     {

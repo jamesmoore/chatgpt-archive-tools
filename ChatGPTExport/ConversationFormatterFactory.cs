@@ -1,11 +1,11 @@
 ﻿using ChatGPTExport.Exporters.Html;
 using ChatGPTExport.Formatters;
-using ChatGPTExport.Formatters.Html;
 using ChatGPTExport.Formatters.Html.Headers;
 using ChatGPTExport.Formatters.Html.Template;
 using ChatGPTExport.Formatters.Json;
 using ChatGPTExport.Formatters.Markdown;
 using ChatGPTExport.Formatters.Plaintext;
+using ChatGPTExport.Visitor;
 
 namespace ChatGPTExport
 {
@@ -13,7 +13,7 @@ namespace ChatGPTExport
     {
         public IEnumerable<IConversationFormatter> GetFormatters(
             IEnumerable<ExportType> exportTypes,
-            bool showHidden
+            MarkdownContentVisitor markdownContentVisitor
             )
         {
             var exporters = new List<IConversationFormatter>();
@@ -23,7 +23,7 @@ namespace ChatGPTExport
             }
             if (exportTypes.Contains(ExportType.Markdown))
             {
-                exporters.Add(new MarkdownFormatter(showHidden));
+                exporters.Add(new MarkdownFormatter(markdownContentVisitor));
             }
             if (exportTypes.Contains(ExportType.Html))
             {
@@ -36,11 +36,11 @@ namespace ChatGPTExport
                     ]
                 );
 
-                exporters.Add(new HtmlFormatter(new TailwindHtmlFormatter(), headerProvider, showHidden));
+                exporters.Add(new HtmlFormatter(new TailwindHtmlFormatter(), headerProvider, markdownContentVisitor));
             }
             if (exportTypes.Contains(ExportType.Text))
             {
-                exporters.Add(new PlaintextFormatter(showHidden));
+                exporters.Add(new PlaintextFormatter(markdownContentVisitor));
             }
 
             return exporters;

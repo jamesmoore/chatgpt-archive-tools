@@ -1,4 +1,5 @@
-﻿using ChatGPTExport.Decoders;
+﻿using ChatGPTExport.Assets;
+using ChatGPTExport.Decoders;
 using ChatGPTExport.Formatters.Plaintext;
 using ChatGPTExport.Models;
 using ChatGPTExport.Visitor;
@@ -8,21 +9,26 @@ namespace ChatGpt.Archive.Api.Services
     public class PlaintextExtractor
     {
         private readonly FTSPlaintextMessageFormatter plaintextFormatter = new();
-        private static readonly NullAssetRenderer markdownAssetRenderer = new NullAssetRenderer();
-        private readonly MarkdownContentVisitor visitor = new(markdownAssetRenderer, new ConversationContext(), false);
+        private static readonly NullAssetRenderer markdownAssetRenderer = new();
+        private readonly MarkdownContentVisitor visitor = new(new NullAssetLocator(),  markdownAssetRenderer);
 
-        public string ExtractPlaintext(Message message)
+        public string ExtractPlaintext(Message message, ConversationContext conversationContext)
         {
-            var results = plaintextFormatter.FormatMessage(message, visitor).Where(p => string.IsNullOrWhiteSpace(p) == false);
+            var results = plaintextFormatter.FormatMessage(message, visitor, conversationContext).Where(p => string.IsNullOrWhiteSpace(p) == false);
             return string.Join(Environment.NewLine, results);
         }
 
         private class NullAssetRenderer : IMarkdownAssetRenderer
         {
-            public IEnumerable<string> RenderAsset(MessageContext context, string asset_pointer)
+            public IEnumerable<string> RenderAsset(Asset? asset, string asset_pointer)
             {
                 return [];
             }
+        }
+
+        private class NullAssetLocator : IAssetLocator
+        {
+            public Asset? GetMarkdownMediaAsset(AssetRequest assetRequest) => null;
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using ChatGpt.Archive.Api.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace ChatGpt.Archive.Api.Controllers
 {

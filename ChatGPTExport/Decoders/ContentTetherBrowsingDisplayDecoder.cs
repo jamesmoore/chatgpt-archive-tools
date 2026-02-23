@@ -2,11 +2,11 @@ using ChatGPTExport.Models;
 
 namespace ChatGPTExport.Decoders
 {
-    public class ContentTetherBrowsingDisplayDecoder(bool showHidden) : IDecoder<ContentTetherBrowsingDisplay, MarkdownContentResult>
+    public class ContentTetherBrowsingDisplayDecoder : IDecoder<ContentTetherBrowsingDisplay, MarkdownContentResult>
     {
         public MarkdownContentResult Decode(ContentTetherBrowsingDisplay content, MessageContext context)
         {
-            if (!showHidden)
+            if (!context.ShowHidden)
             {
                 return new MarkdownContentResult();
             }

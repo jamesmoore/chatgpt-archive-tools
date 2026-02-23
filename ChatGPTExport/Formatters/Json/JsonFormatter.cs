@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using ChatGPTExport.Decoders;
 using ChatGPTExport.Models;
 
 namespace ChatGPTExport.Formatters.Json
@@ -13,7 +12,7 @@ namespace ChatGPTExport.Formatters.Json
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         };
 
-        public FormattedConversation Format(IMarkdownAssetRenderer assetLocator, Conversation conversation, string pathPrefix)
+        public FormattedConversation Format(Conversation conversation, string pathPrefix, bool showHidden)
         {
             return new FormattedConversation(JsonSerializer.Serialize(conversation, options), [], ".json");
         }

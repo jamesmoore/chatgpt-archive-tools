@@ -1,8 +1,9 @@
-﻿using ChatGPTExport.Models;
+﻿using ChatGPTExport.Assets;
+using ChatGPTExport.Models;
 
 namespace ChatGPTExport.Decoders
 {
-    public class ContentMultimodalTextDecoder(IMarkdownAssetRenderer markdownAssetRenderer) : IDecoder<ContentMultimodalText, MarkdownContentResult>
+    public class ContentMultimodalTextDecoder(IAssetLocator assetLocator, IMarkdownAssetRenderer markdownAssetRenderer) : IDecoder<ContentMultimodalText, MarkdownContentResult>
     {
         private const string ImageAssetPointer = "image_asset_pointer";
 
@@ -34,7 +35,8 @@ namespace ChatGPTExport.Decoders
                 case ImageAssetPointer when string.IsNullOrWhiteSpace(obj.asset_pointer) == false:
                     {
                         var asset_pointer = obj.asset_pointer;
-                        var strings = markdownAssetRenderer.RenderAsset(context, asset_pointer);
+                        var asset = GetAsset(context, asset_pointer);
+                        var strings = markdownAssetRenderer.RenderAsset(asset, asset_pointer);
 
                         foreach (var str in strings)
                         {
@@ -52,7 +54,8 @@ namespace ChatGPTExport.Decoders
                 case "real_time_user_audio_video_asset_pointer" when string.IsNullOrWhiteSpace(obj.audio_asset_pointer?.asset_pointer) == false:
                     {
                         var asset_pointer = obj.audio_asset_pointer.asset_pointer;
-                        var strings = markdownAssetRenderer.RenderAsset(context, asset_pointer);
+                        var asset = GetAsset(context, asset_pointer);
+                        var strings = markdownAssetRenderer.RenderAsset(asset, asset_pointer);
 
                         foreach (var str in strings)
                         {
@@ -64,7 +67,8 @@ namespace ChatGPTExport.Decoders
                 case "audio_asset_pointer" when string.IsNullOrWhiteSpace(obj.asset_pointer) == false:
                     {
                         var asset_pointer = obj.asset_pointer;
-                        var strings = markdownAssetRenderer.RenderAsset(context, asset_pointer);
+                        var asset = GetAsset(context, asset_pointer);
+                        var strings = markdownAssetRenderer.RenderAsset(asset, asset_pointer);
 
                         foreach (var str in strings)
                         {
@@ -77,6 +81,28 @@ namespace ChatGPTExport.Decoders
                     yield return $"*{obj.text}*  ";
                     break;
             }
+        }
+
+        private Asset? GetAsset(MessageContext context, string asset_pointer)
+        {
+            var searchPattern = GetSearchPattern(asset_pointer);
+            var markdownAsset = GetMediaAsset(context, searchPattern);
+            return markdownAsset;
+        }
+
+        private static string GetSearchPattern(string assetPointer)
+        {
+            return assetPointer.Replace("sediment://", string.Empty).Replace("file-service://", string.Empty);
+        }
+
+        private Asset? GetMediaAsset(MessageContext context, string searchPattern)
+        {
+            return assetLocator.GetMarkdownMediaAsset(new AssetRequest(
+                searchPattern,
+                context.Role,
+                context.CreatedDate,
+                context.UpdatedDate)
+                );
         }
 
     }
