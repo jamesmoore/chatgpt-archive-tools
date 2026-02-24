@@ -61,30 +61,39 @@ namespace ChatGpt.Exporter.Cli
                     foreach (var asset in formattedConversation.Assets)
                     {
                         var assetDestinationFilename = fileSystem.Path.Join(destination.FullName, asset.Name);
+                        Console.Write($"\t\t{asset.Name}...");
                         if (fileSystem.File.Exists(assetDestinationFilename) == false)
                         {
-                            var assetDestinationDirectory = fileSystem.Path.GetDirectoryName(assetDestinationFilename);
-                            if (string.IsNullOrEmpty(assetDestinationDirectory) == false)
-                            {
-                                fileSystem.Directory.CreateDirectory(assetDestinationDirectory);
-                            }
-
                             using var stream = asset.GetStream();
-                            using var fileStream = fileSystem.File.Create(assetDestinationFilename);
-                            stream.CopyTo(fileStream);
-                            Console.WriteLine($"\t\t{asset.Name}...Saved");
+                            SaveToFilesystem(stream, assetDestinationFilename);
+                            Console.WriteLine("Saved");
                         }
                         else
                         {
-                            Console.WriteLine($"\t\t{asset.Name}...Exists");
+                            Console.WriteLine("Exists");
                         }
                     }
 
                     foreach (var markdownAsset in formattedConversation.MarkdownAssets)
                     {
-                        Console.WriteLine($"\t\t{markdownAsset.RelativePath}");
+                        var destinationSegments = new[] { destination.FullName }
+                            .Concat(markdownAsset.DestinationSegments)
+                            .ToArray();
+                        var fullDestinationPath = fileSystem.Path.Join(destinationSegments);
+                        var exists = fileSystem.File.Exists(fullDestinationPath);
+                        Console.Write($"\t\t{markdownAsset.MarkdownPath}...");
+                        if(exists == false)
+                        {
+                            //TODO set set last modified
+                            using var stream = markdownAsset.GetStream();
+                            SaveToFilesystem(stream, fullDestinationPath);
+                            Console.WriteLine("Saved");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Exists");
+                        }
                     }
-
                 }
             }
             catch (Exception ex)
@@ -93,6 +102,16 @@ namespace ChatGpt.Exporter.Cli
             }
         }
 
+        private void SaveToFilesystem(Stream stream, string destinationFilename)
+        {
+            var destinationDirectory = fileSystem.Path.GetDirectoryName(destinationFilename);
+            if (string.IsNullOrEmpty(destinationDirectory) == false)
+            {
+                fileSystem.Directory.CreateDirectory(destinationDirectory);
+            }
+            using var fileStream = fileSystem.File.Create(destinationFilename);
+            stream.CopyTo(fileStream);
+        }
 
         private bool FileStringMismatch(string destinationFilename, string contents)
         {

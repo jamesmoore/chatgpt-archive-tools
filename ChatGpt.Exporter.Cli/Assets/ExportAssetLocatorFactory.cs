@@ -7,10 +7,7 @@ namespace ChatGpt.Exporter.Cli.Assets
     {
         public IAssetLocator GetAssetLocator(IEnumerable<ConversationAssets> conversationAssets, IDirectoryInfo destination)
         {
-            var existingAssetLocator = new ExistingAssetLocator(destination);
-            var assetLocators = conversationAssets.Select(asset => new AssetLocator(asset, destination, existingAssetLocator) as IAssetLocator).ToList();
-            assetLocators.Insert(0, existingAssetLocator);
-
+            var assetLocators = conversationAssets.Select(asset => new AssetLocator(asset) as IAssetLocator).ToList();
             var compositeAssetLocator = new CompositeAssetLocator(assetLocators);
             return compositeAssetLocator;
         }

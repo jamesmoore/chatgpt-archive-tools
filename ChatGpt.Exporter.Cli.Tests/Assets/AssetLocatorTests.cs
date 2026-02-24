@@ -18,8 +18,7 @@ namespace ChatGpt.Exporter.Cli.Tests.Assets
 
             var conversationsFile = fs.FileInfo.New(MockUnixSupport.Path(@"c:\source\conversations.json"));
             var destDir = fs.DirectoryInfo.New(MockUnixSupport.Path(@"c:\dest"));
-            var existing = new ExistingAssetLocator(destDir);
-            var locator = new AssetLocator(ConversationAssets.FromConversationsFile(conversationsFile), destDir, existing);
+            var locator = new AssetLocator(ConversationAssets.FromConversationsFile(conversationsFile));
 
             var request = new AssetRequest("img.png", "../evil", null, null);
 
