@@ -1,10 +1,11 @@
-﻿using ChatGPTExport.Decoders;
+﻿using ChatGPTExport.Assets;
+using ChatGPTExport.Decoders;
 using ChatGPTExport.Models;
 using ChatGPTExport.Visitor;
 
 namespace ChatGPTExport.Formatters.Markdown
 {
-    internal class MarkdownFormatter(MarkdownContentVisitor markdownContentVisitor) : IConversationFormatter
+    internal class MarkdownFormatter(IContentVisitor<MarkdownContentResult> markdownContentVisitor) : IConversationFormatter
     {
         private readonly string LineBreak = Environment.NewLine;
 
@@ -13,7 +14,7 @@ namespace ChatGPTExport.Formatters.Markdown
             var messages = conversation.GetMessagesWithContent();
 
             var strings = new List<string>();
-
+            var assets = new List<Asset>();
             ConversationContext conversationContext = new();
 
             strings.AddRange(GetYamlHeader(conversation));
@@ -24,12 +25,16 @@ namespace ChatGPTExport.Formatters.Markdown
                 {
                     var visitResult = message.Accept(markdownContentVisitor, conversationContext, showHidden);
 
-                    if (message.author != null && visitResult != null && visitResult.Lines.Any())
+                    if (visitResult != null)
                     {
-                        var authorname = string.IsNullOrWhiteSpace(message.author.name) ? "" : $" ({message.author.name})";
-                        strings.Add($"**{message.author.role}{authorname}{visitResult.Suffix}**:  "); // double space for line break
-                        strings.Add(string.Join(LineBreak, visitResult.Lines));
-                        strings.Add(LineBreak);
+                        if (message.author != null && visitResult.Lines.Any())
+                        {
+                            var authorname = string.IsNullOrWhiteSpace(message.author.name) ? "" : $" ({message.author.name})";
+                            strings.Add($"**{message.author.role}{authorname}{visitResult.Suffix}**:  "); // double space for line break
+                            strings.Add(string.Join(LineBreak, visitResult.Lines));
+                            strings.Add(LineBreak);
+                        }
+                        assets.AddRange(visitResult.Assets);
                     }
                 }
                 catch (Exception ex)
@@ -38,7 +43,7 @@ namespace ChatGPTExport.Formatters.Markdown
                 }
             }
 
-            return new FormattedConversation(string.Join(Environment.NewLine, strings), [], ".md");
+            return new FormattedConversation(string.Join(Environment.NewLine, strings), [], assets, ".md");
         }
 
         private static IEnumerable<string> GetYamlHeader(Conversation conversation)

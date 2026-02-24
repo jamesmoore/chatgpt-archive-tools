@@ -33,7 +33,7 @@ public class MarkdownContentVisitorTests
 
     private class NullAssetRenderer : IMarkdownAssetRenderer
     {
-        public IEnumerable<string> RenderAsset(Asset? asset, string asset_pointer) => [];
+        public string RenderAsset(Asset? asset, string asset_pointer) => string.Empty;
     }
 
     private class AssetLocator : IAssetLocator

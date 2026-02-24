@@ -52,7 +52,7 @@ namespace ChatGpt.Archive.Api.Services
 
             var asset = foundAsset.Asset!;
 
-            return new MediaAssetDefinition(asset.Name, foundAsset.Index, asset.GetRelativePathTo(foundAsset.ParentDirectory));
+            return new MediaAssetDefinition(asset.Name, foundAsset.Index, asset.GetRelativePathTo(foundAsset.ParentDirectory), asset);
         }
 
         public string? GetMediaAssetPath(int index, string relativePath)

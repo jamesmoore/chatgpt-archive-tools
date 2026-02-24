@@ -10,13 +10,18 @@ namespace ChatGPTExport.Decoders
         public MarkdownContentResult Decode(ContentMultimodalText content, MessageContext context)
         {
             var markdownContent = new List<string>();
+            var markdownAssets = new List<Asset>();
             bool hasImage = false;
             foreach (var part in content.parts ?? [])
             {
                 if (part.IsObject && part.ObjectValue != null)
                 {
                     var mediaAssets = GetMarkdownMediaAsset(context, part.ObjectValue);
-                    markdownContent.AddRange(mediaAssets);
+                    markdownContent.AddRange(mediaAssets.MarkdownLines);
+                    if (mediaAssets.MarkdownAsset != null)
+                    {
+                        markdownAssets.Add(mediaAssets.MarkdownAsset);
+                    }
                     hasImage = hasImage || part.ObjectValue.content_type == ImageAssetPointer;
                 }
                 else if (part.IsString && part.StringValue != null)
@@ -24,11 +29,11 @@ namespace ChatGPTExport.Decoders
                     markdownContent.Add(part.StringValue);
                 }
             }
-            return new MarkdownContentResult(markdownContent, null, hasImage);
+            return new MarkdownContentResult(markdownContent, markdownAssets, null, hasImage);
 
         }
 
-        private IEnumerable<string> GetMarkdownMediaAsset(MessageContext context, ContentMultimodalText.ContentMultimodalTextParts obj)
+        private (IEnumerable<string> MarkdownLines, Asset? MarkdownAsset) GetMarkdownMediaAsset(MessageContext context, ContentMultimodalText.ContentMultimodalTextParts obj)
         {
             switch (obj.content_type)
             {
@@ -36,50 +41,40 @@ namespace ChatGPTExport.Decoders
                     {
                         var asset_pointer = obj.asset_pointer;
                         var asset = GetAsset(context, asset_pointer);
-                        var strings = markdownAssetRenderer.RenderAsset(asset, asset_pointer);
+                        var assetString = markdownAssetRenderer.RenderAsset(asset, asset_pointer);
 
-                        foreach (var str in strings)
+                        var mediaAssets = new List<string>
                         {
-                            yield return str;
-                        }
+                            assetString
+                        };
 
                         if (context.MessageMetadata.image_gen_title != null)
                         {
-                            yield return $"*{context.MessageMetadata.image_gen_title}*  ";
+                            mediaAssets.Add($"*{context.MessageMetadata.image_gen_title}*  ");
                         }
-                        yield return $"**Size:** {obj.size_bytes} **Dims:** {obj.width}x{obj.height}  ";
-                        break;
+                        mediaAssets.Add($"**Size:** {obj.size_bytes} **Dims:** {obj.width}x{obj.height}  ");
+                        return (mediaAssets, asset);
                     }
-
                 case "real_time_user_audio_video_asset_pointer" when string.IsNullOrWhiteSpace(obj.audio_asset_pointer?.asset_pointer) == false:
                     {
                         var asset_pointer = obj.audio_asset_pointer.asset_pointer;
                         var asset = GetAsset(context, asset_pointer);
-                        var strings = markdownAssetRenderer.RenderAsset(asset, asset_pointer);
+                        var assetString = markdownAssetRenderer.RenderAsset(asset, asset_pointer);
 
-                        foreach (var str in strings)
-                        {
-                            yield return str;
-                        }
-                        break;
+                        return ([assetString], asset);
                     }
-
                 case "audio_asset_pointer" when string.IsNullOrWhiteSpace(obj.asset_pointer) == false:
                     {
                         var asset_pointer = obj.asset_pointer;
                         var asset = GetAsset(context, asset_pointer);
-                        var strings = markdownAssetRenderer.RenderAsset(asset, asset_pointer);
+                        var assetString = markdownAssetRenderer.RenderAsset(asset, asset_pointer);
 
-                        foreach (var str in strings)
-                        {
-                            yield return str;
-                        }
-                        break;
+                        return ([assetString], asset);
                     }
-
                 case "audio_transcription" when string.IsNullOrWhiteSpace(obj.text) == false:
-                    yield return $"*{obj.text}*  ";
-                    break;
+                    return ([$"*{obj.text}*  "], null);
+                default:
+                    return (Enumerable.Empty<string>(), null);
             }
         }
 

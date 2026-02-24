@@ -24,7 +24,7 @@ namespace ChatGPTExport.Decoders
                 }
             }
 
-            return new MarkdownContentResult(lines);
+            return MarkdownContentResult.FromLines(lines);
         }
     }
 }

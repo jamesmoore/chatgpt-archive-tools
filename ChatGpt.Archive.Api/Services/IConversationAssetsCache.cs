@@ -1,4 +1,6 @@
-﻿namespace ChatGpt.Archive.Api.Services
+﻿using System.IO.Abstractions;
+
+namespace ChatGpt.Archive.Api.Services
 {
     public interface IConversationAssetsCache
     {
@@ -7,5 +9,5 @@
         void Reset();
     }
 
-    public record MediaAssetDefinition(string Name, int RootId, string RelativePath);
+    public record MediaAssetDefinition(string Name, int RootId, string RelativePath, IFileInfo FileInfo);
 }

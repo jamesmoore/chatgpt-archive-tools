@@ -20,9 +20,9 @@ namespace ChatGpt.Archive.Api.Services
 
         private class NullAssetRenderer : IMarkdownAssetRenderer
         {
-            public IEnumerable<string> RenderAsset(Asset? asset, string asset_pointer)
+            public string RenderAsset(Asset? asset, string asset_pointer)
             {
-                return [];
+                return string.Empty;
             }
         }
 

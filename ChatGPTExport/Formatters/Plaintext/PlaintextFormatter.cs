@@ -4,7 +4,7 @@ using ChatGPTExport.Visitor;
 
 namespace ChatGPTExport.Formatters.Plaintext
 {
-    public class PlaintextFormatter(MarkdownContentVisitor markdownContentVisitor) : IConversationFormatter
+    public class PlaintextFormatter(IContentVisitor<MarkdownContentResult> markdownContentVisitor) : IConversationFormatter
     {
         private readonly string LineBreak = Environment.NewLine;
 
@@ -37,7 +37,7 @@ namespace ChatGPTExport.Formatters.Plaintext
                 strings.AddRange(FormatMessage(message, conversationContext, showHidden));
             }
 
-            return new FormattedConversation(string.Join(Environment.NewLine, strings), [], ".txt");
+            return new FormattedConversation(string.Join(Environment.NewLine, strings), [], [], ".txt");
         }
 
         private IEnumerable<string> FormatMessage(Message message, ConversationContext conversationContext, bool showHidden)

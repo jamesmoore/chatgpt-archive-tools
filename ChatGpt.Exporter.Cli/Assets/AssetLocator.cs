@@ -22,11 +22,6 @@ namespace ChatGpt.Exporter.Cli.Assets
 
         public Asset? GetMarkdownMediaAsset(AssetRequest assetRequest)
         {
-            return FindAssetInSourceDirectory(assetRequest);
-        }
-
-        private Asset? FindAssetInSourceDirectory(AssetRequest assetRequest)
-        {
             var sourceFile = sourceDirectory.FindAsset(assetRequest.SearchPattern);
             if (sourceFile != null)
             {
@@ -57,7 +52,11 @@ namespace ChatGpt.Exporter.Cli.Assets
                     }
                 }
 
-                return new Asset(assetWithoutPath, $"./{destinationAssetsPath}/{Uri.EscapeDataString(assetWithoutPath)}"); 
+                return new Asset(
+                    assetWithoutPath, 
+                    $"/{destinationAssetsPath}/{Uri.EscapeDataString(assetWithoutPath)}",
+                    sourceFile
+                    ); 
             }
 
             return null;

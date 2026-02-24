@@ -14,7 +14,7 @@ namespace ChatGPTExport.Decoders
         {
             if (context.Author.role == "tool" && context.Author.name == "personalized_context" && context.ShowHidden == false)
             {
-                return new MarkdownContentResult();
+                return MarkdownContentResult.Empty();
             }
 
             var parts = content.parts?.Where(TextContentFilter).SelectMany(p => DecodeText(p, context)).ToList() ?? [];
@@ -83,7 +83,7 @@ namespace ChatGPTExport.Decoders
                 }
             }
 
-            return new MarkdownContentResult(parts);
+            return MarkdownContentResult.FromLines(parts);
         }
 
         /// <summary>

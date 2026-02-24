@@ -62,7 +62,7 @@ namespace ChatGpt.Exporter.Cli.Assets
                 {
                     relativePath = relativePath.Replace(fileSystem.Path.DirectorySeparatorChar, '/');
                 }
-                return new Asset(targetFile.Name, $"./{Uri.EscapeDataString(relativePath).Replace("%2F", "/")}");
+                return new Asset(targetFile.Name, $"/{Uri.EscapeDataString(relativePath).Replace("%2F", "/")}", targetFile);
             }
             return null;
         }

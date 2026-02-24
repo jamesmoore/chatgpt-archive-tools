@@ -1,9 +1,10 @@
+using ChatGPTExport;
+using ChatGPTExport.Assets;
+using ChatGPTExport.Formatters;
+using ChatGPTExport.Models;
 using System.Buffers;
 using System.IO.Abstractions;
 using System.Text;
-using ChatGPTExport;
-using ChatGPTExport.Formatters;
-using ChatGPTExport.Models;
 
 namespace ChatGpt.Exporter.Cli
 {
@@ -78,6 +79,12 @@ namespace ChatGpt.Exporter.Cli
                             Console.WriteLine($"\t\t{asset.Name}...Exists");
                         }
                     }
+
+                    foreach (var markdownAsset in formattedConversation.MarkdownAssets)
+                    {
+                        Console.WriteLine($"\t\t{markdownAsset.RelativePath}");
+                    }
+
                 }
             }
             catch (Exception ex)
