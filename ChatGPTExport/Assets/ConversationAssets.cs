@@ -11,9 +11,11 @@ namespace ChatGPTExport.Assets
     {
         private static readonly Regex ConversationsFilePattern = ConversationFileRegex();
 
+        public static bool IsConversationFileName(string name) => ConversationsFilePattern.IsMatch(name);
+
         public static ConversationAssets FromConversationsFile(IFileInfo conversationsFile)
         {
-            if (!ConversationsFilePattern.IsMatch(conversationsFile.Name) || conversationsFile.Exists == false)
+            if (!IsConversationFileName(conversationsFile.Name) || conversationsFile.Exists == false)
             {
                 throw new ArgumentException("The provided file must be named 'conversations.json' or 'conversations-###.json' (where ### is 3 digits) and must exist.", nameof(conversationsFile));
             }

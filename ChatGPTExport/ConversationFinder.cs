@@ -1,13 +1,12 @@
 ﻿using System.IO;
 using System.IO.Abstractions;
-using System.Text.RegularExpressions;
+using ChatGPTExport.Assets;
 
 namespace ChatGPTExport
 {
-    public partial class ConversationFinder
+    public class ConversationFinder
     {
         private const string SearchPattern = "conversations*.json";
-        private static readonly Regex ConversationFilePattern = ConversationFileRegex();
 
         public IEnumerable<IFileInfo> GetConversationFiles(IEnumerable<IDirectoryInfo> sources)
         {
@@ -20,11 +19,8 @@ namespace ChatGPTExport
         {
             return sourceDir.Exists
                 ? sourceDir.GetFiles(SearchPattern, SearchOption.AllDirectories)
-                    .Where(f => ConversationFilePattern.IsMatch(f.Name))
+                    .Where(f => ConversationAssets.IsConversationFileName(f.Name))
                 : [];
         }
-
-        [GeneratedRegex(@"^conversations(-\d{3})?\.json$")]
-        private static partial Regex ConversationFileRegex();
     }
 }
