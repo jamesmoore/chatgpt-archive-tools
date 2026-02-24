@@ -48,21 +48,31 @@ namespace ChatGPTExport.Models
 
             var leaves = mapping.Where(p => p.Value.IsLeaf()).ToList();
 
+            if (leaves.Count == 0)
+            {
+                return null;
+            }
+
             var messageTimestamps = leaves.Select(p => new
             {
                 messageId = p.Key,
-                timeStamp = p.Value.message?.GetMessageTimestamp()
+                timestamp = p.Value.message?.GetMessageTimestamp()
             }
             ).ToList();
 
-            var allHaveTimestamp = messageTimestamps.All(p => p.timeStamp.HasValue);
+            var allHaveTimestamp = messageTimestamps.All(p => p.timestamp.HasValue);
             if (!allHaveTimestamp)
             {
                 Console.WriteLine("Warning: Not all messages have update_time/create_time.");
             }
 
-            var proposed = messageTimestamps.Where(p => p.timeStamp.HasValue).OrderBy(p => p.timeStamp!).Last();
-            return proposed.messageId;
+            var withTimestamps = messageTimestamps.Where(p => p.timestamp.HasValue).ToList();
+            if (withTimestamps.Count == 0)
+            {
+                return leaves.Last().Key;
+            }
+
+            return withTimestamps.OrderBy(p => p.timestamp!).Last().messageId;
         }
 
         private Dictionary<string, MessageContainer> GetLatestBranch()
