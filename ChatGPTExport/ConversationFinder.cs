@@ -5,7 +5,7 @@ namespace ChatGPTExport
 {
     public class ConversationFinder
     {
-        private const string SearchPattern = "conversations.json";
+        private const string SearchPattern = "conversations*.json";
 
         public IEnumerable<IFileInfo> GetConversationFiles(IEnumerable<IDirectoryInfo> sources)
         {

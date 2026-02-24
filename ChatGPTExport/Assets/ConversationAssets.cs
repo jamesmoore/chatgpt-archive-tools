@@ -1,19 +1,21 @@
 ﻿using System.IO;
 using System.IO.Abstractions;
+using System.Text.RegularExpressions;
 
 namespace ChatGPTExport.Assets
 {
     /// <summary>
     /// Represents the assets for a given conversations file.
     /// </summary>
-    public class ConversationAssets
+    public partial class ConversationAssets
     {
+        private static readonly Regex ConversationsFilePattern = ConversationFileRegex();
+
         public static ConversationAssets FromConversationsFile(IFileInfo conversationsFile)
         {
-            if (conversationsFile.Name != "conversations.json" || conversationsFile.Exists == false)
+            if (!ConversationsFilePattern.IsMatch(conversationsFile.Name) || conversationsFile.Exists == false)
             {
-                throw new ArgumentException("The provided file must be named 'conversations.json' and must exist.", nameof(conversationsFile));
-
+                throw new ArgumentException("The provided file must be named 'conversations.json' or 'conversations-###.json' (where ### is 3 digits) and must exist.", nameof(conversationsFile));
             }
             if (conversationsFile.Directory == null)
             {
@@ -44,5 +46,8 @@ namespace ChatGPTExport.Assets
             var path = cachedFiles.Value.FirstOrDefault(p => p.Contains(searchPattern));
             return path == null ? null : parentDirectory.FileSystem.FileInfo.New(path);
         }
+
+        [GeneratedRegex(@"^conversations(-\d{3})?\.json$")]
+        private static partial Regex ConversationFileRegex();
     }
 }
