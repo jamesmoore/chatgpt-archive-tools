@@ -9,7 +9,7 @@ namespace ChatGPTExport.Assets
     /// </summary>
     public partial class ConversationAssets
     {
-        private static readonly Regex ConversationsFilePattern = ConversationFileRegex();
+        public static readonly Regex ConversationsFilePattern = ConversationFileRegex();
 
         public static ConversationAssets FromConversationsFile(IFileInfo conversationsFile)
         {
