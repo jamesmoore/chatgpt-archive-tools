@@ -17,6 +17,7 @@ namespace ChatGPTExport
             return sourceDir.Exists
                 ? sourceDir.GetFiles("conversations*.json", SearchOption.AllDirectories)
                     .Where(ConversationsFileNameValidator.IsConversationFile)
+                    .OrderBy(p => p.FullName)
                 : [];
         }
     }
