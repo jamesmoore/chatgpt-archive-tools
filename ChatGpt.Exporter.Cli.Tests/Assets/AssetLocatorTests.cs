@@ -24,8 +24,8 @@ namespace ChatGpt.Exporter.Cli.Tests.Assets
             var result = locator.GetMarkdownMediaAsset(request);
 
             Assert.NotNull(result);
-            var markdownLink = result.GetMarkdownLink();
-            Assert.Equal("![img.png](./unknown-assets/img.png)  ", markdownLink);
+            Assert.Equal("unknown-assets", result.PathSegments[0]);
+            Assert.Equal("img.png", result.PathSegments[1]);
         }
     }
 }

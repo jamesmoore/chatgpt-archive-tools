@@ -12,8 +12,6 @@ namespace ChatGPTExport.Assets
         DateTimeOffset? UpdatedDate
         )
     {
-        public string GetMarkdownLink() => $"![{Name}]({MarkdownPath})  ";
-
         public Stream GetStream() => FileInfo.OpenRead();
     }
 }

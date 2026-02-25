@@ -8,7 +8,7 @@ namespace ChatGPTExport.Decoders
         {
             if (markdownAsset != null)
             {
-                return markdownAsset.GetMarkdownLink();
+                 return $"![{markdownAsset.Name}]({markdownAsset.MarkdownPath})  ";
             }
             else
             {
