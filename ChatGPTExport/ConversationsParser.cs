@@ -14,6 +14,11 @@ namespace ChatGPTExport
 
     public class ConversationsParser(IEnumerable<IConversationsValidator> validators)
     {
+        private readonly JsonSerializerOptions options = new()
+        {
+            AllowOutOfOrderMetadataProperties = true,
+        };
+
         public (Conversations? Conversations, ConversationParseResult Status) GetConversations(IFileInfo p)
         {
             try
@@ -36,7 +41,7 @@ namespace ChatGPTExport
         {
             var conversationsJsonStream = sourceFile.FileSystem.File.OpenRead(sourceFile.FullName);
 
-            var conversations = JsonSerializer.Deserialize<Conversations>(conversationsJsonStream);
+            var conversations = JsonSerializer.Deserialize<Conversations>(conversationsJsonStream, options);
 
             if (conversations == null)
             {
