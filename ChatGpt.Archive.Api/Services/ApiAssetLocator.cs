@@ -15,7 +15,7 @@ namespace ChatGpt.Archive.Api.Services
 
             string signature = AssetSignature.Create(foundAsset.RootId, foundAsset.RelativePath);
             string assetUrl = $"/asset/{foundAsset.RootId}/{UrlEncoder.Default.Encode(foundAsset.RelativePath)}?sig={signature}";
-            return new Asset(foundAsset.Name, assetUrl, foundAsset.FileInfo, []);
+            return new Asset(foundAsset.Name, assetUrl, foundAsset.FileInfo, [], assetRequest.CreatedDate, assetRequest.UpdatedDate);
         }
     }
 }

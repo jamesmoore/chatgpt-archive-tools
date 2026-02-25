@@ -65,7 +65,7 @@ namespace ChatGpt.Exporter.Cli
                         if (fileSystem.File.Exists(assetDestinationFilename) == false)
                         {
                             using var stream = asset.GetStream();
-                            SaveToFilesystem(stream, assetDestinationFilename);
+                            SaveToFilesystem(stream, assetDestinationFilename, null, null);
                             Console.WriteLine("Saved");
                         }
                         else
@@ -84,9 +84,8 @@ namespace ChatGpt.Exporter.Cli
                         Console.Write($"\t\t{markdownAsset.MarkdownPath}...");
                         if(exists == false)
                         {
-                            //TODO set set last modified
                             using var stream = markdownAsset.GetStream();
-                            SaveToFilesystem(stream, fullDestinationPath);
+                            SaveToFilesystem(stream, fullDestinationPath, markdownAsset.CreatedDate, markdownAsset.UpdatedDate);
                             Console.WriteLine("Saved");
                         }
                         else
@@ -102,7 +101,7 @@ namespace ChatGpt.Exporter.Cli
             }
         }
 
-        private void SaveToFilesystem(Stream stream, string destinationFilename)
+        private void SaveToFilesystem(Stream stream, string destinationFilename, DateTimeOffset? createdDate, DateTimeOffset? updateDate)
         {
             var destinationDirectory = fileSystem.Path.GetDirectoryName(destinationFilename);
             if (string.IsNullOrEmpty(destinationDirectory) == false)
@@ -111,6 +110,15 @@ namespace ChatGpt.Exporter.Cli
             }
             using var fileStream = fileSystem.File.Create(destinationFilename);
             stream.CopyTo(fileStream);
+
+            if (createdDate.HasValue)
+            {
+                fileSystem.File.SetCreationTimeUtcIfPossible(destinationFilename, createdDate.Value.DateTime);
+            }
+            if(updateDate.HasValue)
+            {
+                fileSystem.File.SetLastWriteTimeUtc(destinationFilename, updateDate.Value.DateTime);
+            }
         }
 
         private bool FileStringMismatch(string destinationFilename, string contents)

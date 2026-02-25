@@ -7,7 +7,9 @@ namespace ChatGPTExport.Assets
         string Name, 
         string MarkdownPath,
         IFileInfo FileInfo,
-        string[] DestinationSegments
+        string[] DestinationSegments,
+        DateTimeOffset? CreatedDate,
+        DateTimeOffset? UpdatedDate
         )
     {
         public string GetMarkdownLink() => $"![{Name}]({MarkdownPath})  ";

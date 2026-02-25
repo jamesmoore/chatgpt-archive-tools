@@ -4,7 +4,7 @@ using System.IO.Abstractions;
 namespace ChatGpt.Exporter.Cli.Assets
 {
     public class AssetLocator(
-        ConversationAssets sourceDirectory
+        ConversationAssets conversationAssets
         ) : IAssetLocator
     {
         private static readonly HashSet<string> AllowedRoles = new(StringComparer.OrdinalIgnoreCase)
@@ -18,42 +18,19 @@ namespace ChatGpt.Exporter.Cli.Assets
 
         public Asset? GetMarkdownMediaAsset(AssetRequest assetRequest)
         {
-            var sourceFile = sourceDirectory.FindAsset(assetRequest.SearchPattern);
+            var sourceFile = conversationAssets.FindAsset(assetRequest.SearchPattern);
             if (sourceFile != null)
             {
-                var assetWithoutPath = sourceFile.Name;
                 var sanitizedRole = SanitizeRole(assetRequest.Role);
                 var destinationAssetsPath = $"{sanitizedRole}-assets";
-                //var destinationAssetsDir = fileSystem.Path.Join(destinationDirectory.FullName, destinationAssetsPath);
-                //if (fileSystem.Directory.Exists(destinationAssetsDir) == false)
-                //{
-                //    fileSystem.Directory.CreateDirectory(destinationAssetsDir);
-                //}
-
-                //var fullDestinationAssetPath = fileSystem.Path.Combine(destinationAssetsDir, assetWithoutPath);
-
-                //if (fileSystem.File.Exists(fullDestinationAssetPath) == false)
-                //{
-                //    fileSystem.File.Copy(sourceFile.FullName, fullDestinationAssetPath, true);
-                //    existingAssetLocator.Add(fullDestinationAssetPath);
-
-                //    if (assetRequest.CreatedDate.HasValue)
-                //    {
-                //        fileSystem.File.SetCreationTimeUtcIfPossible(fullDestinationAssetPath, assetRequest.CreatedDate.Value.DateTime);
-                //    }
-
-                //    if (assetRequest.UpdatedDate.HasValue)
-                //    {
-                //        fileSystem.File.SetLastWriteTimeUtc(fullDestinationAssetPath, assetRequest.UpdatedDate.Value.DateTime);
-                //    }
-                //}
-
-                string escapedAssetPath = Uri.EscapeDataString(assetWithoutPath);
+                var escapedAssetPath = Uri.EscapeDataString(sourceFile.Name);
                 return new Asset(
-                    assetWithoutPath,
+                    sourceFile.Name,
                     $"./{destinationAssetsPath}/{escapedAssetPath}",
                     sourceFile,
-                    [destinationAssetsPath, assetWithoutPath]
+                    [destinationAssetsPath, sourceFile.Name],
+                    assetRequest.CreatedDate,
+                    assetRequest.UpdatedDate
                     );
             }
 
