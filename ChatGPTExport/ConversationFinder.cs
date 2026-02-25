@@ -5,8 +5,6 @@ namespace ChatGPTExport
 {
     public class ConversationFinder
     {
-        private const string SearchPattern = "conversations.json";
-
         public IEnumerable<IFileInfo> GetConversationFiles(IEnumerable<IDirectoryInfo> sources)
         {
             var conversationFiles = sources.Select(GetConversationFiles).
@@ -16,7 +14,10 @@ namespace ChatGPTExport
 
         public IEnumerable<IFileInfo> GetConversationFiles(IDirectoryInfo sourceDir)
         {
-            return sourceDir.Exists ? sourceDir.GetFiles(SearchPattern, SearchOption.AllDirectories) : [];
+            return sourceDir.Exists
+                ? sourceDir.GetFiles("conversations*.json", SearchOption.AllDirectories)
+                    .Where(ConversationsFileNameValidator.IsConversationFile)
+                : [];
         }
     }
 }

@@ -10,10 +10,9 @@ namespace ChatGPTExport.Assets
     {
         public static ConversationAssets FromConversationsFile(IFileInfo conversationsFile)
         {
-            if (conversationsFile.Name != "conversations.json" || conversationsFile.Exists == false)
+            if (!ConversationsFileNameValidator.IsConversationFile(conversationsFile) || conversationsFile.Exists == false)
             {
-                throw new ArgumentException("The provided file must be named 'conversations.json' and must exist.", nameof(conversationsFile));
-
+                throw new ArgumentException("The provided file must be named 'conversations.json' or 'conversations-###.json' (where ### is 3 digits) and must exist.", nameof(conversationsFile));
             }
             if (conversationsFile.Directory == null)
             {
