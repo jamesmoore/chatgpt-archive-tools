@@ -8,8 +8,7 @@ namespace ChatGpt.Archive.Api.Controllers
     [Route("[controller]")]
     public class AssetController(
         IConversationAssetsCache conversationAssets, 
-        IFileSystem fileSystem,
-        ILogger<AssetController> logger
+        IFileSystem fileSystem
         ) : ControllerBase
     {
         [HttpGet("{**path}")]
