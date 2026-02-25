@@ -77,7 +77,7 @@ namespace ChatGpt.Exporter.Cli
                     foreach (var markdownAsset in formattedConversation.MarkdownAssets)
                     {
                         var destinationSegments = new[] { destination.FullName }
-                            .Concat(markdownAsset.DestinationSegments)
+                            .Concat(markdownAsset.PathSegments)
                             .ToArray();
                         var fullDestinationPath = fileSystem.Path.Join(destinationSegments);
                         var exists = fileSystem.File.Exists(fullDestinationPath);

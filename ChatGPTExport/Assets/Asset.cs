@@ -7,7 +7,7 @@ namespace ChatGPTExport.Assets
         string Name, 
         string MarkdownPath,
         IFileInfo FileInfo,
-        string[] DestinationSegments,
+        string[] PathSegments,
         DateTimeOffset? CreatedDate,
         DateTimeOffset? UpdatedDate
         )
