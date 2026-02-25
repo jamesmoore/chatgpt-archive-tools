@@ -5,7 +5,7 @@ using System.IO.Abstractions;
 namespace ChatGpt.Archive.Api.Services
 {
     public class ApiAssetLocatorFactory(
-        ArchiveSourcesOptions options, 
+        ArchiveSourcesOptions options,
         IFileSystem fileSystem,
         ConversationFinder conversationFinder,
         IConversationAssetsCache conversationAssetsCache
@@ -13,18 +13,12 @@ namespace ChatGpt.Archive.Api.Services
     {
         public IAssetLocator Create()
         {
-            var conversationAssets = GetConversationAssets();
-            var assetLocators = conversationAssets.Select(p => new AssetLocator(p));
-            var compositeAssetLocator = new CompositeAssetLocator(assetLocators);
-            return new ApiAssetLocator( compositeAssetLocator, conversationAssetsCache);
-        }
-
-        private IEnumerable<ConversationAssets> GetConversationAssets()
-        {
             var sourceDirectories = options.SourceDirectories.Select(fileSystem.DirectoryInfo.New);
-            var conversationAssets = conversationFinder.GetConversationFiles(sourceDirectories).OrderByDescending(p => p.LastWriteTimeUtc);
-            var assetsDirectries = conversationAssets.Select(ConversationAssets.FromConversationsFile);
-            return assetsDirectries;
+            var conversationFiles = conversationFinder.GetConversationFiles(sourceDirectories).OrderByDescending(p => p.LastWriteTimeUtc);
+            var conversationAssets = conversationFiles.Select(ConversationAssets.FromConversationsFile);
+            var assetLocators = conversationAssets.Select(p => new AssetLocator(p)).ToList();
+            var compositeAssetLocator = new CompositeAssetLocator(assetLocators);
+            return new ApiAssetLocator(compositeAssetLocator, conversationAssetsCache);
         }
     }
 }
