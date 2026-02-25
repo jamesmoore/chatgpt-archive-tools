@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.IO.Abstractions;
-using ChatGPTExport.Assets;
 
 namespace ChatGPTExport
 {
@@ -17,7 +16,7 @@ namespace ChatGPTExport
         {
             return sourceDir.Exists
                 ? sourceDir.GetFiles("conversations*.json", SearchOption.AllDirectories)
-                    .Where(f => ConversationAssets.ConversationsFilePattern.IsMatch(f.Name))
+                    .Where(ConversationsFileNameValidator.IsConversationFile)
                 : [];
         }
     }
