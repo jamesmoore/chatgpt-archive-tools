@@ -6,7 +6,7 @@ namespace ChatGPTExport.Assets
     /// <summary>
     /// Represents the assets for a given conversations file.
     /// </summary>
-    public partial class ConversationAssets
+    public class ConversationAssets
     {
         public static ConversationAssets FromConversationsFile(IFileInfo conversationsFile)
         {
