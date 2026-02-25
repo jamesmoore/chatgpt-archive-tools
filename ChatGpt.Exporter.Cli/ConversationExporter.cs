@@ -1,5 +1,4 @@
 using ChatGPTExport;
-using ChatGPTExport.Assets;
 using ChatGPTExport.Formatters;
 using ChatGPTExport.Models;
 using System.Buffers;
@@ -81,8 +80,8 @@ namespace ChatGpt.Exporter.Cli
                             .ToArray();
                         var fullDestinationPath = fileSystem.Path.Join(destinationSegments);
                         var exists = fileSystem.File.Exists(fullDestinationPath);
-                        Console.Write($"\t\t{markdownAsset.MarkdownPath}...");
-                        if(exists == false)
+                        Console.Write($"\t\t{string.Join("/", markdownAsset.PathSegments)}...");
+                        if (exists == false)
                         {
                             using var stream = markdownAsset.GetStream();
                             SaveToFilesystem(stream, fullDestinationPath, markdownAsset.CreatedDate, markdownAsset.UpdatedDate);
@@ -115,7 +114,7 @@ namespace ChatGpt.Exporter.Cli
             {
                 fileSystem.File.SetCreationTimeUtcIfPossible(destinationFilename, createdDate.Value.DateTime);
             }
-            if(updateDate.HasValue)
+            if (updateDate.HasValue)
             {
                 fileSystem.File.SetLastWriteTimeUtc(destinationFilename, updateDate.Value.DateTime);
             }

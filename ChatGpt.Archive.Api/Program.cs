@@ -74,8 +74,9 @@ builder.Services.AddSingleton<ISchemaInitializer, SqliteSchemaInitializer>();
 builder.Services.AddSingleton<IArchiveRepository, ArchiveRepository>();
 builder.Services.AddSingleton<IConversationsService, ConversationsService>();
 builder.Services.AddSingleton<IConversationAssetsCache, ConversationAssetsCache>();
-builder.Services.AddSingleton<IAssetLocator, ApiAssetLocator>();
-builder.Services.AddSingleton<IMarkdownAssetRenderer, MarkdownAssetRenderer>();
+builder.Services.AddSingleton<ApiAssetLocatorFactory>();
+builder.Services.AddSingleton<IAssetLocator>(sp => sp.GetRequiredService<ApiAssetLocatorFactory>().Create());
+builder.Services.AddSingleton<IMarkdownAssetRenderer, AbsolutePathMarkdownAssetRenderer>();
 builder.Services.AddSingleton<ConversationFormatterFactory>();
 builder.Services.AddSingleton<AssetsCache>();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

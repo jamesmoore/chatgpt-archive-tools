@@ -1,7 +1,6 @@
-﻿using ChatGPTExport.Assets;
-using System.IO.Abstractions;
+﻿using System.IO.Abstractions;
 
-namespace ChatGpt.Exporter.Cli.Assets
+namespace ChatGPTExport.Assets
 {
     public class AssetLocator(
         ConversationAssets conversationAssets
@@ -23,10 +22,8 @@ namespace ChatGpt.Exporter.Cli.Assets
             {
                 var sanitizedRole = SanitizeRole(assetRequest.Role);
                 var destinationAssetsPath = $"{sanitizedRole}-assets";
-                var escapedAssetPath = Uri.EscapeDataString(sourceFile.Name);
                 return new Asset(
                     sourceFile.Name,
-                    $"./{destinationAssetsPath}/{escapedAssetPath}",
                     sourceFile,
                     [destinationAssetsPath, sourceFile.Name],
                     assetRequest.CreatedDate,

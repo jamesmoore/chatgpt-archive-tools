@@ -54,8 +54,8 @@ namespace ChatGpt.Exporter.Cli
                 .ToList();
 
             var conversationAssetsList = successfulConversations.OrderByDescending(p => p.Conversations.GetUpdateTime()).Select(p => p.ConversationAssets);
-            var assetLocator = exportAssetLocatorFactory.GetAssetLocator(conversationAssetsList, destination);
-            var assetRenderer = new MarkdownAssetRenderer();
+            var assetLocator = exportAssetLocatorFactory.GetAssetLocator(conversationAssetsList);
+            var assetRenderer = new RelativePathMarkdownAssetRenderer();
 
             var markdownContentVisitor = new MarkdownContentVisitor(assetLocator, assetRenderer);
 

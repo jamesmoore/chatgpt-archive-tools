@@ -5,7 +5,6 @@ namespace ChatGPTExport.Assets
 {
     public record Asset(
         string Name, 
-        string MarkdownPath,
         IFileInfo FileInfo,
         string[] PathSegments,
         DateTimeOffset? CreatedDate,

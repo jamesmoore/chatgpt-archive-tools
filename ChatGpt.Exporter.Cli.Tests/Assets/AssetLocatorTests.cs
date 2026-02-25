@@ -1,4 +1,3 @@
-using ChatGpt.Exporter.Cli.Assets;
 using ChatGPTExport.Assets;
 using System.IO.Abstractions.TestingHelpers;
 

@@ -12,24 +12,16 @@ namespace ChatGpt.Archive.Api.Controllers
         ILogger<AssetController> logger
         ) : ControllerBase
     {
-        [HttpGet("{rootId}/{**path}")]
-        public IActionResult GetAsset(int rootId, string path, [FromQuery(Name = "sig")] string? signature)
+        [HttpGet("{**path}")]
+        public IActionResult GetAsset(string path)
         {
             var decodedPath = Uri.UnescapeDataString(path);
 
-            if (!AssetSignature.IsValid(rootId, decodedPath, signature))
-            {
-                var safePath = decodedPath?.Replace("\r", string.Empty).Replace("\n", string.Empty);
-                var safeSignature = signature?.Replace("\r", string.Empty).Replace("\n", string.Empty);
-                logger.LogWarning("Asset request denied: {rootId}, {path}, {sig}", rootId, safePath, safeSignature);
-                return Unauthorized();
-            }
-
-            var fullPath = conversationAssets.GetMediaAssetPath(rootId, decodedPath);
-            if (fullPath == null || !fileSystem.File.Exists(fullPath))
+            var asset = conversationAssets.GetAsset(decodedPath);
+            if (asset == null || !asset.FileInfo.Exists)
                 return NotFound();
 
-            return PhysicalFile(fullPath, GetMimeType(fullPath));
+            return PhysicalFile(asset.FileInfo.FullName, GetMimeType(asset.FileInfo.FullName));
         }
 
         private string GetMimeType(string path)
