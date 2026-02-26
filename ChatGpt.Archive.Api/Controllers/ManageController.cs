@@ -37,7 +37,7 @@ namespace ChatGpt.Archive.Api.Controllers
                 Select(fileSystem.DirectoryInfo.New).
                 Select(p => 
                     p.Exists ? 
-                    new SourceDirectory(p.FullName, true, conversationFinder.GetConversationFiles(p).Select(q => q.FullName).ToArray()) :
+                    new SourceDirectory(p.FullName, true, conversationFinder.GetConversationFiles(p).SelectMany(p => p.ConversationFiles).Select(q => q.FullName).ToArray()) :
                     new SourceDirectory(p.FullName, false, [])
                     );
             return Ok(new Status(

@@ -14,7 +14,7 @@ namespace ChatGpt.Archive.Api.Services
         public IAssetLocator Create()
         {
             var sourceDirectories = options.SourceDirectories.Select(fileSystem.DirectoryInfo.New);
-            var conversationFiles = conversationFinder.GetConversationFiles(sourceDirectories).OrderByDescending(p => p.LastWriteTimeUtc);
+            var conversationFiles = conversationFinder.GetConversationFiles(sourceDirectories).SelectMany(p => p.ConversationFiles).OrderByDescending(p => p.LastWriteTimeUtc);
             var conversationAssets = conversationFiles.Select(ConversationAssets.FromConversationsFile);
             var assetLocators = conversationAssets.Select(p => new AssetLocator(p)).ToList();
             var compositeAssetLocator = new CompositeAssetLocator(assetLocators);
