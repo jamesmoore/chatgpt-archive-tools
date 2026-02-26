@@ -5,12 +5,14 @@ using System.Text.Json;
 
 namespace ChatGPTExport
 {
-    public enum ConversationParseResult
+    public enum ConversationParseStatus
     {
         Success,
         ValidationFail,
         Error,
     }
+
+    public record struct ConversationParseResult(ConversationParseStatus Status, Conversations? Conversations = null);
 
     public class ConversationsParser(IEnumerable<IConversationsValidator> validators)
     {
@@ -19,21 +21,21 @@ namespace ChatGPTExport
             AllowOutOfOrderMetadataProperties = true,
         };
 
-        public (Conversations? Conversations, ConversationParseResult Status) GetConversations(IFileInfo p)
+        public ConversationParseResult GetConversations(IFileInfo p)
         {
             try
             {
                 Console.WriteLine($"Loading conversation " + p.FullName);
-                return (this.GetConversationsForFile(p), ConversationParseResult.Success);
+                return new ConversationParseResult(ConversationParseStatus.Success, this.GetConversationsForFile(p));
             }
             catch (ValidationException)
             {
-                return (null, ConversationParseResult.ValidationFail);
+                return new ConversationParseResult(ConversationParseStatus.ValidationFail);
             }
             catch (Exception ex)
             {
                 Console.Error.WriteLine($"Error parsing file: {p.FullName}{Environment.NewLine}\t{ex.Message}");
-                return (null, ConversationParseResult.Error);
+                return new ConversationParseResult(ConversationParseStatus.Error);
             }
         }
 

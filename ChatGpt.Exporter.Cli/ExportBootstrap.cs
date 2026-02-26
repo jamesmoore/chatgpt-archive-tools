@@ -28,7 +28,7 @@ namespace ChatGpt.Exporter.Cli
                     );
                 }).ToList();
 
-            var failedValidation = fileConversationsMap.Where(p => p.Status == ConversationParseResult.ValidationFail).ToList();
+            var failedValidation = fileConversationsMap.Where(p => p.Status == ConversationParseStatus.ValidationFail).ToList();
             if (failedValidation.Count != 0)
             {
                 foreach (var conversationFile in failedValidation)
@@ -38,7 +38,7 @@ namespace ChatGpt.Exporter.Cli
                 return 1;
             }
 
-            var failedToParse = fileConversationsMap.Where(p => p.Status == ConversationParseResult.Error).ToList();
+            var failedToParse = fileConversationsMap.Where(p => p.Status == ConversationParseStatus.Error).ToList();
             if (failedToParse.Count != 0)
             {
                 Console.Error.WriteLine($"Failed to parse {failedToParse.Count} file(s) due to errors:");
@@ -49,7 +49,7 @@ namespace ChatGpt.Exporter.Cli
             }
 
             var successfulConversations = fileConversationsMap
-                .Where(p => p.Status == ConversationParseResult.Success)
+                .Where(p => p.Status == ConversationParseStatus.Success)
                 .Select(p => (Conversations: p.Conversations!, ConversationAssets: ConversationAssets.FromConversationsFile(p.File)))
                 .ToList();
 
