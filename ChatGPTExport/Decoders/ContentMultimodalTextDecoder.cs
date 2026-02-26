@@ -1,4 +1,5 @@
 ﻿using ChatGPTExport.Assets;
+using ChatGPTExport.Decoders.AssetRenderer;
 using ChatGPTExport.Models;
 
 namespace ChatGPTExport.Decoders

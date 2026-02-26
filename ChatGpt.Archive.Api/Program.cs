@@ -3,7 +3,7 @@ using ChatGpt.Archive.Api.Database;
 using ChatGpt.Archive.Api.Services;
 using ChatGPTExport;
 using ChatGPTExport.Assets;
-using ChatGPTExport.Decoders;
+using ChatGPTExport.Decoders.AssetRenderer;
 using Microsoft.AspNetCore.HttpOverrides;
 using System.CommandLine;
 using System.IO.Abstractions;
