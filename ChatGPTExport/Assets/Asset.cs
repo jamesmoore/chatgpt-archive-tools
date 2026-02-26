@@ -1,7 +1,16 @@
-﻿namespace ChatGPTExport.Assets
+﻿using System.IO;
+using System.IO.Abstractions;
+
+namespace ChatGPTExport.Assets
 {
-    public record Asset(string Name, string RelativePath)
+    public record Asset(
+        string Name, 
+        IFileInfo FileInfo,
+        string[] PathSegments,
+        DateTimeOffset? CreatedDate,
+        DateTimeOffset? UpdatedDate
+        )
     {
-        public string GetMarkdownLink() => $"![{Name}]({RelativePath})  ";
+        public Stream GetStream() => FileInfo.OpenRead();
     }
 }

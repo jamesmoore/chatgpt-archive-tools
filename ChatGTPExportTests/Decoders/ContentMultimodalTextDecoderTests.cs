@@ -1,5 +1,6 @@
 using ChatGPTExport.Assets;
 using ChatGPTExport.Decoders;
+using ChatGPTExport.Decoders.AssetRenderer;
 using ChatGPTExport.Models;
 
 namespace ChatGTPExportTests.Decoders;
@@ -8,9 +9,9 @@ public class ContentMultimodalTextDecoderTests
 {
     private sealed class TestAssetRenderer : IMarkdownAssetRenderer
     {
-        public IEnumerable<string> RenderAsset(Asset? asset, string asset_pointer)
+        public string RenderAsset(Asset? asset, string asset_pointer)
         {
-            return [$"![asset]({asset_pointer})"];
+            return $"![asset]({asset_pointer})";
         }
     }
 

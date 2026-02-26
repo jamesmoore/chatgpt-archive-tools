@@ -1,5 +1,6 @@
 ﻿using ChatGPTExport.Assets;
 using ChatGPTExport.Decoders;
+using ChatGPTExport.Decoders.AssetRenderer;
 using ChatGPTExport.Formatters.Plaintext;
 using ChatGPTExport.Models;
 using ChatGPTExport.Visitor;
@@ -20,9 +21,9 @@ namespace ChatGpt.Archive.Api.Services
 
         private class NullAssetRenderer : IMarkdownAssetRenderer
         {
-            public IEnumerable<string> RenderAsset(Asset? asset, string asset_pointer)
+            public string RenderAsset(Asset? asset, string asset_pointer)
             {
-                return [];
+                return string.Empty;
             }
         }
 

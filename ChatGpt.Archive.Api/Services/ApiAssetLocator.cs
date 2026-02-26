@@ -1,21 +1,28 @@
 using ChatGPTExport.Assets;
-using System.Text.Encodings.Web;
 
 namespace ChatGpt.Archive.Api.Services
 {
-    public class ApiAssetLocator(IConversationAssetsCache directoryCache) : IAssetLocator
+    public class ApiAssetLocator(IAssetLocator inner, IConversationAssetsCache conversationAssetsCache) : IAssetLocator
     {
         public Asset? GetMarkdownMediaAsset(AssetRequest assetRequest)
         {
-            var foundAsset = directoryCache.FindMediaAsset(assetRequest.SearchPattern);
-            if (foundAsset == null)
+            var asset = inner.GetMarkdownMediaAsset(assetRequest);
+            if (asset == null)
             {
                 return null;
             }
+            else
+            {
+                var apiAsset = new Asset(
+                    asset.Name,
+                    asset.FileInfo,
+                    ["asset", .. asset.PathSegments],
+                    asset.CreatedDate,
+                    asset.UpdatedDate);
 
-            string signature = AssetSignature.Create(foundAsset.RootId, foundAsset.RelativePath);
-            string assetUrl = $"/asset/{foundAsset.RootId}/{UrlEncoder.Default.Encode(foundAsset.RelativePath)}?sig={signature}";
-            return new Asset(foundAsset.Name, assetUrl);
+                conversationAssetsCache.StoreAsset(apiAsset);
+                return apiAsset;
+            }
         }
     }
 }

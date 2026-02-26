@@ -6,7 +6,7 @@ namespace ChatGPTExport.Decoders
     {
         public MarkdownContentResult Decode(ContentComputerOutput content, MessageContext context)
         {
-            return new MarkdownContentResult();
+            return MarkdownContentResult.Empty();
         }
     }
 }

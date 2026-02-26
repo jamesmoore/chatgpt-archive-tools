@@ -8,18 +8,18 @@ namespace ChatGPTExport.Decoders
         {
             if (!context.ShowHidden)
             {
-                return new MarkdownContentResult();
+                return MarkdownContentResult.Empty();
             }
 
             if (content.result == null)
             {
-                return new MarkdownContentResult();
+                return MarkdownContentResult.Empty();
             }
             var lines = new string?[] {
                 content.result.Replace("\n", "  \n"),
                 content.summary
             }.OfType<string>();
-            return new MarkdownContentResult(lines);
+            return MarkdownContentResult.FromLines(lines);
         }
     }
 }

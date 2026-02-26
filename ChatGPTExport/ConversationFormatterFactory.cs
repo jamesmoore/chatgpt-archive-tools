@@ -1,4 +1,5 @@
-﻿using ChatGPTExport.Exporters.Html;
+﻿using ChatGPTExport.Decoders;
+using ChatGPTExport.Exporters.Html;
 using ChatGPTExport.Formatters;
 using ChatGPTExport.Formatters.Html.Headers;
 using ChatGPTExport.Formatters.Html.Template;
@@ -13,7 +14,7 @@ namespace ChatGPTExport
     {
         public IEnumerable<IConversationFormatter> GetFormatters(
             IEnumerable<ExportType> exportTypes,
-            MarkdownContentVisitor markdownContentVisitor
+            IContentVisitor<MarkdownContentResult> markdownContentVisitor
             )
         {
             var exporters = new List<IConversationFormatter>();

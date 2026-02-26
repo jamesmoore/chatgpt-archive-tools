@@ -1,9 +1,9 @@
-using System.Buffers;
-using System.IO.Abstractions;
-using System.Text;
 using ChatGPTExport;
 using ChatGPTExport.Formatters;
 using ChatGPTExport.Models;
+using System.Buffers;
+using System.IO.Abstractions;
+using System.Text;
 
 namespace ChatGpt.Exporter.Cli
 {
@@ -60,22 +60,36 @@ namespace ChatGpt.Exporter.Cli
                     foreach (var asset in formattedConversation.Assets)
                     {
                         var assetDestinationFilename = fileSystem.Path.Join(destination.FullName, asset.Name);
+                        Console.Write($"\t\t{asset.Name}...");
                         if (fileSystem.File.Exists(assetDestinationFilename) == false)
                         {
-                            var assetDestinationDirectory = fileSystem.Path.GetDirectoryName(assetDestinationFilename);
-                            if (string.IsNullOrEmpty(assetDestinationDirectory) == false)
-                            {
-                                fileSystem.Directory.CreateDirectory(assetDestinationDirectory);
-                            }
-
                             using var stream = asset.GetStream();
-                            using var fileStream = fileSystem.File.Create(assetDestinationFilename);
-                            stream.CopyTo(fileStream);
-                            Console.WriteLine($"\t\t{asset.Name}...Saved");
+                            SaveToFilesystem(stream, assetDestinationFilename, null, null);
+                            Console.WriteLine("Saved");
                         }
                         else
                         {
-                            Console.WriteLine($"\t\t{asset.Name}...Exists");
+                            Console.WriteLine("Exists");
+                        }
+                    }
+
+                    foreach (var markdownAsset in formattedConversation.MarkdownAssets)
+                    {
+                        var destinationSegments = new[] { destination.FullName }
+                            .Concat(markdownAsset.PathSegments)
+                            .ToArray();
+                        var fullDestinationPath = fileSystem.Path.Join(destinationSegments);
+                        var exists = fileSystem.File.Exists(fullDestinationPath);
+                        Console.Write($"\t\t{string.Join("/", markdownAsset.PathSegments)}...");
+                        if (exists == false)
+                        {
+                            using var stream = markdownAsset.GetStream();
+                            SaveToFilesystem(stream, fullDestinationPath, markdownAsset.CreatedDate, markdownAsset.UpdatedDate);
+                            Console.WriteLine("Saved");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Exists");
                         }
                     }
                 }
@@ -86,6 +100,25 @@ namespace ChatGpt.Exporter.Cli
             }
         }
 
+        private void SaveToFilesystem(Stream stream, string destinationFilename, DateTimeOffset? createdDate, DateTimeOffset? updateDate)
+        {
+            var destinationDirectory = fileSystem.Path.GetDirectoryName(destinationFilename);
+            if (string.IsNullOrEmpty(destinationDirectory) == false)
+            {
+                fileSystem.Directory.CreateDirectory(destinationDirectory);
+            }
+            using var fileStream = fileSystem.File.Create(destinationFilename);
+            stream.CopyTo(fileStream);
+
+            if (createdDate.HasValue)
+            {
+                fileSystem.File.SetCreationTimeUtcIfPossible(destinationFilename, createdDate.Value.DateTime);
+            }
+            if (updateDate.HasValue)
+            {
+                fileSystem.File.SetLastWriteTimeUtc(destinationFilename, updateDate.Value.DateTime);
+            }
+        }
 
         private bool FileStringMismatch(string destinationFilename, string contents)
         {

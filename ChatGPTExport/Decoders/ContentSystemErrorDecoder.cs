@@ -8,10 +8,10 @@ namespace ChatGPTExport.Decoders
         {
             if (!context.ShowHidden)
             {
-                return new MarkdownContentResult();
+                return MarkdownContentResult.Empty();
             }
 
-            return new MarkdownContentResult($"🔴 {content.name}: {content.text}");
+            return MarkdownContentResult.FromLine($"🔴 {content.name}: {content.text}");
         }
     }
 }

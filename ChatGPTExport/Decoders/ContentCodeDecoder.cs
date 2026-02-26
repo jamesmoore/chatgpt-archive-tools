@@ -11,12 +11,12 @@ namespace ChatGPTExport.Decoders
         {
             if (context.ShowHidden == false && context.Recipient != "all")
             {
-                return new MarkdownContentResult();
+                return MarkdownContentResult.Empty();
             }
 
             if (string.IsNullOrWhiteSpace(content.text))
             {
-                return new MarkdownContentResult();
+                return MarkdownContentResult.Empty();
             }
 
             var searchRegex = SearchRegex();
@@ -24,17 +24,17 @@ namespace ChatGPTExport.Decoders
             if (content.language == "unknown" && matches.Success)
             {
                 var code = matches.Groups[1].Value;
-                return new MarkdownContentResult($"> 🔍 **Web search:** {code}.");
+                return MarkdownContentResult.FromLine($"> 🔍 **Web search:** {code}.");
             }
             else if (content.language == "unknown" && content.text.IsValidJson())
             {
                 var code = ToCodeBlock(content.text, "json");
-                return new MarkdownContentResult(code);
+                return MarkdownContentResult.FromLine(code);
             }
             else
             {
                 var code = ToCodeBlock(content.text, content.language);
-                return new MarkdownContentResult(code);
+                return MarkdownContentResult.FromLine(code);
             }
         }
 

@@ -1,11 +1,11 @@
-﻿namespace ChatGpt.Archive.Api.Services
+﻿using ChatGPTExport.Assets;
+
+namespace ChatGpt.Archive.Api.Services
 {
     public interface IConversationAssetsCache
     {
-        MediaAssetDefinition? FindMediaAsset(string searchPattern);
-        string? GetMediaAssetPath(int index, string relativePath);
+        void StoreAsset(Asset asset);
+        Asset? GetAsset(string key);
         void Reset();
     }
-
-    public record MediaAssetDefinition(string Name, int RootId, string RelativePath);
 }

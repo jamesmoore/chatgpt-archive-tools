@@ -8,7 +8,7 @@ namespace ChatGPTExport.Decoders
         {
             if (!context.ShowHidden)
             {
-                return new MarkdownContentResult();
+                return MarkdownContentResult.Empty();
             }
 
             var markdownContent = new List<string>
@@ -16,7 +16,7 @@ namespace ChatGPTExport.Decoders
                 "**User profile:** " + content.user_profile + "  ",
                 "**User instructions:** " + content.user_instructions + "  "
             };
-            return new MarkdownContentResult(markdownContent);
+            return MarkdownContentResult.FromLines(markdownContent);
         }
     }
 }

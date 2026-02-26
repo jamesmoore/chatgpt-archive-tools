@@ -3,6 +3,9 @@ using System.IO.Abstractions;
 
 namespace ChatGPTExport.Assets
 {
+    // PROBLEM: With the latest export version there can be muliple conversations files (conversations.json, conversations-001.json, conversations-002.json, etc.) 
+    // this will cause the same directory to be enumerated multiple times when looking for assets, which can cause performance issues.
+
     /// <summary>
     /// Represents the assets for a given conversations file.
     /// </summary>

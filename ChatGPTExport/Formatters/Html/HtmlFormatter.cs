@@ -1,4 +1,5 @@
-﻿using ChatGPTExport.Decoders;
+﻿using ChatGPTExport.Assets;
+using ChatGPTExport.Decoders;
 using ChatGPTExport.Formatters;
 using ChatGPTExport.Formatters.Html;
 using ChatGPTExport.Formatters.Html.Headers;
@@ -13,7 +14,7 @@ namespace ChatGPTExport.Exporters.Html
     internal partial class HtmlFormatter(
         IHtmlFormatter formatter,
         IHeaderProvider headerProvider,
-        MarkdownContentVisitor markdownContentVisitor
+        IContentVisitor<MarkdownContentResult> markdownContentVisitor
         ) : IConversationFormatter
     {
         private readonly string LineBreak = Environment.NewLine;
@@ -25,7 +26,7 @@ namespace ChatGPTExport.Exporters.Html
             var messages = conversation.GetMessagesWithContent();
 
             var strings = new List<(string MessageId, Author Author, string Content, bool HasImage)>();
-
+            var assets = new List<Asset>();
             ConversationContext conversationContext = new();
 
             foreach (var message in messages)
@@ -34,9 +35,13 @@ namespace ChatGPTExport.Exporters.Html
                 {
                     var visitResult = message.Accept(markdownContentVisitor, conversationContext, showHidden);
 
-                    if (message.author != null && visitResult != null && visitResult.Lines.Any() && message.id != null)
+                    if (visitResult != null)
                     {
-                        strings.Add((message.id, message.author, string.Join(LineBreak, visitResult.Lines), visitResult.HasImage));
+                        if (message.author != null && visitResult.Lines.Any() && message.id != null)
+                        {
+                            strings.Add((message.id, message.author, string.Join(LineBreak, visitResult.Lines), visitResult.HasImage));
+                        }
+                        assets.AddRange(visitResult.Assets);
                     }
                 }
                 catch (Exception ex)
@@ -69,10 +74,10 @@ namespace ChatGPTExport.Exporters.Html
             var headers = headerProvider.GetHeaders(body);
 
             string html = formatter.FormatHtmlPage(
-                new HtmlPage(titleString, [headers], htmlFragments, CssAsset.Name), 
+                new HtmlPage(titleString, [headers], htmlFragments, CssAsset.Name),
                 pathPrefix);
 
-            return new FormattedConversation(html, [CssAsset], ".html");
+            return new FormattedConversation(html, [CssAsset], assets, ".html");
         }
 
         [GeneratedRegex("```(.*)")]

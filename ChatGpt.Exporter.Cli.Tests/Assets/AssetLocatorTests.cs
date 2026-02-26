@@ -1,4 +1,3 @@
-using ChatGpt.Exporter.Cli.Assets;
 using ChatGPTExport.Assets;
 using System.IO.Abstractions.TestingHelpers;
 
@@ -17,23 +16,15 @@ namespace ChatGpt.Exporter.Cli.Tests.Assets
             fs.AddDirectory(MockUnixSupport.Path(@"c:\dest"));
 
             var conversationsFile = fs.FileInfo.New(MockUnixSupport.Path(@"c:\source\conversations.json"));
-            var destDir = fs.DirectoryInfo.New(MockUnixSupport.Path(@"c:\dest"));
-            var existing = new ExistingAssetLocator(destDir);
-            var locator = new AssetLocator(ConversationAssets.FromConversationsFile(conversationsFile), destDir, existing);
+            var locator = new AssetLocator(ConversationAssets.FromConversationsFile(conversationsFile));
 
             var request = new AssetRequest("img.png", "../evil", null, null);
 
             var result = locator.GetMarkdownMediaAsset(request);
 
-            var expected = fs.Path.Combine(destDir.FullName, "unknown-assets", "img.png");
-            Assert.True(fs.File.Exists(expected));
-            
             Assert.NotNull(result);
-            var markdownLink = result.GetMarkdownLink();
-            Assert.Equal("![img.png](./unknown-assets/img.png)  ", markdownLink);
-
-            var traversal = fs.Path.Combine(destDir.FullName, "..", "evil-assets", "img.png");
-            Assert.False(fs.File.Exists(traversal));
+            Assert.Equal("unknown-assets", result.PathSegments[0]);
+            Assert.Equal("img.png", result.PathSegments[1]);
         }
     }
 }

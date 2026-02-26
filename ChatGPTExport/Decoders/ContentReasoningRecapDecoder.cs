@@ -8,14 +8,14 @@ namespace ChatGPTExport.Decoders
         {
             if (!context.ShowHidden)
             {
-                return new MarkdownContentResult();
+                return MarkdownContentResult.Empty();
             }
 
             if (content.content == null)
             {
-                return new MarkdownContentResult();
+                return MarkdownContentResult.Empty();
             }
-            return new MarkdownContentResult(content.content);
+            return MarkdownContentResult.FromLine(content.content);
         }
     }
 }

@@ -10,16 +10,16 @@ namespace ChatGPTExport.Decoders
         {
             if (!context.ShowHidden)
             {
-                return new MarkdownContentResult();
+                return MarkdownContentResult.Empty();
             }
 
             if (content.text == null)
             {
-                return new MarkdownContentResult();
+                return MarkdownContentResult.Empty();
             }
 
             var code = ToCodeBlock(content.text);
-            return new MarkdownContentResult(code);
+            return MarkdownContentResult.FromLine(code);
         }
 
         private string ToCodeBlock(string code, string? language = null)
