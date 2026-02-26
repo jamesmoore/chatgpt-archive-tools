@@ -1,7 +1,7 @@
 ﻿using ChatGpt.Exporter.Cli.Assets;
 using ChatGPTExport;
 using ChatGPTExport.Assets;
-using ChatGPTExport.Decoders;
+using ChatGPTExport.Decoders.AssetRenderer;
 using ChatGPTExport.Models;
 using ChatGPTExport.Visitor;
 using System.IO.Abstractions;

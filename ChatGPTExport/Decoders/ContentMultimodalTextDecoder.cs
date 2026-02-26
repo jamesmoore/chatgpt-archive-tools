@@ -81,25 +81,15 @@ namespace ChatGPTExport.Decoders
 
         private Asset? GetAsset(MessageContext context, string asset_pointer)
         {
-            var searchPattern = GetSearchPattern(asset_pointer);
-            var markdownAsset = GetMediaAsset(context, searchPattern);
-            return markdownAsset;
+            var searchPattern = asset_pointer
+                .Replace("sediment://", string.Empty)
+                .Replace("file-service://", string.Empty);
+            AssetRequest assetRequest = new(
+                            searchPattern,
+                            context.Role,
+                            context.CreatedDate,
+                            context.UpdatedDate);
+            return assetLocator.GetMarkdownMediaAsset(assetRequest);
         }
-
-        private static string GetSearchPattern(string assetPointer)
-        {
-            return assetPointer.Replace("sediment://", string.Empty).Replace("file-service://", string.Empty);
-        }
-
-        private Asset? GetMediaAsset(MessageContext context, string searchPattern)
-        {
-            return assetLocator.GetMarkdownMediaAsset(new AssetRequest(
-                searchPattern,
-                context.Role,
-                context.CreatedDate,
-                context.UpdatedDate)
-                );
-        }
-
     }
 }
