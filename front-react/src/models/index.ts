@@ -17,10 +17,15 @@ export interface MessageSearchResult {
   snippet: string;
 }
 
+export interface ConversationDirectory {
+  directoryName: string;
+  conversations: string[];
+}
+
 export interface SourceDirectory {
   directoryName: string;
   exists: boolean;
-  conversations: string[];
+  conversationDirectories: ConversationDirectory[];
 }
 
 export interface Status {

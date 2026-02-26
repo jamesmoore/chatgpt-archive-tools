@@ -15,9 +15,9 @@ namespace ChatGpt.Exporter.Cli
         IEnumerable<ExportType> exportTypes,
         bool showHidden)
     {
-        public int RunExport(IEnumerable<IFileInfo> conversationFiles, IDirectoryInfo destination)
+        public int RunExport(IEnumerable<ConversationExportDirectory> conversationExportDirectories, IDirectoryInfo destination)
         {
-            var fileConversationsMap = conversationFiles
+            var fileConversationsMap = conversationExportDirectories.SelectMany(p => p.ConversationFiles)
                 .Select(file =>
                 {
                     var conversationParseResult = conversationsParser.GetConversations(file);

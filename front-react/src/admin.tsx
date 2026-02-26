@@ -190,25 +190,32 @@ export function Admin() {
                                             <AccordionTrigger className="text-sm">
                                                 <div className="flex flex-col items-start">
                                                     <span className="text-xs text-muted-foreground">
-                                                        {sourceDirectory.conversations.length}{" "}
-                                                        {sourceDirectory.conversations.length === 1 ? "conversation file" : "conversation files"}
+                                                        {sourceDirectory.conversationDirectories.length}{" "}
+                                                        {sourceDirectory.conversationDirectories.length === 1 ? "conversation directory" : "conversation directories"}
                                                     </span>
                                                 </div>
                                             </AccordionTrigger>
                                             <AccordionContent>
-                                                {sourceDirectory.conversations.length === 0 ? (
+                                                {sourceDirectory.conversationDirectories.length === 0 ? (
                                                     <p className="text-sm text-muted-foreground">
                                                         No conversations found in this source directory.
                                                     </p>
                                                 ) : (
-                                                    <ul className="space-y-1 overflow-auto">
-                                                        {sourceDirectory.conversations.map((conversation) => (
+                                                    <ul className="space-y-1 overflow-auto ">
+                                                        {sourceDirectory.conversationDirectories.map((conversationDirectory) => (
                                                             <li
-                                                                key={conversation}
-                                                                className="text-sm text-muted-foreground break-all"
+                                                                key={conversationDirectory.directoryName}
+                                                                className="text-sm text-muted-foreground break-all border p-2 rounded-md"
                                                             >
                                                                 <pre>
-                                                                    {conversation}
+                                                                    {conversationDirectory.directoryName}
+                                                                    {
+                                                                        conversationDirectory.conversations.map((conversation) => (
+                                                                            <div key={conversation} className="pl-4">
+                                                                                {conversation}
+                                                                            </div>
+                                                                        ))
+                                                                    }
                                                                 </pre>
                                                             </li>
                                                         ))}

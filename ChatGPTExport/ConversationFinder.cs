@@ -5,20 +5,31 @@ namespace ChatGPTExport
 {
     public class ConversationFinder
     {
-        public IEnumerable<IFileInfo> GetConversationFiles(IEnumerable<IDirectoryInfo> sources)
+        public IEnumerable<ConversationExportDirectory> GetConversationFiles(IEnumerable<IDirectoryInfo> sources)
         {
             var conversationFiles = sources.Select(GetConversationFiles).
                 SelectMany(fileInfo => fileInfo).ToList();
             return conversationFiles;
         }
 
-        public IEnumerable<IFileInfo> GetConversationFiles(IDirectoryInfo sourceDir)
+        public IEnumerable<ConversationExportDirectory> GetConversationFiles(IDirectoryInfo sourceDir)
         {
-            return sourceDir.Exists
+            bool exists = sourceDir.Exists;
+            var files = exists
                 ? sourceDir.GetFiles("conversations*.json", SearchOption.AllDirectories)
                     .Where(ConversationsFileNameValidator.IsConversationFile)
                     .OrderBy(p => p.FullName)
-                : [];
+                : Enumerable.Empty<IFileInfo>();
+
+            var grouped = files.Where(p => p.Directory != null).GroupBy(p => p.Directory!.FullName)
+                .Select(g => new ConversationExportDirectory
+                {
+                    DirectoryInfo = g.First().Directory!,
+                    ConversationFiles = g.ToList(),
+                    Exists = exists,
+                }).ToList();
+
+            return grouped;
         }
     }
 }
