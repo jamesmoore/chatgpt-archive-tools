@@ -14,7 +14,8 @@ namespace ChatGPTExport
 
         public IEnumerable<ConversationExportDirectory> GetConversationFiles(IDirectoryInfo sourceDir)
         {
-            var files = sourceDir.Exists
+            bool exists = sourceDir.Exists;
+            var files = exists
                 ? sourceDir.GetFiles("conversations*.json", SearchOption.AllDirectories)
                     .Where(ConversationsFileNameValidator.IsConversationFile)
                     .OrderBy(p => p.FullName)
@@ -24,7 +25,8 @@ namespace ChatGPTExport
                 .Select(g => new ConversationExportDirectory
                 {
                     DirectoryInfo = g.First().Directory!,
-                    ConversationFiles = g.ToList()
+                    ConversationFiles = g.ToList(),
+                    Exists = exists,
                 }).ToList();
 
             return grouped;

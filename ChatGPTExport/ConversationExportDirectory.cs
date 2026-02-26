@@ -6,8 +6,6 @@ namespace ChatGPTExport
     {
         public required IDirectoryInfo DirectoryInfo { get; set; }
         public required IEnumerable<IFileInfo> ConversationFiles { get; set; }
-
-        // add concept of exists
-
+        public required bool Exists { get; set; }
     }
 }
