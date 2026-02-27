@@ -60,11 +60,12 @@ public class ParsedConversationDirectoryTests
     private static ParsedConversationDirectory CreateDirectory(params ParsedConversationFile[] files)
     {
         var fs = new MockFileSystem();
-        fs.AddDirectory(@"C:\export");
+        var directoryPath = MockUnixSupport.Path(@"C:\export");
+        fs.AddDirectory(directoryPath);
 
         return new ParsedConversationDirectory
         {
-            DirectoryInfo = fs.DirectoryInfo.New(@"C:\export"),
+            DirectoryInfo = fs.DirectoryInfo.New(directoryPath),
             ParsedConversationFiles = files
         };
     }
@@ -72,8 +73,9 @@ public class ParsedConversationDirectoryTests
     private static ParsedConversationFile CreateParsedFile(string name, ConversationParseStatus status, Conversations? conversations)
     {
         var fs = new MockFileSystem();
-        var path = $@"C:\export\{name}";
-        fs.AddDirectory(@"C:\export");
+        var exportPath = MockUnixSupport.Path(@"C:\export");
+        var path = MockUnixSupport.Path($@"C:\export\{name}");
+        fs.AddDirectory(exportPath);
         fs.AddFile(path, new MockFileData("[]"));
 
         return new ParsedConversationFile

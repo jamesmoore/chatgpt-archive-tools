@@ -76,25 +76,27 @@ public class ParsedConversationDirectoriesTests
 
     private static ParsedConversationDirectory CreateDirectory(string directoryPath, params ParsedConversationFile[] files)
     {
+        var normalizedDirectoryPath = MockUnixSupport.Path(directoryPath);
         var fs = new MockFileSystem();
-        fs.AddDirectory(directoryPath);
+        fs.AddDirectory(normalizedDirectoryPath);
 
         return new ParsedConversationDirectory
         {
-            DirectoryInfo = fs.DirectoryInfo.New(directoryPath),
+            DirectoryInfo = fs.DirectoryInfo.New(normalizedDirectoryPath),
             ParsedConversationFiles = files
         };
     }
 
     private static ParsedConversationFile CreateParsedFile(string filePath, ConversationParseStatus status, Conversations? conversations)
     {
+        var normalizedFilePath = MockUnixSupport.Path(filePath);
         var fs = new MockFileSystem();
-        fs.AddDirectory(Path.GetDirectoryName(filePath)!);
-        fs.AddFile(filePath, new MockFileData("[]"));
+        fs.AddDirectory(Path.GetDirectoryName(normalizedFilePath)!);
+        fs.AddFile(normalizedFilePath, new MockFileData("[]"));
 
         return new ParsedConversationFile
         {
-            File = fs.FileInfo.New(filePath),
+            File = fs.FileInfo.New(normalizedFilePath),
             ParseStatus = status,
             Conversations = conversations
         };
