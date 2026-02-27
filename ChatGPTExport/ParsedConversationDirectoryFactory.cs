@@ -8,7 +8,7 @@
             return new ParsedConversationDirectories(parsedDirectories);
         }
 
-        public ParsedConversationDirectory Create(ConversationExportDirectory conversationExportDirectory)
+        private ParsedConversationDirectory Create(ConversationExportDirectory conversationExportDirectory)
         {
             var parsedFiles = conversationExportDirectory.ConversationFiles.Select(file =>
             {
