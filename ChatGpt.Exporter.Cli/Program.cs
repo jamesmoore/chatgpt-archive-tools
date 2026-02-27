@@ -180,8 +180,10 @@ rootCommand.SetAction(parseResult =>
 
         var exporter = new ConversationExporter(fileSystem, exportMode);
 
+        var factory = new ParsedConversationDirectoryFactory(new ConversationsParser(validators));
+
         var result = new ExportBootstrap(
-            new ConversationsParser(validators),
+            factory,
             new ExportAssetLocatorFactory(),
             exporter,
             exportTypes,
