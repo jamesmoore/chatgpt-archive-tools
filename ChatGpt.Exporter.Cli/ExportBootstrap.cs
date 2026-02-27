@@ -38,13 +38,9 @@ namespace ChatGpt.Exporter.Cli
                 }
             }
 
-            var successfulConversations = fileConversationsMap.GetFilesWithStatus(ConversationParseStatus.Success)
-                .Select(p => (Conversations: p.Conversations!, ConversationAssets: ConversationAssets.FromConversationsFile(p.File)))
-                .ToList();
-
             var conversations = fileConversationsMap.GetLatestConversations();
-
-            var conversationAssetsList = successfulConversations.OrderByDescending(p => p.Conversations.GetUpdateTime()).Select(p => p.ConversationAssets);
+            var mostRecent = fileConversationsMap.GetMostRecentlyUpdatedConversationsFilesPerDirectory();
+            var conversationAssetsList = mostRecent.Select(p => ConversationAssets.FromConversationsFile(p.File)).ToList();
             var assetLocator = exportAssetLocatorFactory.GetAssetLocator(conversationAssetsList);
             var assetRenderer = new RelativePathMarkdownAssetRenderer();
 

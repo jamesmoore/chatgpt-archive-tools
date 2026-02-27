@@ -3,41 +3,65 @@ using System.IO.Abstractions;
 
 namespace ChatGPTExport
 {
-    public class ParsedConversationDirectories(IEnumerable<ParsedConversationDirectory> parsedConversationDirectories) //: IEnumerable<ParsedConversationDirectory>
+    public class ParsedConversationDirectories(IEnumerable<ParsedConversationDirectory> parsedConversationDirectories)
     {
         public IEnumerable<Conversation> GetLatestConversations()
-        {
-            var successfulConversations = this.GetFilesWithStatus(ConversationParseStatus.Success)
-                //.Select(p => (Conversations: p.Conversations!, ConversationAssets: ConversationAssets.FromConversationsFile(p.File)))
-                .ToList();
-
-            var conversations = successfulConversations
-                .Select(p => p.Conversations!)
-                .GetLatestConversations()
-                .ToList();
-            return conversations;
+        {          
+            return parsedConversationDirectories.Select(p => p.GetConsolidatedConversations()).Where(p => p != null).Select(p => p!).GetLatestConversations();
         }
 
         public IEnumerable<ParsedConversationFile> GetFilesWithStatus(ConversationParseStatus status)
         {
-            return parsedConversationDirectories.SelectMany(p => p.ParsedConversationFiles.Where(f => f.ParseStatus == status));
+            return parsedConversationDirectories.SelectMany(p => p.GetFilesWithStatus(status));
         }
 
-        //public IEnumerator<ParsedConversationDirectory> GetEnumerator()
-        //{
-        //    return parsedConversationDirectories.GetEnumerator();
-        //}
-
-        //IEnumerator IEnumerable.GetEnumerator()
-        //{
-        //    return parsedConversationDirectories.GetEnumerator();
-        //}
+        /// <summary>
+        /// When obtaining assets we want to prioritize the most recently updated conversations.
+        /// Returns the most recently conversation file per directory, in recently updated order.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<ParsedConversationFile> GetMostRecentlyUpdatedConversationsFilesPerDirectory()
+        {
+            var mostRecent = parsedConversationDirectories
+                .Select(p => p.GetMostRecentlyUpdatedConversationsFile())
+                .Where(p => p != null)
+                .Select(p => p!)
+                .OrderByDescending(p => p!.Conversations!.GetUpdateTime())
+                .ToList();
+            return mostRecent;
+        }
     }
 
     public class ParsedConversationDirectory
     {
         public required IDirectoryInfo DirectoryInfo { get; set; }
         public required IEnumerable<ParsedConversationFile> ParsedConversationFiles { get; set; }
+
+        public IEnumerable<ParsedConversationFile> GetFilesWithStatus(ConversationParseStatus status)
+        {
+            return ParsedConversationFiles.Where(f => f.ParseStatus == status);
+        }
+
+        public ParsedConversationFile? GetMostRecentlyUpdatedConversationsFile()
+        {
+            var successfulFiles = GetFilesWithStatus(ConversationParseStatus.Success).OrderByDescending(p => p.Conversations!.GetUpdateTime());
+            return successfulFiles.FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Consolidate conversations at the directory level to handle multi-file conversations.
+        /// </summary>
+        /// <returns></returns>
+        public Conversations? GetConsolidatedConversations()
+        {
+            var successfulFiles = GetFilesWithStatus(ConversationParseStatus.Success)
+                .Select(p => p.Conversations!).
+                GetLatestConversations();
+
+            var newConversations = new Conversations();
+            newConversations.AddRange(successfulFiles);
+            return newConversations;
+        }
     }
 
     public class ParsedConversationFile
