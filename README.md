@@ -1,24 +1,14 @@
 # ChatGPT Archive Tools
 
-<img width="1024" height="183" alt="ChatGPT Export Export" src="https://github.com/user-attachments/assets/3cf24bdf-df3e-48c8-97aa-c10e8d72bff0" />
-
 ## About
 
 ChatGPT does not offer a clean, built-in way to save or print conversations for offline or archival use. While some browser extensions exist, they may pose security risks.
 
-This tool enables you to extract and reformat your conversations from the official ChatGPT export ZIP file. You can export your data via [ChatGPT settings - https://chatgpt.com/#settings/DataControls](https://chatgpt.com/#settings/DataControls).
-
-## Use cases
-* **Create a readable archive** - Convert your ChatGPT conversations into clean Markdown or HTML files that can be read offline, shared, or backed up.
-* **Selective cleanup** - Keep a local copy of the chats you want to delete from the web interface, preserving only the chats you need.
-* **Knowledge‑base ingestion** - Import your conversations into a wiki, knowledge base, or documentation system with minimal effort.
-* **Account migration** - Export all conversations before switching your ChatGPT account, so you retain a viewable copy of your data in case you need it later.
+This tool enables you to browse, search, extract and reformat your conversations from the official ChatGPT export ZIP file. You can export your data via [ChatGPT settings - https://chatgpt.com/#settings/DataControls](https://chatgpt.com/#settings/DataControls).
 
 ## Features
-* Convert ChatGPT exports into smaller, viewable: 
-  * markdown files
-  * html files
-  * json files
+* Browse and search your ChatGPT exports in a web UI.
+* Convert ChatGPT exports into smaller, viewable markdown, html and json files
 * Process multiple exports in one sweep, detecting the latest version of each conversation.
 * Include uploaded and generated image assets in the markdown (thanks to [GLightbox](https://biati-digital.github.io/glightbox/)).
 * Transform web references into markdown footnotes.
@@ -26,6 +16,10 @@ This tool enables you to extract and reformat your conversations from the offici
 * Detect and render mathematical notation (thanks to [mathjax](https://www.mathjax.org/))
 * Runs on Docker, Windows, Linux and MacOS.
 * Fully open source with no usage limits or monetization.
+
+## Two modes
+1. [ChatGPT Archive Server](#chatgpt-archive-server) - which runs a local website serving your exported chats.
+2. [ChatGPT Exporter](#chatgpt-exporter)  - a command line tool that can tansform your exported chats into new html and markdown files on your filesystem.
 
 ## First steps
 
@@ -46,32 +40,18 @@ You can provide multiple sources. For bare metal, pass `-s`/`--source` multiple 
 <details>
   <summary>Archive Server - Bare metal</summary>
 
-  1. Run the server (use `-s`/`--source` to point at your export folder):
+  1. Download the latest **chatgpt-archive-server** binary for your system from the [Releases page](../../releases) and unpack it.
+  2. On unix systems you may need to `chmod +x` it.
+  3. Run the server (use `-s`/`--source` to point at your export folder):
   ```sh
-  dotnet run --project ./ChatGpt.Archive.Api/ChatGpt.Archive.Api.csproj -- -s ~/chatgpt-export
+  ./chatgpt-archive-server -s ~/chatgpt-export
   ```
   If your filesystem is case-sensitive, use the exact project folder casing.
-  2. Open the URL printed in the console (typically `http://localhost:5104`).
-
+  4. Open the URL printed in the console (typically `http://localhost:5000`).
 </details>
 
 <details>
-  <summary>Archive Server - Docker</summary>
-
-  1. Run the container (set the `SOURCE` env var and mount the export folder):
-  ```sh
-  docker run --rm \
-    -p 8080:8080 \
-    -e SOURCE=/source \
-    -v ~/chatgpt-export:/source:ro \
-    ghcr.io/jamesmoore/chatgpt-archive-server:main
-  ```
-  2. Open `http://localhost:8080`. The container listens on port 8080, so change the host port as needed (for example: `-p 80:8080`). You can also run it behind a reverse proxy like Traefik, Caddy, or Nginx.
-
-</details>
-
-<details>
-  <summary>Archive Server - Docker compose</summary>
+  <summary>Archive Server - Docker compose (Recommended)</summary>
 
   1. Create a `docker-compose.yaml` (adapt the `SOURCE` and volume path as needed):
   ```yaml
@@ -89,9 +69,24 @@ You can provide multiple sources. For bare metal, pass `-s`/`--source` multiple 
   ```sh
   docker compose up
   ```
-  3. Open `http://localhost:8080`. The container listens on port 8080, so change the host port as needed. You can also run it behind a reverse proxy like Traefik, Caddy, or Nginx.
+  3. Open `http://localhost:8080`. The container listens on port 8080, so change the host port as needed. You can also run it behind a reverse proxy like Traefik, Caddy, or Nginx, in which case the port can be ignored.
 
 </details>
+
+<details>
+  <summary>Archive Server - Docker</summary>
+  
+  1. Run the container (set the `SOURCE` env var and mount the export folder):
+  ```sh
+  docker run --rm \
+    -p 8080:8080 \
+    -e SOURCE=/source \
+    -v ~/chatgpt-export:/source:ro \
+    ghcr.io/jamesmoore/chatgpt-archive-server:main
+  ```
+  2. Open `http://localhost:8080`. The container listens on port 8080, so change the host port as needed (for example: `-p 80:8080`). You can also run it behind a reverse proxy like Traefik, Caddy, or Nginx.
+</details>
+
 
 ## ChatGPT Exporter
 
@@ -112,27 +107,6 @@ You can export from multiple sources. For bare metal, pass `-s`/`--source` multi
   ./chatgpt-exporter -s ~/chatgpt-export -d ~/chatgpt-markdown
   ```
   6. Open `~/chatgpt-markdown` - you’ll see an html and markdown file for each conversation.
-
-</details>
-
-<details>
-  <summary>Exporter - Docker</summary>
-
-  1. Create a directory for the destination
-  ```sh
-  mkdir ~/chatgpt-markdown
-  ```
-  2. Run the docker command (adapt the `-v ~/chatgpt-export` and `-v ~/chatgpt-markdown` parameters to the directories you have just created)
-  ```sh
-  docker run --rm \
-    -v ~/chatgpt-export:/source:ro \
-    -v ~/chatgpt-markdown:/destination \
-    ghcr.io/jamesmoore/chatgpt-exporter:latest \
-    -s /source \
-    -d /destination
-  ```
-  3. Open `~/chatgpt-markdown` - you’ll see an html and markdown file for each conversation.
-
 </details>
 
 <details>
@@ -160,10 +134,28 @@ You can export from multiple sources. For bare metal, pass `-s`/`--source` multi
   docker compose run --rm chatgptexport
   ```
   4. Open `~/chatgpt-markdown` - you’ll see an html and markdown file for each conversation.
-
 </details>
 
-## Exporter Complete Usage
+<details>
+  <summary>Exporter - Docker</summary>
+
+  1. Create a directory for the destination
+  ```sh
+  mkdir ~/chatgpt-markdown
+  ```
+  2. Run the docker command (adapt the `-v ~/chatgpt-export` and `-v ~/chatgpt-markdown` parameters to the directories you have just created)
+  ```sh
+  docker run --rm \
+    -v ~/chatgpt-export:/source:ro \
+    -v ~/chatgpt-markdown:/destination \
+    ghcr.io/jamesmoore/chatgpt-exporter:latest \
+    -s /source \
+    -d /destination
+  ```
+  3. Open `~/chatgpt-markdown` - you’ll see an html and markdown file for each conversation.
+</details>
+
+### Exporter Complete Usage
 
 |Parameter|Optional?|Usage|Default|
 |----|----|----|----|
@@ -179,7 +171,7 @@ You can export from multiple sources. For bare metal, pass `-s`/`--source` multi
 |`--showhidden`||Includes hidden content in markdown and html exports.<br>Enabling this will include thinking, web searches, image prompts in the export.|`false`|
 |`--validate`||Validate the json against the known and expected schema.|`false`|
 
-## How it works
+### How it works
 The source folder must contain a file named conversations.json, which holds all your conversations in JSON format. The conversations.json can be in a subfolder, and you can have multiple subfolders (eg, one for each export if you have created many).
 
 Each conversation is converted into one or more files in the destination folder. Depending on the parameters passed in, json, markdown and html files may be created.
@@ -188,16 +180,16 @@ The files will be named with a timestamp and the conversation title (eg, `<YYYY-
 
 For markdown and html exports, any image assets are also extracted and copied to the destination folder.
 
-### <a name="export-modes"></a>Export modes
+> [!CAUTION]
+> Running this on a large export may create many files. It will also overwrite any existing files with the same name. Be sure to choose choose an empty destination directory for the first run.
+
+#### <a name="export-modes"></a>Export modes
 There are two export modes - `latest` and `complete`. This is to handle conversations that have multiple branches. In ChatGPT If you click "Try again..." or go back and edit one of your previous messages, this causes the conversation to start a new branch. The old branch is hidden and the conversation continues on the latest branch.
 
 `latest` is the recommended mode, as it will produce an export that contains the latest instance of the conversation. `complete` mode will include all the old hidden branches together in a single document. Because of this the conversation may not be coherent.
 
-### Asset management
+#### Asset management
 Any images generated in ChatGPT that are included in the exports will be copied into the destination directory under a subdirectory named `tool-assets`. The corresponding path in the markdown and html will be updated to a relative path. Similarly images uploaded by the user are copied into `user-assets` and referenced the same way.
 
-## Tips
-* Running this on a large export may create many files. It will also overwrite any existing files with the same name. Be sure to choose choose an empty destination directory for the first run.
-* Keep a copy of your original export ZIPs. In the future you may want to re‑run the tool to generate updated Markdown or a better format:
-  * This program may be improved with new features in the future
-  * Someone else may write a better one
+> [!NOTE]
+> Keep a copy of your original export ZIPs. In the future you may want to re‑run the tool to generate updated Markdown or a better format. This program may be improved with new features in the future. Someone else may write a better one.
