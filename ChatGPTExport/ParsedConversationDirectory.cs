@@ -7,7 +7,12 @@ namespace ChatGPTExport
     {
         public IEnumerable<Conversation> GetLatestConversations()
         {          
-            return parsedConversationDirectories.Select(p => p.GetConsolidatedConversations()).Where(p => p != null).Select(p => p!).GetLatestConversations();
+            return parsedConversationDirectories
+                .Select(p => p.GetConsolidatedConversations())
+                .Where(p => p != null)
+                .Select(p => p!)
+                .GetLatestConversations()
+                .ToList();
         }
 
         public IEnumerable<ParsedConversationFile> GetFilesWithStatus(ConversationParseStatus status)
@@ -42,7 +47,7 @@ namespace ChatGPTExport
             return ParsedConversationFiles.Where(f => f.ParseStatus == status);
         }
 
-        public ParsedConversationFile? GetMostRecentlyUpdatedConversationsFile()
+        internal ParsedConversationFile? GetMostRecentlyUpdatedConversationsFile()
         {
             var successfulFiles = GetFilesWithStatus(ConversationParseStatus.Success).OrderByDescending(p => p.Conversations!.GetUpdateTime());
             return successfulFiles.FirstOrDefault();
@@ -52,7 +57,7 @@ namespace ChatGPTExport
         /// Consolidate conversations at the directory level to handle multi-file conversations.
         /// </summary>
         /// <returns></returns>
-        public Conversations? GetConsolidatedConversations()
+        internal Conversations? GetConsolidatedConversations()
         {
             var successfulFiles = GetFilesWithStatus(ConversationParseStatus.Success)
                 .Select(p => p.Conversations!).

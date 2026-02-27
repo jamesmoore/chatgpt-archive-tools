@@ -1,5 +1,4 @@
-﻿using ChatGpt.Exporter.Cli.Assets;
-using ChatGPTExport;
+﻿using ChatGPTExport;
 using ChatGPTExport.Assets;
 using ChatGPTExport.Decoders.AssetRenderer;
 using ChatGPTExport.Visitor;
@@ -9,7 +8,7 @@ namespace ChatGpt.Exporter.Cli
 {
     internal class ExportBootstrap(
         ParsedConversationDirectoryFactory factory,
-        ExportAssetLocatorFactory exportAssetLocatorFactory,
+        CompositeAssetLocatorFactory exportAssetLocatorFactory,
         ConversationExporter exporter,
         IEnumerable<ExportType> exportTypes,
         bool showHidden)
@@ -39,8 +38,8 @@ namespace ChatGpt.Exporter.Cli
             }
 
             var conversations = fileConversationsMap.GetLatestConversations();
-            var mostRecent = fileConversationsMap.GetMostRecentlyUpdatedConversationsFilesPerDirectory();
-            var conversationAssetsList = mostRecent.Select(p => ConversationAssets.FromConversationsFile(p.File)).ToList();
+            var mostRecentConversationFiles = fileConversationsMap.GetMostRecentlyUpdatedConversationsFilesPerDirectory();
+            var conversationAssetsList = mostRecentConversationFiles.Select(p => ConversationAssets.FromConversationsFile(p.File)).ToList();
             var assetLocator = exportAssetLocatorFactory.GetAssetLocator(conversationAssetsList);
             var assetRenderer = new RelativePathMarkdownAssetRenderer();
 

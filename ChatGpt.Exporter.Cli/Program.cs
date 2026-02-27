@@ -1,7 +1,7 @@
 ﻿using ChatGpt.Exporter.Cli;
-using ChatGpt.Exporter.Cli.Assets;
 using ChatGpt.Exporter.Cli.Validators;
 using ChatGPTExport;
+using ChatGPTExport.Assets;
 using ChatGPTExport.Validators;
 using System.CommandLine;
 using System.CommandLine.Parsing;
@@ -178,14 +178,14 @@ rootCommand.SetAction(parseResult =>
         }
         var conversationFiles = conversationFinder.GetConversationFiles(sources);
 
-        var exporter = new ConversationExporter(fileSystem, exportMode);
+        var conversationExporter  = new ConversationExporter(fileSystem, exportMode);
 
-        var factory = new ParsedConversationDirectoryFactory(new ConversationsParser(validators));
+        var parsedConversationDirectoryFactory = new ParsedConversationDirectoryFactory(new ConversationsParser(validators));
 
         var result = new ExportBootstrap(
-            factory,
-            new ExportAssetLocatorFactory(),
-            exporter,
+            parsedConversationDirectoryFactory,
+            new CompositeAssetLocatorFactory(),
+            conversationExporter,
             exportTypes,
             showHidden
             ).RunExport(conversationFiles, destination);
