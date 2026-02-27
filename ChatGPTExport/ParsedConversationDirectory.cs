@@ -1,6 +1,4 @@
-﻿using ChatGPTExport.Assets;
-using ChatGPTExport.Models;
-using System.Collections;
+﻿using ChatGPTExport.Models;
 using System.IO.Abstractions;
 
 namespace ChatGPTExport
@@ -10,11 +8,11 @@ namespace ChatGPTExport
         public IEnumerable<Conversation> GetLatestConversations()
         {
             var successfulConversations = this.GetFilesWithStatus(ConversationParseStatus.Success)
-                .Select(p => (Conversations: p.Conversations!, ConversationAssets: ConversationAssets.FromConversationsFile(p.File)))
+                //.Select(p => (Conversations: p.Conversations!, ConversationAssets: ConversationAssets.FromConversationsFile(p.File)))
                 .ToList();
 
             var conversations = successfulConversations
-                .Select(p => p.Conversations)
+                .Select(p => p.Conversations!)
                 .GetLatestConversations()
                 .ToList();
             return conversations;
