@@ -8,16 +8,20 @@ namespace ChatGpt.Archive.Api.Services
         ArchiveSourcesOptions options,
         IFileSystem fileSystem,
         ConversationFinder conversationFinder,
-        IConversationAssetsCache conversationAssetsCache
-        )
+        IConversationAssetsCache conversationAssetsCache,
+        CompositeAssetLocatorFactory compositeAssetLocatorFactory)
     {
         public IAssetLocator Create()
         {
             var sourceDirectories = options.SourceDirectories.Select(fileSystem.DirectoryInfo.New);
+
+            // Compared to the CLI, this uses a slightly different approach - per file here, ordered by last write time.
+            // CLI orders by parsed conversation update time (more expensive).
             var conversationFiles = conversationFinder.GetConversationFiles(sourceDirectories).SelectMany(p => p.ConversationFiles).OrderByDescending(p => p.LastWriteTimeUtc);
-            var conversationAssets = conversationFiles.Select(ConversationAssets.FromConversationsFile);
-            var assetLocators = conversationAssets.Select(p => new AssetLocator(p)).ToList();
-            var compositeAssetLocator = new CompositeAssetLocator(assetLocators);
+            var grouped = conversationFiles.GroupBy(p => p.Directory?.FullName).ToList();
+            var firstFileFromEachGroup = grouped.Select(p => p.First());
+            var conversationAssets = firstFileFromEachGroup.Select(ConversationAssets.FromConversationsFile);
+            var compositeAssetLocator = compositeAssetLocatorFactory.GetAssetLocator(conversationAssets);
             return new ApiAssetLocator(compositeAssetLocator, conversationAssetsCache);
         }
     }

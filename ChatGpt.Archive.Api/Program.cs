@@ -79,6 +79,7 @@ builder.Services.AddSingleton<IAssetLocator>(sp => sp.GetRequiredService<ApiAsse
 builder.Services.AddSingleton<IMarkdownAssetRenderer, AbsolutePathMarkdownAssetRenderer>();
 builder.Services.AddSingleton<ConversationFormatterFactory>();
 builder.Services.AddSingleton<AssetsCache>();
+builder.Services.AddSingleton<CompositeAssetLocatorFactory>();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 

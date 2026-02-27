@@ -41,9 +41,9 @@ namespace ChatGpt.Archive.Api.Services
             var directories = options.SourceDirectories.Select(fileSystem.DirectoryInfo.New);
             var conversationFiles = conversationFinder.GetConversationFiles(directories);
             var conversationsParser = new ConversationsParser([]);
-            var conversations = conversationFiles.SelectMany(p => p.ConversationFiles).Select(conversationsParser.GetConversations).ToList();
-            var successfulConversations = conversations.Where(p => p.Status == ConversationParseResult.Success && p.Conversations != null).ToList();
-            var latestConversations = successfulConversations.Select(p => p.Conversations!).GetLatestConversations();
+            var factory = new ParsedConversationDirectoryFactory(conversationsParser);
+            var parsedDirectories = factory.Create(conversationFiles);
+            var latestConversations = parsedDirectories.GetLatestConversations();
             return latestConversations;
         }
 

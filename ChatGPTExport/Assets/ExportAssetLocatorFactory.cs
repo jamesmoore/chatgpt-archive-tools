@@ -1,8 +1,6 @@
-﻿using ChatGPTExport.Assets;
-
-namespace ChatGpt.Exporter.Cli.Assets
+﻿namespace ChatGPTExport.Assets
 {
-    internal class ExportAssetLocatorFactory()
+    public class CompositeAssetLocatorFactory()
     {
         public IAssetLocator GetAssetLocator(IEnumerable<ConversationAssets> conversationAssets)
         {
