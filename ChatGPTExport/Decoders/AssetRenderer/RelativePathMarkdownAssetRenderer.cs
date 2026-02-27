@@ -13,7 +13,6 @@ namespace ChatGPTExport.Decoders.AssetRenderer
             }
             else
             {
-                // TODO prevent this from being displayed in the FTS indexing.
                 Console.Error.WriteLine("\tUnable to find asset " + asset_pointer);
                 return $"> ⚠️ **Warning:** Could not find asset: {asset_pointer}.";
             }

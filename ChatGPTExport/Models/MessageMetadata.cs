@@ -32,7 +32,7 @@ namespace ChatGPTExport.Models
         public object[]? search_queries { get; set; }
         public object[]? image_results { get; set; }
         public bool? real_time_audio_has_video { get; set; }
-        public string? image_gen_title { get; set; } // TODO add in caption
+        public string? image_gen_title { get; set; }
         public bool? image_gen_async { get; set; }
         public bool? trigger_async_ux { get; set; }
         public bool? is_error { get; set; }
