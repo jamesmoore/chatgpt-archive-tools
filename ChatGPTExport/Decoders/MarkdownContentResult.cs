@@ -2,7 +2,7 @@
 
 namespace ChatGPTExport.Decoders
 {
-    public record MarkdownContentResult(IEnumerable<string> Lines, IEnumerable<Asset> Assets, string? Suffix = null, bool HasImage = false)
+    public record MarkdownContentResult(IEnumerable<string> Lines, IEnumerable<FileSystemAsset> Assets, string? Suffix = null, bool HasImage = false)
     {
         public static MarkdownContentResult Empty() 
             => new([], []);

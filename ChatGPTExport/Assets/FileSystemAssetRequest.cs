@@ -1,6 +1,6 @@
 ﻿namespace ChatGPTExport.Assets
 {
-    public record AssetRequest(
+    public record FileSystemAssetRequest(
         string SearchPattern, 
         string Role, 
         DateTimeOffset? CreatedDate, 

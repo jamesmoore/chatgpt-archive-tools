@@ -4,14 +4,14 @@ using ChatGPTExport.Models;
 
 namespace ChatGPTExport.Decoders
 {
-    public class ContentMultimodalTextDecoder(IAssetLocator assetLocator, IMarkdownAssetRenderer markdownAssetRenderer) : IDecoder<ContentMultimodalText, MarkdownContentResult>
+    public class ContentMultimodalTextDecoder(IFileSystemAssetLocator assetLocator, IMarkdownAssetRenderer markdownAssetRenderer) : IDecoder<ContentMultimodalText, MarkdownContentResult>
     {
         private const string ImageAssetPointer = "image_asset_pointer";
 
         public MarkdownContentResult Decode(ContentMultimodalText content, MessageContext context)
         {
             var markdownContent = new List<string>();
-            var markdownAssets = new List<Asset>();
+            var markdownAssets = new List<FileSystemAsset>();
             bool hasImage = false;
             foreach (var part in content.parts ?? [])
             {
@@ -34,7 +34,7 @@ namespace ChatGPTExport.Decoders
 
         }
 
-        private (IEnumerable<string> MarkdownLines, Asset? MarkdownAsset) GetMarkdownMediaAsset(MessageContext context, ContentMultimodalText.ContentMultimodalTextParts obj)
+        private (IEnumerable<string> MarkdownLines, FileSystemAsset? MarkdownAsset) GetMarkdownMediaAsset(MessageContext context, ContentMultimodalText.ContentMultimodalTextParts obj)
         {
             switch (obj.content_type)
             {
@@ -79,12 +79,12 @@ namespace ChatGPTExport.Decoders
             }
         }
 
-        private Asset? GetAsset(MessageContext context, string asset_pointer)
+        private FileSystemAsset? GetAsset(MessageContext context, string asset_pointer)
         {
             var searchPattern = asset_pointer
                 .Replace("sediment://", string.Empty)
                 .Replace("file-service://", string.Empty);
-            AssetRequest assetRequest = new(
+            FileSystemAssetRequest assetRequest = new(
                             searchPattern,
                             context.Role,
                             context.CreatedDate,

@@ -59,64 +59,15 @@ namespace ChatGpt.Exporter.Cli
 
                     foreach (var asset in formattedConversation.Assets)
                     {
-                        var assetDestinationFilename = fileSystem.Path.Join(destination.FullName, asset.Name);
                         Console.Write($"\t\t{asset.Name}...");
-                        if (fileSystem.File.Exists(assetDestinationFilename) == false)
-                        {
-                            using var stream = asset.GetStream();
-                            SaveToFilesystem(stream, assetDestinationFilename, null, null);
-                            Console.WriteLine("Saved");
-                        }
-                        else
-                        {
-                            Console.WriteLine("Exists");
-                        }
-                    }
-
-                    foreach (var markdownAsset in formattedConversation.MarkdownAssets)
-                    {
-                        var destinationSegments = new[] { destination.FullName }
-                            .Concat(markdownAsset.PathSegments)
-                            .ToArray();
-                        var fullDestinationPath = fileSystem.Path.Join(destinationSegments);
-                        var exists = fileSystem.File.Exists(fullDestinationPath);
-                        Console.Write($"\t\t{string.Join("/", markdownAsset.PathSegments)}...");
-                        if (exists == false)
-                        {
-                            using var stream = markdownAsset.GetStream();
-                            SaveToFilesystem(stream, fullDestinationPath, markdownAsset.CreatedDate, markdownAsset.UpdatedDate);
-                            Console.WriteLine("Saved");
-                        }
-                        else
-                        {
-                            Console.WriteLine("Exists");
-                        }
+                        var result = asset.SaveToFileSystem(destination);
+                        Console.WriteLine(result);
                     }
                 }
             }
             catch (Exception ex)
             {
                 Console.Error.WriteLine(ex.ToString());
-            }
-        }
-
-        private void SaveToFilesystem(Stream stream, string destinationFilename, DateTimeOffset? createdDate, DateTimeOffset? updateDate)
-        {
-            var destinationDirectory = fileSystem.Path.GetDirectoryName(destinationFilename);
-            if (string.IsNullOrEmpty(destinationDirectory) == false)
-            {
-                fileSystem.Directory.CreateDirectory(destinationDirectory);
-            }
-            using var fileStream = fileSystem.File.Create(destinationFilename);
-            stream.CopyTo(fileStream);
-
-            if (createdDate.HasValue)
-            {
-                fileSystem.File.SetCreationTimeUtcIfPossible(destinationFilename, createdDate.Value.DateTime);
-            }
-            if (updateDate.HasValue)
-            {
-                fileSystem.File.SetLastWriteTimeUtc(destinationFilename, updateDate.Value.DateTime);
             }
         }
 

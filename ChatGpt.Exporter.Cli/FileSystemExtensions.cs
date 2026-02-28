@@ -56,12 +56,6 @@ namespace ChatGpt.Exporter.Cli
             return candidatePath.StartsWith(basePath + fileSystem.Path.DirectorySeparatorChar, comparison);
         }
 
-        public static void SetCreationTimeUtcIfPossible(this IFile target, string filename, DateTime createdDate)
-        {
-            if (OperatingSystem.IsWindows())
-            {
-                target.SetCreationTimeUtc(filename, createdDate);
-            }
-        }
+
     }
 }

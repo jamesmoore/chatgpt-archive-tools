@@ -34,11 +34,11 @@ public class MarkdownContentVisitorTests
 
     private class NullAssetRenderer : IMarkdownAssetRenderer
     {
-        public string RenderAsset(Asset? asset, string asset_pointer) => string.Empty;
+        public string RenderAsset(FileSystemAsset? asset, string asset_pointer) => string.Empty;
     }
 
-    private class AssetLocator : IAssetLocator
+    private class AssetLocator : IFileSystemAssetLocator
     {
-        public Asset? GetMarkdownMediaAsset(AssetRequest assetRequest) => null;
+        public FileSystemAsset? GetMarkdownMediaAsset(FileSystemAssetRequest assetRequest) => null;
     }
 }

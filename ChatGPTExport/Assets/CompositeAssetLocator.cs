@@ -1,8 +1,8 @@
 ﻿namespace ChatGPTExport.Assets
 {
-    public class CompositeAssetLocator(IEnumerable<IAssetLocator> assetLocators) : IAssetLocator
+    public class CompositeAssetLocator(IEnumerable<IFileSystemAssetLocator> assetLocators) : IFileSystemAssetLocator
     {
-        public Asset? GetMarkdownMediaAsset(AssetRequest assetRequest)
+        public FileSystemAsset? GetMarkdownMediaAsset(FileSystemAssetRequest assetRequest)
         {
             return assetLocators
                 .Select(locator => locator.GetMarkdownMediaAsset(assetRequest))

@@ -14,7 +14,7 @@ namespace ChatGPTExport.Formatters.Markdown
             var messages = conversation.GetMessagesWithContent();
 
             var strings = new List<string>();
-            var assets = new List<Asset>();
+            var assets = new List<FileSystemAsset>();
             ConversationContext conversationContext = new();
 
             strings.AddRange(GetYamlHeader(conversation));
@@ -43,7 +43,7 @@ namespace ChatGPTExport.Formatters.Markdown
                 }
             }
 
-            return new FormattedConversation(string.Join(Environment.NewLine, strings), [], assets, ".md");
+            return new FormattedConversation(string.Join(Environment.NewLine, strings), assets, ".md");
         }
 
         private static IEnumerable<string> GetYamlHeader(Conversation conversation)

@@ -8,10 +8,9 @@ namespace ChatGpt.Archive.Api.Services
         ArchiveSourcesOptions options,
         IFileSystem fileSystem,
         ConversationFinder conversationFinder,
-        IConversationAssetsCache conversationAssetsCache,
         CompositeAssetLocatorFactory compositeAssetLocatorFactory)
     {
-        public IAssetLocator Create()
+        public IFileSystemAssetLocator Create()
         {
             var sourceDirectories = options.SourceDirectories.Select(fileSystem.DirectoryInfo.New);
 
@@ -22,7 +21,7 @@ namespace ChatGpt.Archive.Api.Services
             var firstFileFromEachGroup = grouped.Select(p => p.First());
             var conversationAssets = firstFileFromEachGroup.Select(ConversationAssets.FromConversationsFile);
             var compositeAssetLocator = compositeAssetLocatorFactory.GetAssetLocator(conversationAssets);
-            return new ApiAssetLocator(compositeAssetLocator, conversationAssetsCache);
+            return new ApiAssetLocator(compositeAssetLocator);
         }
     }
 }
