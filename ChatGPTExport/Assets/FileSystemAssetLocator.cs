@@ -22,10 +22,12 @@ namespace ChatGPTExport.Assets
             {
                 var sanitizedRole = SanitizeRole(assetRequest.Role);
                 var destinationAssetsPath = $"{sanitizedRole}-assets";
+                var pathSegments = new[] { destinationAssetsPath, sourceFile.Name };
+                var name = "/" + string.Join("/", pathSegments);
                 return new FileSystemAsset(
-                    sourceFile.Name,
+                    name,
                     sourceFile,
-                    [destinationAssetsPath, sourceFile.Name],
+                    pathSegments,
                     assetRequest.CreatedDate,
                     assetRequest.UpdatedDate
                     );
