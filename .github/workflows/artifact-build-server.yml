@@ -1,4 +1,4 @@
-name: Publish Server
+name: Publish Server Artifacts
 
 on:
   release:
