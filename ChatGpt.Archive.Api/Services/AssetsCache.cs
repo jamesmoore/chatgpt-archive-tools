@@ -20,5 +20,10 @@ namespace ChatGpt.Archive.Api.Services
         {
             cache[key] = asset;
         }
+
+        public void Clear()
+        {
+            cache.Clear();
+        }
     }
 }

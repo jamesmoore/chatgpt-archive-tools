@@ -11,7 +11,6 @@ namespace ChatGpt.Archive.Api.Services
     public class ConversationsService(
         IFileSystem fileSystem,
         IArchiveRepository archiveRepository,
-        IConversationAssetsCache conversationAssetsCache,
         ConversationFinder conversationFinder,
         ArchiveSourcesOptions options,
         IFileSystemAssetLocator assetLocator,
@@ -85,7 +84,7 @@ namespace ChatGpt.Archive.Api.Services
 
             if (formatted != null)
             {
-                var assets = formatted.Assets;
+                var assets = formatted.AllAssets;
                 if (assets != null)
                 {
                     foreach (var asset in assets)
@@ -101,7 +100,7 @@ namespace ChatGpt.Archive.Api.Services
         public void ClearAll()
         {
             archiveRepository.ClearAll();
-            conversationAssetsCache.Reset();
+            assetsCache.Clear();
         }
     }
 }

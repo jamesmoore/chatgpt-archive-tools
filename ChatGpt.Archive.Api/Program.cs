@@ -73,7 +73,6 @@ builder.Services.AddSingleton<FTS5Escaper>();
 builder.Services.AddSingleton<ISchemaInitializer, SqliteSchemaInitializer>();
 builder.Services.AddSingleton<IArchiveRepository, ArchiveRepository>();
 builder.Services.AddSingleton<IConversationsService, ConversationsService>();
-builder.Services.AddSingleton<IConversationAssetsCache, ConversationAssetsCache>();
 builder.Services.AddSingleton<ApiAssetLocatorFactory>();
 builder.Services.AddSingleton<IFileSystemAssetLocator>(sp => sp.GetRequiredService<ApiAssetLocatorFactory>().Create());
 builder.Services.AddSingleton<IMarkdownAssetRenderer, AbsolutePathMarkdownAssetRenderer>();

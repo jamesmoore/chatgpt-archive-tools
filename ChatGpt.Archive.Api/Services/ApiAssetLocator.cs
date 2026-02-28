@@ -2,7 +2,12 @@ using ChatGPTExport.Assets;
 
 namespace ChatGpt.Archive.Api.Services
 {
-    public class ApiAssetLocator(IFileSystemAssetLocator inner, IConversationAssetsCache conversationAssetsCache) : IFileSystemAssetLocator
+    /// <summary>
+    /// Wraps an IFileSystemAssetLocator to convert the FileSystemAsset's PathSegments to include an "asset" segment at the beginning,
+    /// so that the API can serve them from a consistent URL path like /asset/{conversationId}/{assetName}.
+    /// </summary>
+    /// <param name="inner"></param>
+    public class ApiAssetLocator(IFileSystemAssetLocator inner) : IFileSystemAssetLocator
     {
         public FileSystemAsset? GetMarkdownMediaAsset(FileSystemAssetRequest assetRequest)
         {
@@ -19,8 +24,6 @@ namespace ChatGpt.Archive.Api.Services
                     ["asset", .. asset.PathSegments],
                     asset.CreatedDate,
                     asset.UpdatedDate);
-
-                conversationAssetsCache.StoreAsset(apiAsset);
                 return apiAsset;
             }
         }

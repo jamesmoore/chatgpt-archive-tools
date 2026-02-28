@@ -1,4 +1,5 @@
 using ChatGpt.Archive.Api.Services;
+using ChatGPTExport.Assets;
 using Microsoft.AspNetCore.Mvc;
 using System.IO.Abstractions;
 
@@ -7,20 +8,34 @@ namespace ChatGpt.Archive.Api.Controllers
     [ApiController]
     [Route("[controller]")]
     public class AssetController(
-        IConversationAssetsCache conversationAssets, 
-        IFileSystem fileSystem
+        IFileSystem fileSystem,
+        AssetsCache assetsCache,
+        ILogger<AssetController> logger
         ) : ControllerBase
     {
         [HttpGet("{**path}")]
         public IActionResult GetAsset(string path)
         {
-            var decodedPath = Uri.UnescapeDataString(path);
-
-            var asset = conversationAssets.GetAsset(decodedPath);
-            if (asset == null || !asset.FileInfo.Exists)
+            var safePath = path?.Replace("\r", string.Empty).Replace("\n", string.Empty);
+            logger.LogInformation("AssetController received request for path: {Path}", safePath);
+            if(string.IsNullOrEmpty(safePath))
+            {
                 return NotFound();
+            }
 
-            return PhysicalFile(asset.FileInfo.FullName, GetMimeType(asset.FileInfo.FullName));
+            var asset = assetsCache.Get("/" + safePath);
+            if (asset == null)
+            {
+                return NotFound();
+            }
+
+            if (asset is FileSystemAsset fileSystemAsset)
+            {
+                var fullName = fileSystemAsset.FileInfo.FullName;
+                return PhysicalFile(fullName, GetMimeType(fullName));
+            }
+
+            return NotFound();
         }
 
         private string GetMimeType(string path)
