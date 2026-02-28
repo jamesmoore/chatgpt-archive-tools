@@ -57,11 +57,9 @@ namespace ChatGpt.Exporter.Cli
                         Console.WriteLine($"\t{filename}...No change");
                     }
 
-                    foreach (var asset in formattedConversation.AllAssets)
+                    foreach (var asset in formattedConversation.Assets)
                     {
                         Console.Write($"\t\t{asset.Name}...");
-                        // previously for filesystem assets:
-                        // Console.Write($"\t\t{string.Join("/", markdownAsset.PathSegments)}...");
                         var result = asset.SaveToFileSystem(destination);
                         Console.WriteLine(result);
                     }

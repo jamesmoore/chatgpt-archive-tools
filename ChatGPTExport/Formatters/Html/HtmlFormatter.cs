@@ -19,14 +19,14 @@ namespace ChatGPTExport.Exporters.Html
     {
         private readonly string LineBreak = Environment.NewLine;
         private readonly MarkdownPipeline MarkdownPipeline = CreatePipeline(formatter);
-        private readonly EmbeddedResourceAsset CssAsset = new("/styles/tailwindcompiled.css", "ChatGPTExport.Formatters.Html.Templates.Styles.tailwindcompiled.css", "text/css");
+        private readonly IFormattedConversationAsset CssAsset = new EmbeddedResourceAsset("/styles/tailwindcompiled.css", "ChatGPTExport.Formatters.Html.Templates.Styles.tailwindcompiled.css", "text/css");
 
         public FormattedConversation Format(Conversation conversation, string pathPrefix, bool showHidden)
         {
             var messages = conversation.GetMessagesWithContent();
 
             var strings = new List<(string MessageId, Author Author, string Content, bool HasImage)>();
-            var assets = new List<FileSystemAsset>();
+            var assets = new List<IFormattedConversationAsset>();
             ConversationContext conversationContext = new();
 
             foreach (var message in messages)
@@ -77,7 +77,7 @@ namespace ChatGPTExport.Exporters.Html
                 new HtmlPage(titleString, [headers], htmlFragments, CssAsset.Name),
                 pathPrefix);
 
-            return new FormattedConversation(html, [CssAsset], assets, ".html");
+            return new FormattedConversation(html, [CssAsset, .. assets], ".html");
         }
 
         [GeneratedRegex("```(.*)")]

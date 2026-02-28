@@ -43,7 +43,7 @@ namespace ChatGPTExport.Formatters.Markdown
                 }
             }
 
-            return new FormattedConversation(string.Join(Environment.NewLine, strings), [], assets, ".md");
+            return new FormattedConversation(string.Join(Environment.NewLine, strings), assets, ".md");
         }
 
         private static IEnumerable<string> GetYamlHeader(Conversation conversation)

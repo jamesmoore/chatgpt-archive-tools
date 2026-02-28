@@ -37,7 +37,7 @@ namespace ChatGPTExport.Formatters.Plaintext
                 strings.AddRange(FormatMessage(message, conversationContext, showHidden));
             }
 
-            return new FormattedConversation(string.Join(Environment.NewLine, strings), [], [], ".txt");
+            return new FormattedConversation(string.Join(Environment.NewLine, strings), [], ".txt");
         }
 
         private IEnumerable<string> FormatMessage(Message message, ConversationContext conversationContext, bool showHidden)

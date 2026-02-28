@@ -84,13 +84,10 @@ namespace ChatGpt.Archive.Api.Services
 
             if (formatted != null)
             {
-                var assets = formatted.AllAssets;
-                if (assets != null)
+                var assets = formatted.Assets;
+                foreach (var asset in assets)
                 {
-                    foreach (var asset in assets)
-                    {
-                        assetsCache.Set(asset.Name, asset);
-                    }
+                    assetsCache.Set(asset.Name, asset);
                 }
             }
 

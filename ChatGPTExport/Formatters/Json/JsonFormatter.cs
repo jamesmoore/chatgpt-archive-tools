@@ -14,7 +14,7 @@ namespace ChatGPTExport.Formatters.Json
 
         public FormattedConversation Format(Conversation conversation, string pathPrefix, bool showHidden)
         {
-            return new FormattedConversation(JsonSerializer.Serialize(conversation, options), [], [], ".json");
+            return new FormattedConversation(JsonSerializer.Serialize(conversation, options), [], ".json");
         }
     }
 }
