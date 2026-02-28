@@ -5,6 +5,6 @@ namespace ChatGPTExport.Formatters
     public record FormattedConversation(
         string Contents,
         IEnumerable<IFormattedConversationAsset> Assets,
-        IEnumerable<Asset> MarkdownAssets,
+        IEnumerable<FileSystemAsset> FileSystemAssets,
         string Extension);
 }

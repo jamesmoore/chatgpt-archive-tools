@@ -4,7 +4,7 @@ namespace ChatGPTExport.Decoders.AssetRenderer
 {
     public class AbsolutePathMarkdownAssetRenderer : IMarkdownAssetRenderer
     {
-        public string RenderAsset(Asset? markdownAsset, string asset_pointer)
+        public string RenderAsset(FileSystemAsset? markdownAsset, string asset_pointer)
         {
             if (markdownAsset != null)
             {

@@ -11,7 +11,7 @@ namespace ChatGpt.Archive.Api.Services
         IConversationAssetsCache conversationAssetsCache,
         CompositeAssetLocatorFactory compositeAssetLocatorFactory)
     {
-        public IAssetLocator Create()
+        public IFileSystemAssetLocator Create()
         {
             var sourceDirectories = options.SourceDirectories.Select(fileSystem.DirectoryInfo.New);
 

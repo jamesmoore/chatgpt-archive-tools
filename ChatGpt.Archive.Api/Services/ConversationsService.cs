@@ -14,7 +14,7 @@ namespace ChatGpt.Archive.Api.Services
         IConversationAssetsCache conversationAssetsCache,
         ConversationFinder conversationFinder,
         ArchiveSourcesOptions options,
-        IAssetLocator assetLocator,
+        IFileSystemAssetLocator assetLocator,
         IMarkdownAssetRenderer markdownAssetRenderer,
         ConversationFormatterFactory conversationFormatterFactory,
         AssetsCache assetsCache) : IConversationsService

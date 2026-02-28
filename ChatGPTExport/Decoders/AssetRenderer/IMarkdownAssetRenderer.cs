@@ -4,6 +4,6 @@ namespace ChatGPTExport.Decoders.AssetRenderer
 {
     public interface IMarkdownAssetRenderer
     {
-        string RenderAsset(Asset? asset, string asset_pointer);
+        string RenderAsset(FileSystemAsset? asset, string asset_pointer);
     }
 }

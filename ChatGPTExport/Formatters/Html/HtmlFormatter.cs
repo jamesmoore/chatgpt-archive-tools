@@ -26,7 +26,7 @@ namespace ChatGPTExport.Exporters.Html
             var messages = conversation.GetMessagesWithContent();
 
             var strings = new List<(string MessageId, Author Author, string Content, bool HasImage)>();
-            var assets = new List<Asset>();
+            var assets = new List<FileSystemAsset>();
             ConversationContext conversationContext = new();
 
             foreach (var message in messages)

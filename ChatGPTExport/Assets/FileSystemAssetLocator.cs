@@ -2,9 +2,9 @@
 
 namespace ChatGPTExport.Assets
 {
-    public class AssetLocator(
+    public class FileSystemAssetLocator(
         ConversationAssets conversationAssets
-        ) : IAssetLocator
+        ) : IFileSystemAssetLocator
     {
         private static readonly HashSet<string> AllowedRoles = new(StringComparer.OrdinalIgnoreCase)
         {
@@ -15,14 +15,14 @@ namespace ChatGPTExport.Assets
             "function"
         };
 
-        public Asset? GetMarkdownMediaAsset(AssetRequest assetRequest)
+        public FileSystemAsset? GetMarkdownMediaAsset(FileSystemAssetRequest assetRequest)
         {
             var sourceFile = conversationAssets.FindAsset(assetRequest.SearchPattern);
             if (sourceFile != null)
             {
                 var sanitizedRole = SanitizeRole(assetRequest.Role);
                 var destinationAssetsPath = $"{sanitizedRole}-assets";
-                return new Asset(
+                return new FileSystemAsset(
                     sourceFile.Name,
                     sourceFile,
                     [destinationAssetsPath, sourceFile.Name],

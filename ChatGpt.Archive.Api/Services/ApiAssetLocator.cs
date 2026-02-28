@@ -2,9 +2,9 @@ using ChatGPTExport.Assets;
 
 namespace ChatGpt.Archive.Api.Services
 {
-    public class ApiAssetLocator(IAssetLocator inner, IConversationAssetsCache conversationAssetsCache) : IAssetLocator
+    public class ApiAssetLocator(IFileSystemAssetLocator inner, IConversationAssetsCache conversationAssetsCache) : IFileSystemAssetLocator
     {
-        public Asset? GetMarkdownMediaAsset(AssetRequest assetRequest)
+        public FileSystemAsset? GetMarkdownMediaAsset(FileSystemAssetRequest assetRequest)
         {
             var asset = inner.GetMarkdownMediaAsset(assetRequest);
             if (asset == null)
@@ -13,7 +13,7 @@ namespace ChatGpt.Archive.Api.Services
             }
             else
             {
-                var apiAsset = new Asset(
+                var apiAsset = new FileSystemAsset(
                     asset.Name,
                     asset.FileInfo,
                     ["asset", .. asset.PathSegments],

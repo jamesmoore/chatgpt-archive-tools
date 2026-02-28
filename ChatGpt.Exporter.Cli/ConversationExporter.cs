@@ -73,7 +73,7 @@ namespace ChatGpt.Exporter.Cli
                         }
                     }
 
-                    foreach (var markdownAsset in formattedConversation.MarkdownAssets)
+                    foreach (var markdownAsset in formattedConversation.FileSystemAssets)
                     {
                         var destinationSegments = new[] { destination.FullName }
                             .Concat(markdownAsset.PathSegments)

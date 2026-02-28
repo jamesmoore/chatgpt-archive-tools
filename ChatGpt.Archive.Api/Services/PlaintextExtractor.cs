@@ -21,15 +21,15 @@ namespace ChatGpt.Archive.Api.Services
 
         private class NullAssetRenderer : IMarkdownAssetRenderer
         {
-            public string RenderAsset(Asset? asset, string asset_pointer)
+            public string RenderAsset(FileSystemAsset? asset, string asset_pointer)
             {
                 return string.Empty;
             }
         }
 
-        private class NullAssetLocator : IAssetLocator
+        private class NullAssetLocator : IFileSystemAssetLocator
         {
-            public Asset? GetMarkdownMediaAsset(AssetRequest assetRequest) => null;
+            public FileSystemAsset? GetMarkdownMediaAsset(FileSystemAssetRequest assetRequest) => null;
         }
     }
 }

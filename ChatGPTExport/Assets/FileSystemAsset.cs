@@ -3,7 +3,7 @@ using System.IO.Abstractions;
 
 namespace ChatGPTExport.Assets
 {
-    public record Asset(
+    public record FileSystemAsset(
         string Name, 
         IFileInfo FileInfo,
         string[] PathSegments,

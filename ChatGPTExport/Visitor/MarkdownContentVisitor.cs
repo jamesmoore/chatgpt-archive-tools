@@ -6,7 +6,7 @@ using ChatGPTExport.Models;
 namespace ChatGPTExport.Visitor
 {
     public class MarkdownContentVisitor(
-        IAssetLocator assetLocator,
+        IFileSystemAssetLocator assetLocator,
         IMarkdownAssetRenderer assetRenderer) : IContentVisitor<MarkdownContentResult>
     {
         private readonly Lazy<ContentTextDecoder> _contentTextDecoder = new(() => new ContentTextDecoder());

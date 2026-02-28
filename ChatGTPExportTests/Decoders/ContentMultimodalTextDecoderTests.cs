@@ -9,15 +9,15 @@ public class ContentMultimodalTextDecoderTests
 {
     private sealed class TestAssetRenderer : IMarkdownAssetRenderer
     {
-        public string RenderAsset(Asset? asset, string asset_pointer)
+        public string RenderAsset(FileSystemAsset? asset, string asset_pointer)
         {
             return $"![asset]({asset_pointer})";
         }
     }
 
-    private class AssetLocator : IAssetLocator
+    private class AssetLocator : IFileSystemAssetLocator
     {
-        public Asset? GetMarkdownMediaAsset(AssetRequest assetRequest) => null;
+        public FileSystemAsset? GetMarkdownMediaAsset(FileSystemAssetRequest assetRequest) => null;
     }
 
     private static MessageContext CreateContext()
