@@ -1,4 +1,5 @@
-﻿using System.IO.Abstractions;
+﻿using System.IO;
+using System.IO.Abstractions;
 
 namespace ChatGPTExport
 {
@@ -22,6 +23,34 @@ namespace ChatGPTExport
             var relativePath = Uri.UnescapeDataString(baseUri.MakeRelativeUri(targetUri).ToString())
                                      .Replace('/', fileSystem.Path.DirectorySeparatorChar);
             return relativePath;
+        }
+
+        public static void SaveToFilesystem(this IFileSystem fileSystem, Stream stream, string destinationFilename, DateTimeOffset? createdDate, DateTimeOffset? updateDate)
+        {
+            var destinationDirectory = fileSystem.Path.GetDirectoryName(destinationFilename);
+            if (string.IsNullOrEmpty(destinationDirectory) == false)
+            {
+                fileSystem.Directory.CreateDirectory(destinationDirectory);
+            }
+            using var fileStream = fileSystem.File.Create(destinationFilename);
+            stream.CopyTo(fileStream);
+
+            if (createdDate.HasValue)
+            {
+                fileSystem.File.SetCreationTimeUtcIfPossible(destinationFilename, createdDate.Value.DateTime);
+            }
+            if (updateDate.HasValue)
+            {
+                fileSystem.File.SetLastWriteTimeUtc(destinationFilename, updateDate.Value.DateTime);
+            }
+        }
+
+        public static void SetCreationTimeUtcIfPossible(this IFile target, string filename, DateTime createdDate)
+        {
+            if (OperatingSystem.IsWindows())
+            {
+                target.SetCreationTimeUtc(filename, createdDate);
+            }
         }
     }
 }

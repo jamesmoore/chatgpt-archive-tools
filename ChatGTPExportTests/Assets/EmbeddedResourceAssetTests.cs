@@ -1,6 +1,7 @@
+using ChatGPTExport.Assets;
 using ChatGPTExport.Formatters;
 
-namespace ChatGTPExportTests.Formatters;
+namespace ChatGTPExportTests.Assets;
 
 public class EmbeddedResourceAssetTests
 {

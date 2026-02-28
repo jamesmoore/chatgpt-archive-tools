@@ -1,9 +1,11 @@
-﻿using System.Collections.Concurrent;
+﻿using ChatGPTExport.Formatters;
+using System.Collections.Concurrent;
 using System.IO;
+using System.IO.Abstractions;
 using System.Reflection;
 using System.Security.Cryptography;
 
-namespace ChatGPTExport.Formatters
+namespace ChatGPTExport.Assets
 {
     public class EmbeddedResourceAsset(string name, string resourceName, string mimeType) : IFormattedConversationAsset
     {
@@ -36,6 +38,22 @@ namespace ChatGPTExport.Formatters
             var hashedName = $"{nameWithoutExt}.{hashString}{ext}";
             HashedNameCache[resourceName] = hashedName;
             return hashedName;
+        }
+
+        public SaveStatus SaveToFileSystem(IDirectoryInfo destination)
+        {
+            var fileSystem = destination.FileSystem;
+            var assetDestinationFilename = fileSystem.Path.Join(destination.FullName, this.Name);
+            if (fileSystem.File.Exists(assetDestinationFilename) == false)
+            {
+                using var stream = this.GetStream();
+                fileSystem.SaveToFilesystem(stream, assetDestinationFilename, null, null);
+                return SaveStatus.Success;
+            }
+            else
+            {
+                return SaveStatus.Exists;
+            }
         }
     }
 }
