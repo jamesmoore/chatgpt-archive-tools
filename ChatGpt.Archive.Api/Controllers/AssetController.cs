@@ -29,7 +29,7 @@ namespace ChatGpt.Archive.Api.Controllers
                 return NotFound();
             }
 
-            if (asset is FileSystemAsset fileSystemAsset)
+            if (asset is FileSystemAsset fileSystemAsset && fileSystemAsset.FileInfo.Exists)
             {
                 var fullName = fileSystemAsset.FileInfo.FullName;
                 return PhysicalFile(fullName, GetMimeType(fullName));
