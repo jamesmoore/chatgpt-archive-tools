@@ -24,4 +24,7 @@ ENV ASPNETCORE_URLS=http://+:8080
 ENV NO_OPEN_BROWSER=true
 EXPOSE 8080
 COPY --from=build-env /app/out .
+RUN apk add --no-cache curl
 ENTRYPOINT ["dotnet", "chatgpt-archive-server.dll"]
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=30s CMD curl --fail http://localhost:8080/health || exit 1

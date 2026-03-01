@@ -81,9 +81,11 @@ builder.Services.AddSingleton<AssetsCache>();
 builder.Services.AddSingleton<CompositeAssetLocatorFactory>();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
+app.MapHealthChecks("/health");
 // Validate that at least one source directory is configured
 var options = app.Services.GetRequiredService<ArchiveSourcesOptions>();
 if (options.SourceDirectories.Count == 0)
