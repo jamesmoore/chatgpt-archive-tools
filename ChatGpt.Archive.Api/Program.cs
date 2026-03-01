@@ -75,7 +75,7 @@ builder.Services.AddSingleton<IArchiveRepository, ArchiveRepository>();
 builder.Services.AddSingleton<IConversationsService, ConversationsService>();
 builder.Services.AddSingleton<ApiAssetLocatorFactory>();
 builder.Services.AddSingleton<IFileSystemAssetLocator>(sp => sp.GetRequiredService<ApiAssetLocatorFactory>().Create());
-builder.Services.AddSingleton<IMarkdownAssetRenderer, AbsolutePathMarkdownAssetRenderer>();
+builder.Services.AddSingleton<IMarkdownAssetRenderer>(new MarkdownAssetRenderer("/asset"));
 builder.Services.AddSingleton<ConversationFormatterFactory>();
 builder.Services.AddSingleton<AssetsCache>();
 builder.Services.AddSingleton<CompositeAssetLocatorFactory>();

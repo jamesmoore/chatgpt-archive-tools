@@ -21,7 +21,7 @@ namespace ChatGpt.Archive.Api.Services
             var firstFileFromEachGroup = grouped.Select(p => p.First());
             var conversationAssets = firstFileFromEachGroup.Select(ConversationAssets.FromConversationsFile);
             var compositeAssetLocator = compositeAssetLocatorFactory.GetAssetLocator(conversationAssets);
-            return new ApiAssetLocator(compositeAssetLocator);
+            return compositeAssetLocator;
         }
     }
 }
