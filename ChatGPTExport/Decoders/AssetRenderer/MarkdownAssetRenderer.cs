@@ -2,13 +2,13 @@
 
 namespace ChatGPTExport.Decoders.AssetRenderer
 {
-    public class RelativePathMarkdownAssetRenderer : IMarkdownAssetRenderer
+    public class MarkdownAssetRenderer(string prefix) : IMarkdownAssetRenderer
     {
         public string RenderAsset(FileSystemAsset? asset, string asset_pointer)
         {
             if (asset != null)
             {
-                var markdownPath = "./" + string.Join("/", asset.PathSegments.Select(Uri.EscapeDataString));
+                var markdownPath = prefix + "/" + string.Join("/", asset.PathSegments.Select(Uri.EscapeDataString));
                 return $"![{asset.PathSegments.Last()}]({markdownPath})  ";
             }
             else

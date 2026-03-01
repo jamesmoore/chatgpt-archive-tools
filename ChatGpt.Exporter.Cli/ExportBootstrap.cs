@@ -41,7 +41,7 @@ namespace ChatGpt.Exporter.Cli
             var mostRecentConversationFiles = fileConversationsMap.GetMostRecentlyUpdatedConversationsFilesPerDirectory();
             var conversationAssetsList = mostRecentConversationFiles.Select(p => ConversationAssets.FromConversationsFile(p.File)).ToList();
             var assetLocator = exportAssetLocatorFactory.GetAssetLocator(conversationAssetsList);
-            var assetRenderer = new RelativePathMarkdownAssetRenderer();
+            var assetRenderer = new MarkdownAssetRenderer(".");
 
             var markdownContentVisitor = new MarkdownContentVisitor(assetLocator, assetRenderer);
 
