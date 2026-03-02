@@ -1,5 +1,6 @@
 ﻿using ChatGPTExport.Models;
 using ChatGPTExport.Validators;
+using System.IO;
 using System.IO.Abstractions;
 using System.Text.Json;
 
@@ -41,7 +42,15 @@ namespace ChatGPTExport
 
         private async Task<Conversations> GetConversationsForFileAsync(IFileInfo sourceFile)
         {
-            await using var conversationsJsonStream = sourceFile.FileSystem.File.OpenRead(sourceFile.FullName);
+            await using var conversationsJsonStream = sourceFile.FileSystem.File.Open(
+                sourceFile.FullName,
+                new FileStreamOptions()
+                {
+                    Mode = FileMode.Open,
+                    Access = FileAccess.Read,
+                    Share = FileShare.Read,
+                    Options = FileOptions.Asynchronous | FileOptions.SequentialScan
+                });
 
             var conversations = await JsonSerializer.DeserializeAsync<Conversations>(conversationsJsonStream, options);
 
