@@ -24,9 +24,9 @@ namespace ChatGpt.Archive.Api.Controllers
         }
 
         [HttpPost("cache")]    // POST /manage/cache (to rebuild/reload)
-        public IActionResult RebuildCache()
+        public async Task<IActionResult> RebuildCache()
         {
-            conversationsService.LoadConversations();
+            await conversationsService.LoadConversationsAsync();
             return Ok();
         }
 

@@ -21,12 +21,12 @@ namespace ChatGPTExport
             AllowOutOfOrderMetadataProperties = true,
         };
 
-        public ConversationParseResult GetConversations(IFileInfo p)
+        public async Task<ConversationParseResult> GetConversationsAsync(IFileInfo p)
         {
             try
             {
                 Console.WriteLine($"Loading conversation " + p.FullName);
-                return new ConversationParseResult(ConversationParseStatus.Success, this.GetConversationsForFile(p));
+                return new ConversationParseResult(ConversationParseStatus.Success, await this.GetConversationsForFileAsync(p));
             }
             catch (ValidationException)
             {
@@ -39,11 +39,11 @@ namespace ChatGPTExport
             }
         }
 
-        private Conversations GetConversationsForFile(IFileInfo sourceFile)
+        private async Task<Conversations> GetConversationsForFileAsync(IFileInfo sourceFile)
         {
-            var conversationsJsonStream = sourceFile.FileSystem.File.OpenRead(sourceFile.FullName);
+            await using var conversationsJsonStream = sourceFile.FileSystem.File.OpenRead(sourceFile.FullName);
 
-            var conversations = JsonSerializer.Deserialize<Conversations>(conversationsJsonStream, options);
+            var conversations = await JsonSerializer.DeserializeAsync<Conversations>(conversationsJsonStream, options);
 
             if (conversations == null)
             {

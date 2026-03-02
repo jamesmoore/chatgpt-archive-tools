@@ -2,24 +2,24 @@
 {
     public class ParsedConversationDirectoryFactory(ConversationsParser conversationsParser)
     {
-        public ParsedConversationDirectories Create(IEnumerable<ConversationExportDirectory> conversationExportDirectories)
+        public async Task<ParsedConversationDirectories> CreateAsync(IEnumerable<ConversationExportDirectory> conversationExportDirectories)
         {
-            var parsedDirectories = conversationExportDirectories.Select(Create).ToList();
+            var parsedDirectories = await Task.WhenAll(conversationExportDirectories.Select(CreateAsync));
             return new ParsedConversationDirectories(parsedDirectories);
         }
 
-        private ParsedConversationDirectory Create(ConversationExportDirectory conversationExportDirectory)
+        private async Task<ParsedConversationDirectory> CreateAsync(ConversationExportDirectory conversationExportDirectory)
         {
-            var parsedFiles = conversationExportDirectory.ConversationFiles.Select(file =>
+            var parsedFiles = await Task.WhenAll(conversationExportDirectory.ConversationFiles.Select(async file =>
             {
-                var parseResult = conversationsParser.GetConversations(file);
+                var parseResult = await conversationsParser.GetConversationsAsync(file);
                 return new ParsedConversationFile
                 {
                     File = file,
                     Conversations = parseResult.Conversations,
                     ParseStatus = parseResult.Status,
                 };
-            }).ToList();
+            }));
             return new ParsedConversationDirectory
             {
                 DirectoryInfo = conversationExportDirectory.DirectoryInfo,

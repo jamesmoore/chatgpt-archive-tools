@@ -121,7 +121,7 @@ var rootCommand = new RootCommand("ChatGPT export reformatter")
     showHiddenOption,
 };
 
-rootCommand.SetAction(parseResult =>
+rootCommand.SetAction(async (parseResult, cancellationToken) =>
 {
     try
     {
@@ -182,13 +182,13 @@ rootCommand.SetAction(parseResult =>
 
         var parsedConversationDirectoryFactory = new ParsedConversationDirectoryFactory(new ConversationsParser(validators));
 
-        var result = new ExportBootstrap(
+        var result = await new ExportBootstrap(
             parsedConversationDirectoryFactory,
             new CompositeAssetLocatorFactory(),
             conversationExporter,
             exportTypes,
             showHidden
-            ).RunExport(conversationFiles, destination);
+            ).RunExportAsync(conversationFiles, destination);
         return result;
     }
     catch (Exception ex)
@@ -203,5 +203,5 @@ rootCommand.SetAction(parseResult =>
 });
 
 var parseResult = rootCommand.Parse(args);
-return parseResult.Invoke();
+return await parseResult.InvokeAsync();
 
