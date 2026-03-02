@@ -18,15 +18,20 @@ namespace ChatGpt.Archive.Api.Services
         ConversationFormatterFactory conversationFormatterFactory,
         AssetsCache assetsCache) : IConversationsService
     {
-        private readonly Lock _loadLock = new();
+        private readonly SemaphoreSlim _loadLock = new(1, 1);
 
-        public void LoadConversations()
+        public async Task LoadConversationsAsync()
         {
-            lock (_loadLock)
+            await _loadLock.WaitAsync();
+            try
             {
                 // Import conversations from source
-                var conversations = GetConversationsFromSource();
+                var conversations = await GetConversationsFromSourceAsync();
                 archiveRepository.InsertConversations(conversations);
+            }
+            finally
+            {
+                _loadLock.Release();
             }
         }
 
@@ -35,13 +40,13 @@ namespace ChatGpt.Archive.Api.Services
             return archiveRepository.GetAll();
         }
 
-        private IEnumerable<Conversation> GetConversationsFromSource()
+        private async Task<IEnumerable<Conversation>> GetConversationsFromSourceAsync()
         {
             var directories = options.SourceDirectories.Select(fileSystem.DirectoryInfo.New);
             var conversationFiles = conversationFinder.GetConversationFiles(directories);
             var conversationsParser = new ConversationsParser([]);
             var factory = new ParsedConversationDirectoryFactory(conversationsParser);
-            var parsedDirectories = factory.Create(conversationFiles);
+            var parsedDirectories = await factory.CreateAsync(conversationFiles);
             var latestConversations = parsedDirectories.GetLatestConversations();
             return latestConversations;
         }

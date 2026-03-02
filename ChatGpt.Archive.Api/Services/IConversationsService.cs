@@ -10,6 +10,6 @@ namespace ChatGpt.Archive.Api.Services
         IEnumerable<ConsolidatedSearchResult> Search(string query);
         string? GetContent(string conversationId, ExportType exportType);
         void ClearAll();
-        void LoadConversations();
+        Task LoadConversationsAsync();
     }
 }

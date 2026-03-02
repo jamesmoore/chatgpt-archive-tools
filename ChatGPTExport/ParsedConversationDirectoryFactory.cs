@@ -1,25 +1,37 @@
-﻿namespace ChatGPTExport
+namespace ChatGPTExport
 {
     public class ParsedConversationDirectoryFactory(ConversationsParser conversationsParser)
     {
-        public ParsedConversationDirectories Create(IEnumerable<ConversationExportDirectory> conversationExportDirectories)
+        public async Task<ParsedConversationDirectories> CreateAsync(IEnumerable<ConversationExportDirectory> conversationExportDirectories)
         {
-            var parsedDirectories = conversationExportDirectories.Select(Create).ToList();
+            var parsedDirectories = new List<ParsedConversationDirectory>();
+            foreach (var conversationExportDirectory in conversationExportDirectories)
+            {
+                var item = await CreateAsync(conversationExportDirectory);
+                foreach (var existing in parsedDirectories)
+                {
+                    existing.RemoveSuperseded(item);
+                }
+                parsedDirectories.Add(item);
+            }
+
             return new ParsedConversationDirectories(parsedDirectories);
         }
 
-        private ParsedConversationDirectory Create(ConversationExportDirectory conversationExportDirectory)
+        private async Task<ParsedConversationDirectory> CreateAsync(ConversationExportDirectory conversationExportDirectory)
         {
-            var parsedFiles = conversationExportDirectory.ConversationFiles.Select(file =>
+            var parsedFiles = new List<ParsedConversationFile>();
+            foreach (var file in conversationExportDirectory.ConversationFiles)
             {
-                var parseResult = conversationsParser.GetConversations(file);
-                return new ParsedConversationFile
+                var parseResult = await conversationsParser.GetConversationsAsync(file);
+                parsedFiles.Add(new ParsedConversationFile
                 {
                     File = file,
                     Conversations = parseResult.Conversations,
                     ParseStatus = parseResult.Status,
-                };
-            }).ToList();
+                });
+            }
+
             return new ParsedConversationDirectory
             {
                 DirectoryInfo = conversationExportDirectory.DirectoryInfo,

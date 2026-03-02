@@ -13,9 +13,9 @@ namespace ChatGpt.Exporter.Cli
         IEnumerable<ExportType> exportTypes,
         bool showHidden)
     {
-        public int RunExport(IEnumerable<ConversationExportDirectory> conversationExportDirectories, IDirectoryInfo destination)
+        public async Task<int> RunExportAsync(IEnumerable<ConversationExportDirectory> conversationExportDirectories, IDirectoryInfo destination)
         {
-            var fileConversationsMap = factory.Create(conversationExportDirectories);
+            var fileConversationsMap = await factory.CreateAsync(conversationExportDirectories);
 
             var failedValidation = fileConversationsMap.GetFilesWithStatus(ConversationParseStatus.ValidationFail).ToList();
             if (failedValidation.Count != 0)
