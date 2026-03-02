@@ -5,7 +5,7 @@ namespace ChatGPTExport.Models
 {
     public class Conversations : List<Conversation>
     {
-        public DateTimeOffset GetUpdateTime() => this.Max(p => p.GetUpdateTime());
+        public DateTimeOffset GetUpdateTime() => this.Any() ? this.Max(p => p.GetUpdateTime()) : DateTimeOffset.MinValue;
     }
 
     public class Conversation
