@@ -13,12 +13,13 @@ namespace ChatGpt.Archive.Api.Services
         IArchiveRepository archiveRepository,
         ConversationFinder conversationFinder,
         ArchiveSourcesOptions options,
-        IFileSystemAssetLocator assetLocator,
+        IApiAssetLocatorFactory apiAssetLocatorFactory,
         IMarkdownAssetRenderer markdownAssetRenderer,
         ConversationFormatterFactory conversationFormatterFactory,
         AssetsCache assetsCache) : IConversationsService
     {
         private readonly SemaphoreSlim _loadLock = new(1, 1);
+        private volatile IFileSystemAssetLocator _assetLocator = apiAssetLocatorFactory.Create();
 
         public async Task LoadConversationsAsync()
         {
@@ -28,6 +29,7 @@ namespace ChatGpt.Archive.Api.Services
                 // Import conversations from source
                 var conversations = await GetConversationsFromSourceAsync();
                 archiveRepository.InsertConversations(conversations);
+                _assetLocator = apiAssetLocatorFactory.Create();
             }
             finally
             {
@@ -78,7 +80,8 @@ namespace ChatGpt.Archive.Api.Services
 
         public string? GetContent(string conversationId, ExportType exportType)
         {
-            var markdownContentVisitor = new MarkdownContentVisitor(assetLocator, markdownAssetRenderer);
+            var locator = _assetLocator;
+            var markdownContentVisitor = new MarkdownContentVisitor(locator, markdownAssetRenderer);
             var formatter = conversationFormatterFactory.GetFormatters([exportType], markdownContentVisitor);
             var conversation = GetConversation(conversationId);
             if (conversation == null)
