@@ -8,7 +8,7 @@ namespace ChatGpt.Archive.Api.Services
         ArchiveSourcesOptions options,
         IFileSystem fileSystem,
         ConversationFinder conversationFinder,
-        CompositeAssetLocatorFactory compositeAssetLocatorFactory)
+        CompositeAssetLocatorFactory compositeAssetLocatorFactory) : IApiAssetLocatorFactory
     {
         public IFileSystemAssetLocator Create()
         {
