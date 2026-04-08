@@ -39,6 +39,11 @@ namespace ChatGPTExport
 
                 exporters.Add(new HtmlFormatter(new TailwindHtmlFormatter(), headerProvider, markdownContentVisitor));
             }
+            if (exportTypes.Contains(ExportType.HtmlBody))
+            {
+                var headerProvider = new CompositeHeaderProvider([]);
+                exporters.Add(new HtmlFormatter(new HtmlBodyFormatter(), headerProvider, markdownContentVisitor));
+            }
             if (exportTypes.Contains(ExportType.Text))
             {
                 exporters.Add(new PlaintextFormatter(markdownContentVisitor));
