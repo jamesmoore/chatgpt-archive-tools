@@ -13,6 +13,13 @@
   }
 }
 
+@layer utilities {
+  .prose h1 {
+    font-size: var(--text-2xl);
+    font-weight: 600;
+  }
+}
+
 /* Scrollbars */
 @layer base {
   :root {
