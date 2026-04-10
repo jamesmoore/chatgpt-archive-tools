@@ -14,7 +14,7 @@
 }
 
 @layer utilities {
-  .prose h1 {
+  .prose :where(h1):not(:where([class~=not-prose], [class~=not-prose] *)) {
     font-size: var(--text-2xl);
     font-weight: 600;
   }
