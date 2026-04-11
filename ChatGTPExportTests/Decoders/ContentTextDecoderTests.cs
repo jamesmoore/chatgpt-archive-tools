@@ -272,6 +272,6 @@ public class ContentTextDecoderTests
         var result = decoder.Decode(content, context);
 
         var line = Assert.Single(result.Lines);
-        Assert.Equal($"First line{Environment.NewLine}Second line", line);
+        Assert.Equal($"First line{Environment.NewLine}Second line", line.MarkdownContent);
     }
 }
