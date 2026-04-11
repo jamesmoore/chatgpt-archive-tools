@@ -29,7 +29,8 @@ namespace ChatGPTExport.Formatters.Markdown
                         {
                             var authorname = string.IsNullOrWhiteSpace(message.author.name) ? "" : $" ({message.author.name})";
                             strings.Add($"**{message.author.role}{authorname}{visitResult.Suffix}**:  "); // double space for line break
-                            strings.Add(visitResult.ToMarkdown(Environment.NewLine));
+
+                            strings.Add(FormatMarkdownLines(visitResult.Lines));
                             strings.Add(Environment.NewLine);
                         }
                         assets.AddRange(visitResult.Assets);
@@ -56,6 +57,23 @@ namespace ChatGPTExport.Formatters.Markdown
                 "title: " + conversation.title,
                 "---",
             ];
+        }
+
+        private static string FormatMarkdownLines(IEnumerable<MarkdownContentLine> lines)
+        {
+            var formattedLines = new List<string>();
+
+            foreach (var line in lines)
+            {
+                if (line.Modifier == MarkdownModifier.Writing)
+                {
+                    formattedLines.Add("*Writing:*  ");
+                }
+
+                formattedLines.Add(line.MarkdownContent);
+            }
+
+            return string.Join(Environment.NewLine, formattedLines);
         }
     }
 }
