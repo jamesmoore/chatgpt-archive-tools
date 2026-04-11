@@ -83,12 +83,9 @@ namespace ChatGPTExport.Decoders
                 }
             }
 
-            for (var i = 0; i < parts.Count; i++)
-            {
-                parts[i] = UnwrapWritingBlock(parts[i]);
-            }
+            var markdownContent = parts.Select(UnwrapWritingBlock).ToList(); 
 
-            return MarkdownContentResult.FromLines(parts);
+            return MarkdownContentResult.FromLines(markdownContent);
         }
 
         /// <summary>
@@ -178,11 +175,11 @@ namespace ChatGPTExport.Decoders
                 ;
         }
 
-        private string UnwrapWritingBlock(string text)
+        private MarkdownContentLine UnwrapWritingBlock(string text)
         {
             if (text.StartsWith(":::writing") == false || text.EndsWith(":::") == false)
             {
-                return text;
+                return new MarkdownContentLine(text);
             }
 
             var lines = text.Split(["\r\n", "\n"], StringSplitOptions.None);
@@ -191,7 +188,7 @@ namespace ChatGPTExport.Decoders
                 return string.Empty;
             }
 
-            return string.Join(LineBreak, lines[1..^1]);
+            return new MarkdownContentLine(string.Join(LineBreak, lines[1..^1]), MarkdownModifier.Writing);
         }
 
 

@@ -13,6 +13,9 @@ namespace ChatGPTExport.Decoders
         public static MarkdownContentResult FromLines(IEnumerable<string> lines, string? suffix = null) 
             => new(lines.Select(line => (MarkdownContentLine)line), [], suffix);
 
+        public static MarkdownContentResult FromLines(IEnumerable<MarkdownContentLine> lines)
+            => new(lines, []);
+
         public string ToMarkdown(string lineBreak)
             => string.Join(lineBreak, Lines.Select(p => p.MarkdownContent));
     }
