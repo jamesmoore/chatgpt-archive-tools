@@ -38,7 +38,7 @@ namespace ChatGPTExport.Exporters.Html
                     {
                         if (message.author != null && visitResult.Lines.Any() && message.id != null)
                         {
-                            strings.Add((message.id, message.author, visitResult.ToMarkdown(Environment.NewLine), visitResult.Lines.Any(p => p.HasImage)));
+                            strings.Add((message.id, message.author, visitResult.ToMarkdown(Environment.NewLine), visitResult.Lines.Any(p => p.Modifier == MarkdownModifier.Image)));
                         }
                         assets.AddRange(visitResult.Assets);
                     }

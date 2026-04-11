@@ -18,7 +18,7 @@ namespace ChatGPTExport.Decoders
                 {
                     var mediaAssets = GetMarkdownMediaAsset(context, part.ObjectValue);
                     var hasImage = part.ObjectValue.content_type == ImageAssetPointer;
-                    markdownContent.AddRange(mediaAssets.MarkdownLines.Select(p => new MarkdownContentLine(p, hasImage)));
+                    markdownContent.AddRange(mediaAssets.MarkdownLines.Select(p => new MarkdownContentLine(p, hasImage ? MarkdownModifier.Image : MarkdownModifier.None)));
                     if (mediaAssets.MarkdownAsset != null)
                     {
                         markdownAssets.Add(mediaAssets.MarkdownAsset);

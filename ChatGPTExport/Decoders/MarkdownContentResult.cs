@@ -17,8 +17,15 @@ namespace ChatGPTExport.Decoders
             => string.Join(lineBreak, Lines.Select(p => p.MarkdownContent));
     }
 
-    public record MarkdownContentLine(string MarkdownContent, bool HasImage = false)
+    public record MarkdownContentLine(string MarkdownContent, MarkdownModifier Modifier = MarkdownModifier.None)
     {
         public static implicit operator MarkdownContentLine(string MarkdownContent) => new(MarkdownContent);
+    }
+
+    public enum MarkdownModifier
+    {
+        None = 0,
+        Image = 1,
+        Writing = 2,
     }
 }
