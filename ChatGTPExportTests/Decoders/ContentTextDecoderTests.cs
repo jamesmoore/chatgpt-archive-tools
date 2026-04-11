@@ -261,4 +261,17 @@ public class ContentTextDecoderTests
         Assert.NotEmpty(result.Lines);
         Assert.Contains("Personalized context content", string.Join("\n", result.Lines));
     }
+
+    [Fact]
+    public void WritingBlocks_AreUnwrapped()
+    {
+        var decoder = CreateDecoder();
+        var content = new ContentText { parts = [":::writing\nFirst line\nSecond line\n:::"] };
+        var context = CreateContext("assistant");
+
+        var result = decoder.Decode(content, context);
+
+        var line = Assert.Single(result.Lines);
+        Assert.Equal($"First line{Environment.NewLine}Second line", line);
+    }
 }
