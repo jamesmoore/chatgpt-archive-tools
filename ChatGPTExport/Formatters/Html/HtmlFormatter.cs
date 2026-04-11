@@ -17,7 +17,6 @@ namespace ChatGPTExport.Exporters.Html
         IContentVisitor<MarkdownContentResult> markdownContentVisitor
         ) : IConversationFormatter
     {
-        private readonly string LineBreak = Environment.NewLine;
         private readonly MarkdownPipeline MarkdownPipeline = CreatePipeline(formatter);
         private readonly IFormattedConversationAsset CssAsset = new EmbeddedResourceAsset("/styles/tailwindcompiled.css", "ChatGPTExport.Formatters.Html.Templates.Styles.tailwindcompiled.css", "text/css");
 
@@ -39,7 +38,7 @@ namespace ChatGPTExport.Exporters.Html
                     {
                         if (message.author != null && visitResult.Lines.Any() && message.id != null)
                         {
-                            strings.Add((message.id, message.author, string.Join(LineBreak, visitResult.Lines), visitResult.HasImage));
+                            strings.Add((message.id, message.author, visitResult.ToMarkdown(Environment.NewLine), visitResult.Lines.Any(p => p.HasImage)));
                         }
                         assets.AddRange(visitResult.Assets);
                     }

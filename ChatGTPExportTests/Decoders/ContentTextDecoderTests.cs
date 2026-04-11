@@ -89,7 +89,7 @@ public class ContentTextDecoderTests
 
         var lines = result.Lines.ToArray();
         // Verify that zero-index references are inserted at the beginning
-        Assert.Contains("[^1]", lines[0]);
+        Assert.Contains("[^1]", lines[0].MarkdownContent);
         // Verify that footnotes are generated
         Assert.Contains("[^1]: [Zero Index Source](https://example.com/zero)", string.Join("\n", lines));
         Assert.Contains("[^2]: [Body Source](https://example.com/body)", string.Join("\n", lines));
@@ -216,8 +216,8 @@ public class ContentTextDecoderTests
         Assert.Contains("[^2]: [Second Source](https://example.com/second)", output);
 
         // Verify the references in the text use the same numbers
-        Assert.Contains("[^1]", lines[0]);
-        Assert.Contains("[^2]", lines[0]);
+        Assert.Contains("[^1]", lines[0].MarkdownContent);
+        Assert.Contains("[^2]", lines[0].MarkdownContent);
 
         // Verify no gaps in numbering
         Assert.DoesNotContain("[^3]", output);

@@ -17,7 +17,7 @@ namespace ChatGPTExport.Formatters.Plaintext
 
                 if (message.author != null && visitResult != null && visitResult.Lines.Any())
                 {
-                    var markdown = string.Join(LineBreak, visitResult.Lines);
+                    var markdown = visitResult.ToMarkdown(LineBreak);
 
                     // Convert markdown to plaintext
                     var plaintext = Markdig.Markdown.ToPlainText(markdown);

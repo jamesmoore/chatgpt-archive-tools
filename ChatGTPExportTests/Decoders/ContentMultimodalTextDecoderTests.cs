@@ -59,9 +59,10 @@ public class ContentMultimodalTextDecoderTests
 
         var output = result.Lines.ToArray();
         Assert.Contains("Intro", output);
-        Assert.Contains("![asset](asset://image)", output);
-        Assert.Contains("*Generated Title*  ", output);
-        Assert.Contains("**Size:** 123 **Dims:** 640x480  ", output);
-        Assert.True(result.HasImage);
+        var textLines = output.Select(p => p.MarkdownContent).ToList();
+        Assert.Contains("![asset](asset://image)", textLines);
+        Assert.Contains("*Generated Title*  ", textLines);
+        Assert.Contains("**Size:** 123 **Dims:** 640x480  ", textLines);
+        Assert.Contains(result.Lines, p => p.HasImage);
     }
 }

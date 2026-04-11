@@ -7,8 +7,6 @@ namespace ChatGPTExport.Formatters.Markdown
 {
     internal class MarkdownFormatter(IContentVisitor<MarkdownContentResult> markdownContentVisitor) : IConversationFormatter
     {
-        private readonly string LineBreak = Environment.NewLine;
-
         public FormattedConversation Format(Conversation conversation, string pathPrefix, bool showHidden)
         {
             var messages = conversation.GetMessagesWithContent();
@@ -31,8 +29,8 @@ namespace ChatGPTExport.Formatters.Markdown
                         {
                             var authorname = string.IsNullOrWhiteSpace(message.author.name) ? "" : $" ({message.author.name})";
                             strings.Add($"**{message.author.role}{authorname}{visitResult.Suffix}**:  "); // double space for line break
-                            strings.Add(string.Join(LineBreak, visitResult.Lines));
-                            strings.Add(LineBreak);
+                            strings.Add(visitResult.ToMarkdown(Environment.NewLine));
+                            strings.Add(Environment.NewLine);
                         }
                         assets.AddRange(visitResult.Assets);
                     }

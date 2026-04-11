@@ -10,28 +10,26 @@ namespace ChatGPTExport.Decoders
 
         public MarkdownContentResult Decode(ContentMultimodalText content, MessageContext context)
         {
-            var markdownContent = new List<string>();
+            var markdownContent = new List<MarkdownContentLine>();
             var markdownAssets = new List<FileSystemAsset>();
-            bool hasImage = false;
             foreach (var part in content.parts ?? [])
             {
                 if (part.IsObject && part.ObjectValue != null)
                 {
                     var mediaAssets = GetMarkdownMediaAsset(context, part.ObjectValue);
-                    markdownContent.AddRange(mediaAssets.MarkdownLines);
+                    var hasImage = part.ObjectValue.content_type == ImageAssetPointer;
+                    markdownContent.AddRange(mediaAssets.MarkdownLines.Select(p => new MarkdownContentLine(p, hasImage)));
                     if (mediaAssets.MarkdownAsset != null)
                     {
                         markdownAssets.Add(mediaAssets.MarkdownAsset);
                     }
-                    hasImage = hasImage || part.ObjectValue.content_type == ImageAssetPointer;
                 }
                 else if (part.IsString && part.StringValue != null)
                 {
                     markdownContent.Add(part.StringValue);
                 }
             }
-            return new MarkdownContentResult(markdownContent, markdownAssets, null, hasImage);
-
+            return new MarkdownContentResult(markdownContent, markdownAssets);
         }
 
         private (IEnumerable<string> MarkdownLines, FileSystemAsset? MarkdownAsset) GetMarkdownMediaAsset(MessageContext context, ContentMultimodalText.ContentMultimodalTextParts obj)
