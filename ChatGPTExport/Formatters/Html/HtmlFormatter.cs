@@ -20,11 +20,19 @@ namespace ChatGPTExport.Exporters.Html
         private readonly MarkdownPipeline MarkdownPipeline = CreatePipeline(formatter);
         private readonly IFormattedConversationAsset CssAsset = new EmbeddedResourceAsset("/styles/tailwindcompiled.css", "ChatGPTExport.Formatters.Html.Templates.Styles.tailwindcompiled.css", "text/css");
 
+        private record struct MessageRenderInfo(
+            string MessageId,
+            Author Author,
+            string Content,
+            bool HasImage,
+            bool HasWriting
+            );
+
         public FormattedConversation Format(Conversation conversation, string pathPrefix, bool showHidden)
         {
             var messages = conversation.GetMessagesWithContent();
 
-            var strings = new List<NewStruct>();
+            var strings = new List<MessageRenderInfo>();
             var assets = new List<IFormattedConversationAsset>();
             ConversationContext conversationContext = new();
 
@@ -38,7 +46,7 @@ namespace ChatGPTExport.Exporters.Html
                     {
                         if (message.author != null && visitResult.Lines.Any() && message.id != null)
                         {
-                            strings.Add(new NewStruct(
+                            strings.Add(new MessageRenderInfo(
                                 message.id, 
                                 message.author, 
                                 visitResult.ToMarkdown(Environment.NewLine), 
@@ -100,10 +108,10 @@ namespace ChatGPTExport.Exporters.Html
             return (codeBlockRegex.Count > 0, languages);
         }
 
-        private HtmlFragment GetHtmlFragment(NewStruct newStruct)
+        private HtmlFragment GetHtmlFragment(MessageRenderInfo messageRenderInfo)
         {
             var hasMath = false;
-            var markdown = newStruct.Content;
+            var markdown = messageRenderInfo.Content;
 
             if (markdown.Contains(@"\(") && markdown.Contains(@"\)") ||
                 markdown.Contains(@"\[") && markdown.Contains(@"\]"))
@@ -113,19 +121,19 @@ namespace ChatGPTExport.Exporters.Html
                 markdown = escaped;
             }
 
-            var id = $"<a id=\"msg-{WebUtility.HtmlEncode(newStruct.MessageId)}\"></a>";
+            var id = $"<a id=\"msg-{WebUtility.HtmlEncode(messageRenderInfo.MessageId)}\"></a>";
 
             var html = id + Environment.NewLine + Markdown.ToHtml(markdown, MarkdownPipeline);
 
             var (HasCode, Languages) = GetLanguages(markdown);
 
             var fragment = new HtmlFragment(
-                newStruct.Author.role == "user",
+                messageRenderInfo.Author.role == "user",
                 html,
                 HasCode,
                 hasMath,
-                newStruct.HasImage,
-                newStruct.HasWriting,
+                messageRenderInfo.HasImage,
+                messageRenderInfo.HasWriting,
                 Languages);
             return fragment;
         }
@@ -163,12 +171,4 @@ namespace ChatGPTExport.Exporters.Html
             return pipelineBuilder;
         }
     }
-
-    internal record struct NewStruct(
-        string MessageId,
-        Author Author,
-        string Content,
-        bool HasImage,
-        bool HasWriting
-        );
 }
