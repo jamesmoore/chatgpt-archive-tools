@@ -24,7 +24,7 @@ namespace ChatGPTExport.Exporters.Html
         {
             var messages = conversation.GetMessagesWithContent();
 
-            var strings = new List<(string MessageId, Author Author, string Content, bool HasImage)>();
+            var strings = new List<NewStruct>();
             var assets = new List<IFormattedConversationAsset>();
             ConversationContext conversationContext = new();
 
@@ -38,7 +38,13 @@ namespace ChatGPTExport.Exporters.Html
                     {
                         if (message.author != null && visitResult.Lines.Any() && message.id != null)
                         {
-                            strings.Add((message.id, message.author, visitResult.ToMarkdown(Environment.NewLine), visitResult.Lines.Any(p => p.Modifier == MarkdownModifier.Image)));
+                            strings.Add(new NewStruct(
+                                message.id, 
+                                message.author, 
+                                visitResult.ToMarkdown(Environment.NewLine), 
+                                visitResult.Lines.Any(p => p.Modifier == MarkdownModifier.Image),
+                                visitResult.Lines.Any(p => p.Modifier == MarkdownModifier.Writing)
+                                ));
                         }
                         assets.AddRange(visitResult.Assets);
                     }
@@ -49,7 +55,7 @@ namespace ChatGPTExport.Exporters.Html
                 }
             }
 
-            var htmlFragments = strings.Select(p => GetHtmlFragment(p.MessageId, p.Author, p.Content, p.HasImage, MarkdownPipeline)).ToList();
+            var htmlFragments = strings.Select(p => GetHtmlFragment(p)).ToList();
 
             var titleString = WebUtility.HtmlEncode(conversation.title ?? "No title");
 
@@ -94,9 +100,10 @@ namespace ChatGPTExport.Exporters.Html
             return (codeBlockRegex.Count > 0, languages);
         }
 
-        private HtmlFragment GetHtmlFragment(string messageId, Author author, string markdown, bool hasImage, MarkdownPipeline markdownPipeline)
+        private HtmlFragment GetHtmlFragment(NewStruct newStruct)
         {
             var hasMath = false;
+            var markdown = newStruct.Content;
 
             if (markdown.Contains(@"\(") && markdown.Contains(@"\)") ||
                 markdown.Contains(@"\[") && markdown.Contains(@"\]"))
@@ -106,18 +113,19 @@ namespace ChatGPTExport.Exporters.Html
                 markdown = escaped;
             }
 
-            var id = $"<a id=\"msg-{WebUtility.HtmlEncode(messageId)}\"></a>";
+            var id = $"<a id=\"msg-{WebUtility.HtmlEncode(newStruct.MessageId)}\"></a>";
 
-            var html = id + Environment.NewLine + Markdown.ToHtml(markdown, markdownPipeline);
+            var html = id + Environment.NewLine + Markdown.ToHtml(markdown, MarkdownPipeline);
 
             var (HasCode, Languages) = GetLanguages(markdown);
 
             var fragment = new HtmlFragment(
-                author.role == "user",
+                newStruct.Author.role == "user",
                 html,
                 HasCode,
                 hasMath,
-                hasImage,
+                newStruct.HasImage,
+                newStruct.HasWriting,
                 Languages);
             return fragment;
         }
@@ -155,4 +163,12 @@ namespace ChatGPTExport.Exporters.Html
             return pipelineBuilder;
         }
     }
+
+    internal record struct NewStruct(
+        string MessageId,
+        Author Author,
+        string Content,
+        bool HasImage,
+        bool HasWriting
+        );
 }

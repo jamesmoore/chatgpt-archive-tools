@@ -1,4 +1,6 @@
-﻿namespace ChatGPTExport.Formatters.Html
+﻿using System.Numerics;
+
+namespace ChatGPTExport.Formatters.Html
 {
 
     public record HtmlPage(
@@ -13,5 +15,6 @@
         bool HasCode,
         bool HasMath,
         bool HasImage,
+        bool IsWriting,
         IReadOnlyCollection<string> Languages);
 }
