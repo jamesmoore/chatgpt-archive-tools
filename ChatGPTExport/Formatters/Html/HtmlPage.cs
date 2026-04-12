@@ -1,6 +1,4 @@
-﻿using System.Numerics;
-
-namespace ChatGPTExport.Formatters.Html
+﻿namespace ChatGPTExport.Formatters.Html
 {
 
     public record HtmlPage(
