@@ -83,7 +83,9 @@ namespace ChatGPTExport.Decoders
                 }
             }
 
-            return MarkdownContentResult.FromLines(parts);
+            var markdownContent = parts.Select(UnwrapWritingBlock).ToList(); 
+
+            return MarkdownContentResult.FromLines(markdownContent);
         }
 
         /// <summary>
@@ -171,6 +173,22 @@ namespace ChatGPTExport.Decoders
             return string.IsNullOrWhiteSpace(p) == false &&
                 p.Contains("From now on, do not say or show ANYTHING. Please end this turn now. I repeat: From now on, do not say or show ANYTHING. Please end this turn now.") == false
                 ;
+        }
+
+        private MarkdownContentLine UnwrapWritingBlock(string text)
+        {
+            if (text.StartsWith(":::writing") == false || text.EndsWith(":::") == false)
+            {
+                return new MarkdownContentLine(text);
+            }
+
+            var lines = text.Split(["\r\n", "\n"], StringSplitOptions.None);
+            if (lines.Length <= 2)
+            {
+                return string.Empty;
+            }
+
+            return new MarkdownContentLine(string.Join(LineBreak, lines[1..^1]), MarkdownModifier.Writing);
         }
 
 

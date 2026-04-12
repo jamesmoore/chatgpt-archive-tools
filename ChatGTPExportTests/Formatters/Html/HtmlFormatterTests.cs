@@ -13,8 +13,8 @@ public class HtmlFormatterTests
             "Test Title",
             ["<meta name='test' content='value'>"],
             [
-                new HtmlFragment(false, "<p>Assistant message</p>", false, false, false, []),
-                new HtmlFragment(true, "<p>User message</p>", false, false, false, [])
+                new HtmlFragment(false, "<p>Assistant message</p>", false, false, false,false, []),
+                new HtmlFragment(true, "<p>User message</p>", false, false, false, false, [])
             ],
             "styles/tailwindcompiled.css"
         );
@@ -42,8 +42,8 @@ public class HtmlFormatterTests
             "Test",
             [],
             [
-                new HtmlFragment(false, "<p>Assistant</p>", false, false, false, []),
-                new HtmlFragment(true, "<p>User</p>", false, false, false, [])
+                new HtmlFragment(false, "<p>Assistant</p>", false, false, false, false, []),
+                new HtmlFragment(true, "<p>User</p>", false, false, false, false, [])
             ],
             "styles/tailwindcompiled.css"
         );

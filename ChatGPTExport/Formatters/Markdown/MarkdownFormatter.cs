@@ -7,8 +7,6 @@ namespace ChatGPTExport.Formatters.Markdown
 {
     internal class MarkdownFormatter(IContentVisitor<MarkdownContentResult> markdownContentVisitor) : IConversationFormatter
     {
-        private readonly string LineBreak = Environment.NewLine;
-
         public FormattedConversation Format(Conversation conversation, string pathPrefix, bool showHidden)
         {
             var messages = conversation.GetMessagesWithContent();
@@ -31,8 +29,9 @@ namespace ChatGPTExport.Formatters.Markdown
                         {
                             var authorname = string.IsNullOrWhiteSpace(message.author.name) ? "" : $" ({message.author.name})";
                             strings.Add($"**{message.author.role}{authorname}{visitResult.Suffix}**:  "); // double space for line break
-                            strings.Add(string.Join(LineBreak, visitResult.Lines));
-                            strings.Add(LineBreak);
+
+                            strings.Add(FormatMarkdownLines(visitResult.Lines));
+                            strings.Add(Environment.NewLine);
                         }
                         assets.AddRange(visitResult.Assets);
                     }
@@ -58,6 +57,23 @@ namespace ChatGPTExport.Formatters.Markdown
                 "title: " + conversation.title,
                 "---",
             ];
+        }
+
+        private static string FormatMarkdownLines(IEnumerable<MarkdownContentLine> lines)
+        {
+            var formattedLines = new List<string>();
+
+            foreach (var line in lines)
+            {
+                if (line.Modifier == MarkdownModifier.Writing)
+                {
+                    formattedLines.Add("*Writing:*  ");
+                }
+
+                formattedLines.Add(line.MarkdownContent);
+            }
+
+            return string.Join(Environment.NewLine, formattedLines);
         }
     }
 }
