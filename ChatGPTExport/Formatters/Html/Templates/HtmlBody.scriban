@@ -24,8 +24,15 @@
   </div>
 </div>
     {{~ else ~}}
+{{~ if fragment.is_writing ~}}
+	<div class="ml-auto w-full rounded-xl bg-neutral-100 dark:bg-neutral-800 px-3 py-2 break-words">
+		<div class="text-neutral-500">Writing:</div>
 {{ fragment.html }}
+    </div>
+{{~ else ~}}
+{{ fragment.html }}
+{{~ end ~}}
     {{~ end ~}}
     {{ end }}
 </div>
-</div>
+</div> 
