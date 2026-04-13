@@ -10,6 +10,7 @@ namespace ChatGPTExport.Formatters.Html.Template
                 body = page.Body.Select(fragment => new
                 {
                     is_user = fragment.IsUser,
+                    is_writing = fragment.IsWriting,
                     html = fragment.Html,
                 }),
             };
