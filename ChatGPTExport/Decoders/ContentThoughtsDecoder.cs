@@ -20,7 +20,7 @@ namespace ChatGPTExport.Decoders
                     markdownContent.Add(thought.content + "  ");
                 }
             }
-            return MarkdownContentResult.FromLinesWithSuffix(markdownContent, " 💭");
+            return MarkdownContentResult.FromLines(markdownContent, " 💭");
         }
     }
 }

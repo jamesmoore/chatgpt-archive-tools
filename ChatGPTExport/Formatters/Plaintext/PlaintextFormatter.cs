@@ -6,8 +6,6 @@ namespace ChatGPTExport.Formatters.Plaintext
 {
     public class PlaintextFormatter(IContentVisitor<MarkdownContentResult> markdownContentVisitor) : IConversationFormatter
     {
-        private readonly string LineBreak = Environment.NewLine;
-
         public FormattedConversation Format(Conversation conversation, string pathPrefix, bool showHidden)
         {
             var messages = conversation.GetMessagesWithContent();
@@ -49,7 +47,7 @@ namespace ChatGPTExport.Formatters.Plaintext
 
                 if (message.author != null && visitResult != null && visitResult.Lines.Any())
                 {
-                    var markdown = string.Join(LineBreak, visitResult.Lines);
+                    var markdown = visitResult.ToMarkdown(Environment.NewLine);
 
                     // Convert markdown to plaintext
                     var plaintext = Markdig.Markdown.ToPlainText(markdown);

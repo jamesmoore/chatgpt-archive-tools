@@ -13,5 +13,6 @@
         bool HasCode,
         bool HasMath,
         bool HasImage,
+        bool IsWriting,
         IReadOnlyCollection<string> Languages);
 }

@@ -17,15 +17,22 @@ namespace ChatGPTExport.Exporters.Html
         IContentVisitor<MarkdownContentResult> markdownContentVisitor
         ) : IConversationFormatter
     {
-        private readonly string LineBreak = Environment.NewLine;
         private readonly MarkdownPipeline MarkdownPipeline = CreatePipeline(formatter);
         private readonly IFormattedConversationAsset CssAsset = new EmbeddedResourceAsset("/styles/tailwindcompiled.css", "ChatGPTExport.Formatters.Html.Templates.Styles.tailwindcompiled.css", "text/css");
+
+        private record struct MessageRenderInfo(
+            string MessageId,
+            Author Author,
+            string Content,
+            bool HasImage,
+            bool HasWriting
+            );
 
         public FormattedConversation Format(Conversation conversation, string pathPrefix, bool showHidden)
         {
             var messages = conversation.GetMessagesWithContent();
 
-            var strings = new List<(string MessageId, Author Author, string Content, bool HasImage)>();
+            var strings = new List<MessageRenderInfo>();
             var assets = new List<IFormattedConversationAsset>();
             ConversationContext conversationContext = new();
 
@@ -39,7 +46,13 @@ namespace ChatGPTExport.Exporters.Html
                     {
                         if (message.author != null && visitResult.Lines.Any() && message.id != null)
                         {
-                            strings.Add((message.id, message.author, string.Join(LineBreak, visitResult.Lines), visitResult.HasImage));
+                            strings.Add(new MessageRenderInfo(
+                                message.id, 
+                                message.author, 
+                                visitResult.ToMarkdown(Environment.NewLine), 
+                                visitResult.Lines.Any(p => p.Modifier == MarkdownModifier.Image),
+                                visitResult.Lines.Any(p => p.Modifier == MarkdownModifier.Writing)
+                                ));
                         }
                         assets.AddRange(visitResult.Assets);
                     }
@@ -50,7 +63,7 @@ namespace ChatGPTExport.Exporters.Html
                 }
             }
 
-            var htmlFragments = strings.Select(p => GetHtmlFragment(p.MessageId, p.Author, p.Content, p.HasImage, MarkdownPipeline)).ToList();
+            var htmlFragments = strings.Select(p => GetHtmlFragment(p)).ToList();
 
             var titleString = WebUtility.HtmlEncode(conversation.title ?? "No title");
 
@@ -95,9 +108,10 @@ namespace ChatGPTExport.Exporters.Html
             return (codeBlockRegex.Count > 0, languages);
         }
 
-        private HtmlFragment GetHtmlFragment(string messageId, Author author, string markdown, bool hasImage, MarkdownPipeline markdownPipeline)
+        private HtmlFragment GetHtmlFragment(MessageRenderInfo messageRenderInfo)
         {
             var hasMath = false;
+            var markdown = messageRenderInfo.Content;
 
             if (markdown.Contains(@"\(") && markdown.Contains(@"\)") ||
                 markdown.Contains(@"\[") && markdown.Contains(@"\]"))
@@ -107,18 +121,19 @@ namespace ChatGPTExport.Exporters.Html
                 markdown = escaped;
             }
 
-            var id = $"<a id=\"msg-{WebUtility.HtmlEncode(messageId)}\"></a>";
+            var id = $"<a id=\"msg-{WebUtility.HtmlEncode(messageRenderInfo.MessageId)}\"></a>";
 
-            var html = id + Environment.NewLine + Markdown.ToHtml(markdown, markdownPipeline);
+            var html = id + Environment.NewLine + Markdown.ToHtml(markdown, MarkdownPipeline);
 
             var (HasCode, Languages) = GetLanguages(markdown);
 
             var fragment = new HtmlFragment(
-                author.role == "user",
+                messageRenderInfo.Author.role == "user",
                 html,
                 HasCode,
                 hasMath,
-                hasImage,
+                messageRenderInfo.HasImage,
+                messageRenderInfo.HasWriting,
                 Languages);
             return fragment;
         }
