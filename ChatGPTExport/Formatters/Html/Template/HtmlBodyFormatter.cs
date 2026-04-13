@@ -2,7 +2,7 @@ namespace ChatGPTExport.Formatters.Html.Template
 {
     internal class HtmlBodyFormatter : IHtmlFormatter
     {
-        public string FormatHtmlPage(HtmlPage page, string pathPrefix)
+        public string FormatHtmlPage(HtmlPage page, string _)
         {
             var model = new
             {

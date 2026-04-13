@@ -57,4 +57,80 @@ public class HtmlFormatterTests
         Assert.Contains("justify-end", html);
         Assert.Contains("rounded-xl", html);
     }
+
+    [Fact]
+    public void HtmlBodyFormatter_FormatHtmlPage_OmitsDocTypeAndHtmlWrappers()
+    {
+        // Arrange
+        var page = new HtmlPage(
+            "Test Title",
+            ["<meta name='test' content='value'>"],
+            [
+                new HtmlFragment(false, "<p>Assistant message</p>", false, false, false, false, []),
+                new HtmlFragment(true, "<p>User message</p>", false, false, false, false, [])
+            ],
+            "styles/tailwindcompiled.css"
+        );
+
+        var formatter = new HtmlBodyFormatter();
+
+        // Act
+        var html = formatter.FormatHtmlPage(page, string.Empty);
+
+        // Assert - must not contain full-page wrapper elements
+        Assert.NotEmpty(html);
+        Assert.DoesNotContain("<!doctype html>", html, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("<html", html, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("<head", html, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("<body", html, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void HtmlBodyFormatter_FormatHtmlPage_ContainsMessageContent()
+    {
+        // Arrange
+        var page = new HtmlPage(
+            "Test Title",
+            [],
+            [
+                new HtmlFragment(false, "<p>Assistant message</p>", false, false, false, false, []),
+                new HtmlFragment(true, "<p>User message</p>", false, false, false, false, [])
+            ],
+            "styles/tailwindcompiled.css"
+        );
+
+        var formatter = new HtmlBodyFormatter();
+
+        // Act
+        var html = formatter.FormatHtmlPage(page, string.Empty);
+
+        // Assert
+        Assert.Contains("Test Title", html);
+        Assert.Contains("Assistant message", html);
+        Assert.Contains("User message", html);
+    }
+
+    [Fact]
+    public void HtmlBodyFormatter_FormatHtmlPage_DifferentiatesUserMessages()
+    {
+        // Arrange
+        var page = new HtmlPage(
+            "Test",
+            [],
+            [
+                new HtmlFragment(false, "<p>Assistant</p>", false, false, false, false, []),
+                new HtmlFragment(true, "<p>User</p>", false, false, false, false, [])
+            ],
+            "styles/tailwindcompiled.css"
+        );
+
+        var formatter = new HtmlBodyFormatter();
+
+        // Act
+        var html = formatter.FormatHtmlPage(page, string.Empty);
+
+        // Assert - same user-bubble classes as the full Tailwind template
+        Assert.Contains("justify-end", html);
+        Assert.Contains("rounded-xl", html);
+    }
 }
