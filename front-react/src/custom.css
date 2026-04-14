@@ -39,3 +39,18 @@
     cursor: pointer !important;
   }
 }
+
+.conversation-html pre {
+  overflow-x: auto;
+}
+
+.conversation-html img {
+  max-width: min(300px, 100%);
+  max-height: 300px;
+  cursor: zoom-in;
+  object-fit: contain;
+}
+
+.conversation-html a.glightbox {
+  display: inline-block;
+}

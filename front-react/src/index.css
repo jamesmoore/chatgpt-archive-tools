@@ -1,5 +1,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@plugin "@tailwindcss/typography";
+@source "../../ChatGPTExport/Formatters/Html/Templates/Tailwind.scriban";
+@source "../../ChatGPTExport/Formatters/Html/Templates/HtmlBody.scriban";
 
 @custom-variant dark (&:is(.dark *));
 

@@ -45,7 +45,7 @@ export async function getConversations(): Promise<ConversationSummary[]> {
  * Returns the conversation in HTML format
  */
 export async function getConversationHtml(id: string): Promise<string> {
-  return fetchText(`${ApiUrl}/${id}/html`);
+  return fetchText(`${ApiUrl}/${id}/htmlbody`);
 }
 
 /**
