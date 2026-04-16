@@ -5,6 +5,7 @@ COPY front-react/package*.json front-react/
 RUN cd front-react && npm ci
 
 COPY front-react/ front-react/
+COPY ChatGPTExport/Formatters/Html/Templates/ ChatGPTExport/Formatters/Html/Templates/
 RUN cd front-react && npm run build
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build-env
