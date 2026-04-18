@@ -11,7 +11,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { useConversations } from '../hooks/use-conversations'
 import { ChevronRight, Search, Settings } from "lucide-react";
@@ -23,13 +23,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { getWrapStatus, setWrapStatus } from "@/getWrapStatus";
+import { useWrapPreference } from "@/hooks/use-wrap-preference";
 
 export function AppSidebar() {
   const { id, format } = useParams();
   const location = useLocation();
   const { setOpenMobile } = useSidebar();
-  const [isWrapped, setIsWrapped] = useState(() => getWrapStatus());
+  const { isWrapped, setIsWrapped } = useWrapPreference();
   const isTextFormat = format === 'markdown' || format === 'json';
 
   const {
@@ -42,8 +42,6 @@ export function AppSidebar() {
 
   const toggleWrap = (checked: boolean) => {
     setIsWrapped(checked);
-    setWrapStatus(checked);
-    window.dispatchEvent(new Event('storage'));
   };
 
   return (
