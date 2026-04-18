@@ -52,7 +52,7 @@ export function ConversationPanel() {
 
         return (
             <div className='overflow-x-auto'>
-                <pre className={isWrapped ? 'whitespace-pre-wrap wrap-break-word' : 'min-w-max whitespace-pre'}>
+                <pre className={isWrapped ? 'whitespace-pre-wrap break-words' : 'min-w-max whitespace-pre'}>
                     <code
                         className={`bg-transparent! hljs language-${format}`}
                         dangerouslySetInnerHTML={{ __html: highlighted }}
