@@ -130,7 +130,13 @@ export function useConversationHtmlEnhancements({
 
                 await preloadMathJax();
                 if (!isDisposed && window.MathJax?.typesetPromise) {
-                    window.MathJax.typesetClear?.([container]);
+                    // Clear all stale math items unconditionally.
+                    // Calling with an element array uses clearMathItemsWithin(), which searches
+                    // the live DOM — after React replaces innerHTML the old <mjx-container> nodes
+                    // are detached, so it finds nothing and clears nothing. Calling with no
+                    // arguments uses document.clear() instead, which wipes the entire item list
+                    // regardless of DOM state, allowing typesetPromise to re-scan the fresh nodes.
+                    window.MathJax.typesetClear?.();
                     await window.MathJax.typesetPromise([container]);
                 }
 
