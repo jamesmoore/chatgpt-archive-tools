@@ -50,6 +50,10 @@ export function ConversationPanel() {
             return;
         }
 
+        if (link?.classList.contains("glightbox")) {
+            return;
+        }
+
         if (isInternalAnchorHref(href)) {
             return;
         }
