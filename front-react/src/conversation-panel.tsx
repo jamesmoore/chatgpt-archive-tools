@@ -1,21 +1,68 @@
+import { useCallback, useMemo } from "react";
+import type { MouseEvent } from "react";
 import { useParams } from "react-router-dom";
 import hljs from "highlight.js";
+import DOMPurify from "dompurify";
 import { useConversation } from "./hooks/use-conversation";
 import { useConversationHtmlEnhancements } from "./hooks/use-conversation-html-enhancements";
 import { useHighlightThemeStyles } from "./hooks/use-highlight-theme-styles";
 import { useWrapPreference } from "./hooks/use-wrap-preference";
 import LoadingSpinner from "./loading-spinner";
 
+const SAFE_LINK_PROTOCOLS = new Set(["http:", "https:", "mailto:", "tel:"]);
+
+function isSafeHref(href: string): boolean {
+    if (href.startsWith("#") || href.startsWith("/") || href.startsWith("./") || href.startsWith("../")) {
+        return true;
+    }
+
+    try {
+        const url = new URL(href, window.location.origin);
+        return SAFE_LINK_PROTOCOLS.has(url.protocol);
+    } catch {
+        return false;
+    }
+}
+
+function isInternalAnchorHref(href: string): boolean {
+    return href.startsWith("#");
+}
+
 export function ConversationPanel() {
 
     const { id, format } = useParams();
     const { data: content, error, isLoading } = useConversation(id, format);
     const { isWrapped } = useWrapPreference();
+    const sanitizedContent = useMemo(
+        () =>
+            format === "html" && content
+                ? DOMPurify.sanitize(content)
+                : "",
+        [content, format]
+    );
+
+    const handleConversationLinkClick = useCallback((event: MouseEvent<HTMLDivElement>) => {
+        const target = event.target as HTMLElement | null;
+        const link = target?.closest<HTMLAnchorElement>("a[href]");
+        const href = link?.getAttribute("href");
+
+        if (!href || !isSafeHref(href)) {
+            return;
+        }
+
+        if (isInternalAnchorHref(href)) {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+        window.open(new URL(href, window.location.origin).toString(), "_blank", "noopener,noreferrer");
+    }, []);
 
     useHighlightThemeStyles();
 
     const contentRef = useConversationHtmlEnhancements({
-        content,
+        content: sanitizedContent,
         conversationId: id,
         format,
     });
@@ -41,7 +88,8 @@ export function ConversationPanel() {
             <div
                 ref={contentRef}
                 className="conversation-html flex-1 w-full overflow-y-auto px-4 pb-6"
-                dangerouslySetInnerHTML={{ __html: content }}
+                onClick={handleConversationLinkClick}
+                dangerouslySetInnerHTML={{ __html: sanitizedContent }}
             />
         );
     }
