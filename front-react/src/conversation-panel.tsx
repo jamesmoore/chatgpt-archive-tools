@@ -24,6 +24,10 @@ function isSafeHref(href: string): boolean {
     }
 }
 
+function isInternalAnchorHref(href: string): boolean {
+    return href.startsWith("#");
+}
+
 export function ConversationPanel() {
 
     const { id, format } = useParams();
@@ -36,22 +40,22 @@ export function ConversationPanel() {
                 : "",
         [content, format]
     );
+
     const handleConversationLinkClick = useCallback((event: MouseEvent<HTMLDivElement>) => {
         const target = event.target as HTMLElement | null;
         const link = target?.closest<HTMLAnchorElement>("a[href]");
         const href = link?.getAttribute("href");
 
-        if (!href) {
+        if (!href || !isSafeHref(href)) {
+            return;
+        }
+
+        if (isInternalAnchorHref(href)) {
             return;
         }
 
         event.preventDefault();
         event.stopPropagation();
-
-        if (!isSafeHref(href)) {
-            return;
-        }
-
         window.open(new URL(href, window.location.origin).toString(), "_blank", "noopener,noreferrer");
     }, []);
 
