@@ -18,6 +18,7 @@ declare global {
                 promise?: Promise<unknown>;
                 typeset?: boolean;
             };
+            typesetClear?: (elements?: HTMLElement[]) => void;
             typesetPromise?: (elements?: HTMLElement[]) => Promise<unknown>;
         };
     }
@@ -129,6 +130,7 @@ export function useConversationHtmlEnhancements({
 
                 await preloadMathJax();
                 if (!isDisposed && window.MathJax?.typesetPromise) {
+                    window.MathJax.typesetClear?.([container]);
                     await window.MathJax.typesetPromise([container]);
                 }
 
