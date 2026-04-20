@@ -4,69 +4,18 @@ type GlightboxInstance = {
     destroy?: () => void;
 };
 
-declare global {
-    interface Window {
-        GLightbox?: (options?: { selector?: string }) => GlightboxInstance;
-    }
-}
+type GlightboxFactory = (options?: { selector?: string }) => GlightboxInstance;
 
-let glightboxPromise: Promise<void> | null = null;
+let glightboxPromise: Promise<GlightboxFactory> | null = null;
 
-function loadStylesheet(id: string, href: string) {
-    if (document.getElementById(id)) {
-        return;
-    }
-
-    const link = document.createElement("link");
-    link.id = id;
-    link.rel = "stylesheet";
-    link.href = href;
-    document.head.appendChild(link);
-}
-
-function loadScript(id: string, src: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-        const existingScript = document.getElementById(id) as HTMLScriptElement | null;
-
-        if (existingScript?.dataset.loaded === "true") {
-            resolve();
-            return;
-        }
-
-        const script = existingScript ?? document.createElement("script");
-
-        const handleLoad = () => {
-            script.dataset.loaded = "true";
-            resolve();
-        };
-
-        const handleError = () => {
-            reject(new Error(`Failed to load script: ${src}`));
-        };
-
-        script.addEventListener("load", handleLoad, { once: true });
-        script.addEventListener("error", handleError, { once: true });
-
-        if (!existingScript) {
-            script.id = id;
-            script.src = src;
-            script.async = true;
-            document.head.appendChild(script);
-        }
-    });
-}
-
-function preloadGlightbox(): Promise<void> {
+function preloadGlightbox(): Promise<GlightboxFactory> {
     glightboxPromise ??= (async () => {
-        loadStylesheet(
-            "conversation-panel-glightbox-style",
-            "https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css"
-        );
+        const [{ default: glightboxFactory }] = await Promise.all([
+            import("glightbox"),
+            import("glightbox/dist/css/glightbox.css"),
+        ]);
 
-        await loadScript(
-            "conversation-panel-glightbox-script",
-            "https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"
-        );
+        return glightboxFactory as unknown as GlightboxFactory;
     })();
 
     return glightboxPromise;
@@ -94,7 +43,7 @@ export function useConversationHtmlGlightbox({
     }, [format]);
 
     const enhanceImagesWithLightbox = useCallback(async (container: HTMLElement) => {
-        await preloadGlightbox();
+        const createLightbox = await preloadGlightbox();
 
         container.querySelectorAll("img").forEach((image) => {
             if (image.closest("a.glightbox")) {
@@ -115,9 +64,9 @@ export function useConversationHtmlGlightbox({
         });
 
         lightboxRef.current?.destroy?.();
-        lightboxRef.current = window.GLightbox?.({
+        lightboxRef.current = createLightbox({
             selector: ".conversation-html .glightbox",
-        }) ?? null;
+        });
     }, [conversationId]);
 
     useEffect(() => () => {
