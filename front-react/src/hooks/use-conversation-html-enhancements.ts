@@ -42,10 +42,6 @@ export function useConversationHtmlEnhancements({
                 }
 
                 await enhanceImagesWithLightbox(container);
-                if (isDisposed) {
-                    return;
-                }
-
                 requestAnimationFrame(() => scrollToMessage());
             } catch (enhancementError) {
                 console.error("Failed to enhance conversation HTML.", enhancementError);

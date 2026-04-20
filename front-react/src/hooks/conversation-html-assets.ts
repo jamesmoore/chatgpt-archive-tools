@@ -70,7 +70,7 @@ export function preloadMathJax(): Promise<void> {
     mathJaxPromise ??= (async () => {
         window.MathJax ??= {
             tex: {
-                inlineMath: [["$", "$"] , ["\\(", "\\)"]],
+                inlineMath: [["$", "$"], ["\\(", "\\)"]],
                 displayMath: [["$$", "$$"], ["\\[", "\\]"]],
             },
             startup: {
