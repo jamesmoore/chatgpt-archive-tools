@@ -5,7 +5,7 @@ type GlightboxInstance = {
     destroy?: () => void;
 };
 
-type GlightboxFactory = (options?: { selector?: string }) => GlightboxInstance;
+type GlightboxFactory = (options?: Record<string, unknown>) => GlightboxInstance;
 
 declare global {
     interface Window {
@@ -49,10 +49,8 @@ function preloadMathJax(): Promise<void> {
 async function preloadGlightbox(): Promise<GlightboxFactory> {
     glightboxPromise ??= (async () => {
         await import("glightbox/dist/css/glightbox.min.css");
-        const glightboxModule = await import("glightbox");
-        return "default" in glightboxModule
-            ? (glightboxModule.default as GlightboxFactory)
-            : (glightboxModule as GlightboxFactory);
+        const { default: createLightbox } = await import("glightbox");
+        return createLightbox as GlightboxFactory;
     })();
 
     return glightboxPromise;
