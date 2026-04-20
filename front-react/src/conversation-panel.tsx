@@ -41,12 +41,18 @@ export function ConversationPanel() {
         const link = target?.closest<HTMLAnchorElement>("a[href]");
         const href = link?.getAttribute("href");
 
-        if (!href || isSafeHref(href)) {
+        if (!href) {
             return;
         }
 
         event.preventDefault();
         event.stopPropagation();
+
+        if (!isSafeHref(href)) {
+            return;
+        }
+
+        window.open(new URL(href, window.location.origin).toString(), "_blank", "noopener,noreferrer");
     }, []);
 
     useHighlightThemeStyles();
