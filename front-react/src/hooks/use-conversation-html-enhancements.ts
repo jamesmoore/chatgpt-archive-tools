@@ -25,6 +25,9 @@ export function useConversationHtmlEnhancements({
     });
 
     useEffect(() => {
+        // The panel can re-render when the user re-selects the current
+        // conversation even if the HTML string is identical, so enhancements
+        // need to follow committed renders instead of only content changes.
         if (format !== "html" || !content || !contentRef.current) {
             return;
         }
@@ -53,14 +56,7 @@ export function useConversationHtmlEnhancements({
         return () => {
             isDisposed = true;
         };
-    }, [
-        content,
-        enhanceImagesWithLightbox,
-        format,
-        highlightCodeBlocks,
-        scrollToMessage,
-        typesetMath,
-    ]);
+    });
 
     return contentRef;
 }
