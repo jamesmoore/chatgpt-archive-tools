@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 const INLINE_MATH_DELIMITERS = [["$", "$"], ["\\(", "\\)"]] as const;
 const DISPLAY_MATH_DELIMITERS = [["$$", "$$"], ["\\[", "\\]"]] as const;
@@ -48,13 +48,6 @@ declare global {
 }
 
 let mathJaxPromise: Promise<MathJaxWindow> | null = null;
-let mathJaxTypesetQueue = Promise.resolve();
-
-function waitForNextAnimationFrame(): Promise<void> {
-    return new Promise<void>((resolve) => {
-        requestAnimationFrame(() => resolve());
-    });
-}
 
 function ensureMathJaxConfiguration(): MathJaxWindow {
     window.MathJax ??= {
@@ -105,17 +98,13 @@ async function preloadMathJax(): Promise<MathJaxWindow> {
     return mathJaxPromise;
 }
 
-function enqueueMathJaxWork(work: () => Promise<void>) {
-    const queuedWork = mathJaxTypesetQueue.then(work, work);
-    mathJaxTypesetQueue = queuedWork.catch(() => undefined);
-    return queuedWork;
-}
-
 type UseConversationHtmlMathJaxOptions = {
     format: string | undefined;
 };
 
 export function useConversationHtmlMathJax({ format }: UseConversationHtmlMathJaxOptions) {
+    const latestTypesetRequestRef = useRef(0);
+
     useEffect(() => {
         if (format !== "html") {
             return;
@@ -126,18 +115,28 @@ export function useConversationHtmlMathJax({ format }: UseConversationHtmlMathJa
         });
     }, [format]);
 
-    const typesetMath = useCallback((container: HTMLElement) => {
-        return enqueueMathJaxWork(async () => {
-            await waitForNextAnimationFrame();
+    useEffect(() => () => {
+        latestTypesetRequestRef.current += 1;
+    }, [format]);
 
+    const typesetMath = useCallback((container: HTMLElement) => {
+        const requestId = latestTypesetRequestRef.current + 1;
+        latestTypesetRequestRef.current = requestId;
+
+        return (async () => {
             const mathJax = await preloadMathJax();
+
+            // A newer conversation render has already started its own pass, so
+            // this stale request must not clear or typeset against MathJax.
+            if (requestId !== latestTypesetRequestRef.current) {
+                return;
+            }
 
             // Conversation content is replaced between views, so clear tracked
             // MathJax items before typesetting the current container again.
             mathJax.typesetClear?.();
-            await waitForNextAnimationFrame();
             await mathJax.typesetPromise?.([container]);
-        });
+        })();
     }, []);
 
     return { typesetMath };

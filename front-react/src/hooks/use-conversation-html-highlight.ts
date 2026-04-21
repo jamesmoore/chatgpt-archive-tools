@@ -7,15 +7,9 @@ const HIGHLIGHTED_ATTRIBUTE = "data-chatgpt-archive-highlighted";
 
 export function useConversationHtmlHighlight() {
     const highlightCodeBlocks = useCallback((container: HTMLElement) => {
-        container.querySelectorAll("pre code").forEach((block) => {
-            const element = block as HTMLElement;
-
-            if (element.hasAttribute(HIGHLIGHTED_ATTRIBUTE)) {
-                return;
-            }
-
-            hljs.highlightElement(element);
-            element.setAttribute(HIGHLIGHTED_ATTRIBUTE, "true");
+        container.querySelectorAll(`pre code:not([${HIGHLIGHTED_ATTRIBUTE}])`).forEach((block) => {
+            hljs.highlightElement(block as HTMLElement);
+            block.setAttribute(HIGHLIGHTED_ATTRIBUTE, "true");
         });
     }, []);
 
