@@ -10,12 +10,17 @@ let glightboxPromise: Promise<GlightboxFactory> | null = null;
 
 function preloadGlightbox(): Promise<GlightboxFactory> {
     glightboxPromise ??= (async () => {
-        const [{ default: glightboxFactory }] = await Promise.all([
-            import("glightbox"),
-            import("glightbox/dist/css/glightbox.css"),
-        ]);
+        try {
+            const [{ default: glightboxFactory }] = await Promise.all([
+                import("glightbox"),
+                import("glightbox/dist/css/glightbox.css"),
+            ]);
 
-        return glightboxFactory as unknown as GlightboxFactory;
+            return glightboxFactory as unknown as GlightboxFactory;
+        } catch (preloadError) {
+            glightboxPromise = null;
+            throw preloadError;
+        }
     })();
 
     return glightboxPromise;
