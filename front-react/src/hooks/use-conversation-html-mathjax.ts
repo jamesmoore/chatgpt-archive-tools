@@ -1,76 +1,114 @@
 import { useCallback, useEffect } from "react";
 
+const INLINE_MATH_DELIMITERS = [["$", "$"], ["\\(", "\\)"]] as const;
+const DISPLAY_MATH_DELIMITERS = [["$$", "$$"], ["\\[", "\\]"]] as const;
+const DISABLED_ACCESSIBILITY_MENU_SETTINGS = {
+    speech: false,
+    braille: false,
+    enrich: false,
+    collapsible: false,
+    assistiveMml: false,
+} as const;
+
+type MathJaxWindow = {
+    version?: string;
+    config?: MathJaxWindow;
+    tex?: {
+        inlineMath?: string[][];
+        displayMath?: string[][];
+    };
+    options?: {
+        enableSpeech?: boolean;
+        enableBraille?: boolean;
+        enableEnrichment?: boolean;
+        enableComplexity?: boolean;
+        enableExplorer?: boolean;
+        menuOptions?: {
+            settings?: {
+                speech?: boolean;
+                braille?: boolean;
+                enrich?: boolean;
+                collapsible?: boolean;
+                assistiveMml?: boolean;
+            };
+        };
+    };
+    startup?: {
+        promise?: Promise<unknown>;
+        typeset?: boolean;
+    };
+    typesetPromise?: (elements?: HTMLElement[]) => Promise<unknown>;
+    typesetClear?: (elements?: HTMLElement[]) => void;
+};
+
 declare global {
     interface Window {
-        MathJax?: {
-            tex?: {
-                inlineMath?: string[][];
-                displayMath?: string[][];
-            };
-            startup?: {
-                promise?: Promise<unknown>;
-                typeset?: boolean;
-            };
-            typesetPromise?: (elements?: HTMLElement[]) => Promise<unknown>;
-        };
+        MathJax?: MathJaxWindow;
     }
 }
 
-let mathJaxPromise: Promise<void> | null = null;
+let mathJaxPromise: Promise<MathJaxWindow> | null = null;
+let mathJaxTypesetQueue = Promise.resolve();
 
-function loadScript(id: string, src: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-        const existingScript = document.getElementById(id) as HTMLScriptElement | null;
-
-        if (existingScript?.dataset.loaded === "true") {
-            resolve();
-            return;
-        }
-
-        const script = existingScript ?? document.createElement("script");
-
-        const handleLoad = () => {
-            script.dataset.loaded = "true";
-            resolve();
-        };
-
-        const handleError = () => {
-            reject(new Error(`Failed to load script: ${src}`));
-        };
-
-        script.addEventListener("load", handleLoad, { once: true });
-        script.addEventListener("error", handleError, { once: true });
-
-        if (!existingScript) {
-            script.id = id;
-            script.src = src;
-            script.async = true;
-            document.head.appendChild(script);
-        }
+function waitForNextAnimationFrame(): Promise<void> {
+    return new Promise<void>((resolve) => {
+        requestAnimationFrame(() => resolve());
     });
 }
 
-function preloadMathJax(): Promise<void> {
+function ensureMathJaxConfiguration(): MathJaxWindow {
+    window.MathJax ??= {
+        tex: {
+            inlineMath: [...INLINE_MATH_DELIMITERS.map((pair) => [...pair])],
+            displayMath: [...DISPLAY_MATH_DELIMITERS.map((pair) => [...pair])],
+        },
+        options: {
+            enableSpeech: false,
+            enableBraille: false,
+            enableEnrichment: false,
+            enableComplexity: false,
+            enableExplorer: false,
+            menuOptions: {
+                settings: {
+                    ...DISABLED_ACCESSIBILITY_MENU_SETTINGS,
+                },
+            },
+        },
+        startup: {
+            typeset: false,
+        },
+    };
+
+    return window.MathJax;
+}
+
+async function preloadMathJax(): Promise<MathJaxWindow> {
     mathJaxPromise ??= (async () => {
-        window.MathJax ??= {
-            tex: {
-                inlineMath: [["$", "$"], ["\\(", "\\)"]],
-                displayMath: [["$$", "$$"], ["\\[", "\\]"]],
-            },
-            startup: {
-                typeset: false,
-            },
-        };
+        ensureMathJaxConfiguration();
 
-        await loadScript(
-            "conversation-panel-mathjax",
-            "https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"
-        );
+        try {
+            await import("mathjax/tex-mml-chtml.js");
+            const mathJax = window.MathJax;
 
-        await window.MathJax?.startup?.promise;
+            if (!mathJax) {
+                throw new Error("MathJax runtime was not attached to window.");
+            }
+
+            await mathJax.startup?.promise;
+            return mathJax;
+        } catch (preloadError) {
+            mathJaxPromise = null;
+            throw preloadError;
+        }
     })();
 
     return mathJaxPromise;
+}
+
+function enqueueMathJaxWork(work: () => Promise<void>) {
+    const queuedWork = mathJaxTypesetQueue.then(work, work);
+    mathJaxTypesetQueue = queuedWork.catch(() => undefined);
+    return queuedWork;
 }
 
 type UseConversationHtmlMathJaxOptions = {
@@ -88,12 +126,18 @@ export function useConversationHtmlMathJax({ format }: UseConversationHtmlMathJa
         });
     }, [format]);
 
-    const typesetMath = useCallback(async (container: HTMLElement) => {
-        await preloadMathJax();
+    const typesetMath = useCallback((container: HTMLElement) => {
+        return enqueueMathJaxWork(async () => {
+            await waitForNextAnimationFrame();
 
-        if (window.MathJax?.typesetPromise) {
-            await window.MathJax.typesetPromise([container]);
-        }
+            const mathJax = await preloadMathJax();
+
+            // Conversation content is replaced between views, so clear tracked
+            // MathJax items before typesetting the current container again.
+            mathJax.typesetClear?.();
+            await waitForNextAnimationFrame();
+            await mathJax.typesetPromise?.([container]);
+        });
     }, []);
 
     return { typesetMath };
