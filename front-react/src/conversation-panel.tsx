@@ -91,7 +91,7 @@ export function ConversationPanel() {
         return (
             <div
                 ref={contentRef}
-                className="conversation-html flex-1 w-full overflow-y-auto px-4 pb-6"
+                className="conversation-html flex-1 w-full overflow-y-auto"
                 onClick={handleConversationLinkClick}
                 dangerouslySetInnerHTML={{ __html: sanitizedContent }}
             />
