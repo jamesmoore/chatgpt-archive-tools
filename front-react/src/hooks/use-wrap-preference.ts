@@ -39,7 +39,6 @@ export function useWrapPreference() {
 
     const updateWrapPreference = useCallback((nextValue: boolean) => {
         setWrapStatus(nextValue);
-        setIsWrappedState(nextValue);
     }, []);
 
     return {
