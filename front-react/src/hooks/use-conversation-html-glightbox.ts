@@ -1,22 +1,18 @@
+import type GLightbox from "glightbox";
 import { useCallback, useEffect, useRef } from "react";
 
-type GlightboxInstance = {
-    destroy?: () => void;
-};
+let glightboxPromise: Promise<typeof GLightbox> | null = null;
 
-type GlightboxFactory = (options?: { selector?: string }) => GlightboxInstance;
-
-let glightboxPromise: Promise<GlightboxFactory> | null = null;
-
-function preloadGlightbox(): Promise<GlightboxFactory> {
+function preloadGlightbox(): Promise<typeof GLightbox> {
     glightboxPromise ??= (async () => {
         try {
+            console.debug("Preloading GLightbox instance.");
             const [{ default: glightboxFactory }] = await Promise.all([
                 import("glightbox"),
                 import("glightbox/dist/css/glightbox.css"),
             ]);
 
-            return glightboxFactory as unknown as GlightboxFactory;
+            return glightboxFactory;
         } catch (preloadError) {
             glightboxPromise = null;
             throw preloadError;
@@ -35,7 +31,7 @@ export function useConversationHtmlGlightbox({
     conversationId,
     format,
 }: UseConversationHtmlGlightboxOptions) {
-    const lightboxRef = useRef<GlightboxInstance | null>(null);
+    const lightboxRef = useRef<ReturnType<typeof GLightbox> | null>(null);
 
     useEffect(() => {
         if (format !== "html") {
@@ -50,6 +46,7 @@ export function useConversationHtmlGlightbox({
     const enhanceImagesWithLightbox = useCallback(async (container: HTMLElement) => {
         const createLightbox = await preloadGlightbox();
 
+        console.debug("Using GLightbox instance.");
         container.querySelectorAll("img").forEach((image) => {
             if (image.closest("a.glightbox")) {
                 return;
@@ -68,14 +65,15 @@ export function useConversationHtmlGlightbox({
             link.appendChild(image);
         });
 
-        lightboxRef.current?.destroy?.();
+        lightboxRef.current?.destroy();
         lightboxRef.current = createLightbox({
             selector: ".conversation-html .glightbox",
         });
     }, [conversationId]);
 
     useEffect(() => () => {
-        lightboxRef.current?.destroy?.();
+        console.debug("Cleaning up GLightbox instance.");
+        lightboxRef.current?.destroy();
         lightboxRef.current = null;
     }, []);
 
