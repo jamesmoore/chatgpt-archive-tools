@@ -6,6 +6,39 @@ namespace ChatGTPExportTests.Formatters.Html;
 public class HtmlFormatterTests
 {
     [Fact]
+    public void HtmlBodyFormatter_FormatHtmlPage_ProducesBodyFragmentWithoutDocumentWrappers()
+    {
+        // Arrange
+        var page = new HtmlPage(
+            "Test Title",
+            [],
+            [
+                new HtmlFragment(false, "<p>Assistant message</p>", false, false, false, false, []),
+                new HtmlFragment(true, "<p>User message</p>", false, false, false, false, []),
+                new HtmlFragment(false, "<p>Writing content</p>", false, false, false, true, [])
+            ],
+            "styles/tailwindcompiled.css"
+        );
+
+        var formatter = new HtmlBodyFormatter();
+
+        // Act
+        var html = formatter.FormatHtmlPage(page, string.Empty);
+
+        // Assert
+        Assert.NotEmpty(html);
+        Assert.Contains("Test Title", html);
+        Assert.Contains("Assistant message", html);
+        Assert.Contains("User message", html);
+        Assert.Contains("Writing:", html);
+        Assert.Contains("Writing content", html);
+        Assert.DoesNotContain("<!doctype html>", html, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("<html", html, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("<head", html, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("<body", html, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public void TailwindHtmlFormatter_FormatHtmlPage_ProducesValidOutput()
     {
         // Arrange

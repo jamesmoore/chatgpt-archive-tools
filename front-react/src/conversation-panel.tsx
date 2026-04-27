@@ -1,54 +1,75 @@
+import { useCallback, useMemo } from "react";
+import type { MouseEvent } from "react";
 import { useParams } from "react-router-dom";
-import { useState, useEffect, useRef } from "react";
 import hljs from "highlight.js";
-import githubStyles from "highlight.js/styles/github.css?inline";
-import githubDarkStyles from "highlight.js/styles/github-dark.css?inline";
+import DOMPurify from "dompurify";
 import { useConversation } from "./hooks/use-conversation";
-import { getWrapStatus } from "./getWrapStatus";
-import { useTheme } from "./components/theme-provider";
+import { useConversationHtmlEnhancements } from "./hooks/use-conversation-html-enhancements";
+import { useHighlightThemeStyles } from "./hooks/use-highlight-theme-styles";
+import { useWrapPreference } from "./hooks/use-wrap-preference";
 import LoadingSpinner from "./loading-spinner";
+
+const SAFE_LINK_PROTOCOLS = new Set(["http:", "https:", "mailto:", "tel:"]);
+
+function isSafeHref(href: string): boolean {
+    if (href.startsWith("#") || href.startsWith("/") || href.startsWith("./") || href.startsWith("../")) {
+        return true;
+    }
+
+    try {
+        const url = new URL(href, window.location.origin);
+        return SAFE_LINK_PROTOCOLS.has(url.protocol);
+    } catch {
+        return false;
+    }
+}
+
+function isInternalAnchorHref(href: string): boolean {
+    return href.startsWith("#");
+}
 
 export function ConversationPanel() {
 
     const { id, format } = useParams();
     const { data: content, error, isLoading } = useConversation(id, format);
-    const { theme } = useTheme();
-    const [isWrapped, setIsWrapped] = useState(() => getWrapStatus());
+    const { isWrapped } = useWrapPreference();
+    const sanitizedContent = useMemo(
+        () =>
+            format === "html" && content
+                ? DOMPurify.sanitize(content)
+                : "",
+        [content, format]
+    );
 
-    const iframeRef = useRef<HTMLIFrameElement>(null);
+    const handleConversationLinkClick = useCallback((event: MouseEvent<HTMLDivElement>) => {
+        const target = event.target as HTMLElement | null;
+        const link = target?.closest<HTMLAnchorElement>("a[href]");
+        const href = link?.getAttribute("href");
 
-    useEffect(() => {
-        const handleStorageChange = () => {
-            setIsWrapped(getWrapStatus());
-        };
-        window.addEventListener('storage', handleStorageChange);
-        return () => window.removeEventListener('storage', handleStorageChange);
-    }, []);
-
-    useEffect(() => {
-        const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-        const resolvedTheme = theme === "system" ? (mediaQuery.matches ? "dark" : "light") : theme;
-        const styleId = "conversation-panel-hljs-theme";
-        let style = document.getElementById(styleId) as HTMLStyleElement | null;
-
-        if (!style) {
-            style = document.createElement("style");
-            style.id = styleId;
-            document.head.appendChild(style);
+        if (!href || !isSafeHref(href)) {
+            return;
         }
 
-        style.textContent = resolvedTheme === "dark" ? githubDarkStyles : githubStyles;
+        if (link?.classList.contains("glightbox")) {
+            return;
+        }
 
-        if (theme !== "system") return;
+        if (isInternalAnchorHref(href)) {
+            return;
+        }
 
-        const handleChange = (event: MediaQueryListEvent) => {
-            if (!style) return;
-            style.textContent = event.matches ? githubDarkStyles : githubStyles;
-        };
+        event.preventDefault();
+        event.stopPropagation();
+        window.open(new URL(href, window.location.origin).toString(), "_blank", "noopener,noreferrer");
+    }, []);
 
-        mediaQuery.addEventListener("change", handleChange);
-        return () => mediaQuery.removeEventListener("change", handleChange);
-    }, [theme]);
+    useHighlightThemeStyles();
+
+    const contentRef = useConversationHtmlEnhancements({
+        content: sanitizedContent,
+        conversationId: id,
+        format,
+    });
 
     if (!id) {
         return <div className="flex-1 flex justify-center items-center text-red-600">
@@ -66,37 +87,13 @@ export function ConversationPanel() {
         return <LoadingSpinner />;
     }
 
-    function scrollToMessage() {
-        let targetMessageId = window.location.hash
-            .replace(/^#/, "")
-            .replace(/^msg-/, "");
-
-        try {
-            if (targetMessageId) {
-                targetMessageId = decodeURIComponent(targetMessageId);
-            }
-        } catch {
-            // If decoding fails, fall back to the raw value to avoid breaking existing behavior.
-        }
-
-        if (!iframeRef.current || !targetMessageId) return;
-
-        const doc = iframeRef.current.contentDocument;
-        const element = doc?.getElementById(`msg-${targetMessageId}`);
-
-        element?.scrollIntoView({ block: "start" });
-    }
-
     if (format === "html" && content) {
         return (
-            <iframe
-                srcDoc={content}
-                className="flex-1 w-full border-none"
-                title="Chat HTML"
-                sandbox="allow-scripts allow-same-origin"
-                referrerPolicy="no-referrer"
-                ref={iframeRef}
-                onLoad={() => scrollToMessage()}
+            <div
+                ref={contentRef}
+                className="conversation-html flex-1 w-full overflow-y-auto"
+                onClick={handleConversationLinkClick}
+                dangerouslySetInnerHTML={{ __html: sanitizedContent }}
             />
         );
     }

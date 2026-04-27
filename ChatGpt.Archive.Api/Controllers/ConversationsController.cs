@@ -51,6 +51,15 @@ namespace ChatGpt.Archive.Api.Controllers
         public IActionResult GetConversationHtml(string id) => GetActionResult(id, ExportType.Html, "text/html");
 
         /// <summary>
+        /// Returns the inner HTML body content of the conversation, without the surrounding html/head/body tags.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}/htmlbody")]
+        [Produces("text/html")]
+        public IActionResult GetConversationHtmlBody(string id) => GetActionResult(id, ExportType.HtmlBody, "text/html");
+
+        /// <summary>
         /// Returns the conversation in the Markdown format.
         /// </summary>
         /// <param name="id"></param>

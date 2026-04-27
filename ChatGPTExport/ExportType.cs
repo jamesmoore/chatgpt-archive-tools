@@ -7,5 +7,6 @@
         Markdown = 2,
         Html = 4,
         Text = 8,
+        HtmlBody = 16,
     }
 }

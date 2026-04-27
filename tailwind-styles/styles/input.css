@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 @source "../../ChatGPTExport/Formatters/Html/Templates/Tailwind.scriban";
+@source "../../ChatGPTExport/Formatters/Html/Templates/HtmlBody.scriban";
 
 /* === Custom Overrides === */
 

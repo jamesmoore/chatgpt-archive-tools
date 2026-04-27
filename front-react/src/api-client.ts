@@ -42,10 +42,11 @@ export async function getConversations(): Promise<ConversationSummary[]> {
 }
 
 /**
- * Returns the conversation in HTML format
+ * Returns the conversation as an HTML body fragment intended to be embedded
+ * into an existing DOM, not as a full standalone HTML document.
  */
 export async function getConversationHtml(id: string): Promise<string> {
-  return fetchText(`${ApiUrl}/${id}/html`);
+  return fetchText(`${ApiUrl}/${id}/htmlbody`);
 }
 
 /**

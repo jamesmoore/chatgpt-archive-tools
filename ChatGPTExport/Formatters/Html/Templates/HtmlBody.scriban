@@ -1,0 +1,38 @@
+<div class="container mx-auto max-w-4xl px-4 py-6">
+<h1 class="text-3xl font-semibold mb-6">{{ title }}</h1>
+<div class="prose dark:prose-invert leading-relaxed max-w-[80ch] md:max-w-[90ch]
+            prose-p:my-2 prose-li:my-1
+            prose-ul:list-disc prose-ol:list-decimal
+            prose-pre:overflow-x-auto
+            prose-hr:my-4
+            marker:text-neutral-400
+
+            prose-code:before:content-none
+            prose-code:after:content-none
+            prose-code:bg-neutral-300
+            dark:prose-code:bg-neutral-700
+            prose-code:rounded
+            prose-code:px-[0.3rem]
+            prose-code:py-[0.15rem]
+            prose-code:text-[--tw-prose-code]
+            ">
+    {{ for fragment in body }}
+    {{~ if fragment.is_user ~}}
+<div class="flex justify-end my-4">
+  <div class="ml-auto w-full sm:w-5/6 md:w-2/3 lg:w-2/3 rounded-xl bg-neutral-100 dark:bg-neutral-800 px-3 break-words">
+{{ fragment.html }}
+  </div>
+</div>
+    {{~ else ~}}
+{{~ if fragment.is_writing ~}}
+	<div class="ml-auto w-full rounded-xl bg-neutral-100 dark:bg-neutral-800 px-3 py-2 break-words">
+		<div class="text-neutral-500">Writing:</div>
+{{ fragment.html }}
+    </div>
+{{~ else ~}}
+{{ fragment.html }}
+{{~ end ~}}
+    {{~ end ~}}
+    {{ end }}
+</div>
+</div> 

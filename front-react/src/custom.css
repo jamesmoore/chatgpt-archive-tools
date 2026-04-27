@@ -39,3 +39,36 @@
     cursor: pointer !important;
   }
 }
+
+.conversation-html pre {
+  overflow-x: auto;
+}
+
+.conversation-html img {
+  max-width: min(300px, 100%);
+  max-height: 300px;
+  cursor: zoom-in;
+  object-fit: contain;
+}
+
+.conversation-html a.glightbox {
+  display: inline-block;
+}
+
+/* === Custom Overrides - keep in sync with tailwind-styles === */
+
+@layer components {
+  .prose pre code {
+    background-color: transparent;
+    padding: 0;
+    border-radius: 0;
+    color: inherit;
+  }
+}
+
+@layer utilities {
+  .prose :where(h1):not(:where([class~=not-prose], [class~=not-prose] *)) {
+    font-size: var(--text-2xl);
+    font-weight: 600;
+  }
+}
