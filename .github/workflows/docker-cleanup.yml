@@ -7,7 +7,7 @@ permissions:
   packages: write
 
 jobs:
-  delete_versions:
+  delete_exporter:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/delete-package-versions@v5
@@ -16,3 +16,12 @@ jobs:
         package-type: 'container'
         min-versions-to-keep: 10
         delete-only-untagged-versions: false
+  delete_archive_server:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/delete-package-versions@v5
+      with: 
+        package-name: 'chatgpt-archive-server'
+        package-type: 'container'
+        min-versions-to-keep: 10
+        delete-only-untagged-versions: false        
