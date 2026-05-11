@@ -63,7 +63,7 @@ namespace ChatGpt.Archive.Api.Database
                     continue;
                 }
 
-                var mapping = conversation.GetLastestConversation().mapping;
+                var mapping = conversation.GetLatestConversation().mapping;
                 if (mapping == null)
                 {
                     continue;

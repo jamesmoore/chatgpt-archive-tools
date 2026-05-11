@@ -378,3 +378,4 @@ public class ExtensionMethodsTests
         Assert.Empty(result);
     }
 }
+
