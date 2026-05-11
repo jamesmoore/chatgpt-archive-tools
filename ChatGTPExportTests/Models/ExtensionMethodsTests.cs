@@ -245,7 +245,7 @@ public class ExtensionMethodsTests
     }
 
     [Fact]
-    public void GetLastestConversation_MostRecentInternalNode_SelectsDescendantLeafWithMissingTimestamp()
+    public void GetLatestConversation_MostRecentInternalNode_SelectsDescendantLeafWithMissingTimestamp()
     {
         // Arrange
         var conversation = new Conversation
@@ -300,7 +300,7 @@ public class ExtensionMethodsTests
     }
 
     [Fact]
-    public void GetLastestConversation_MappingWithNoMessages_FallsBackToLastLeaf()
+    public void GetLatestConversation_MappingWithNoMessages_FallsBackToLastLeaf()
     {
         // Arrange
         var conversation = new Conversation
@@ -335,7 +335,7 @@ public class ExtensionMethodsTests
     }
 
     [Fact]
-    public void GetLastestConversation_MostRecentSubtreeWithMultipleLevels_SelectsDeepestLeaf()
+    public void GetLatestConversation_MostRecentSubtreeWithMultipleLevels_SelectsDeepestLeaf()
     {
         // Arrange
         var conversation = new Conversation
@@ -402,7 +402,7 @@ public class ExtensionMethodsTests
     }
 
     [Fact]
-    public void GetLastestConversation_SubtreeCycleWithoutLeaves_ReturnsEmptyMapping()
+    public void GetLatestConversation_SubtreeCycleWithoutLeaves_ReturnsEmptyMapping()
     {
         // Arrange
         var conversation = new Conversation

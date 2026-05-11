@@ -62,11 +62,16 @@ namespace ChatGPTExport.Models
                 var visited = new HashSet<string>();
 
                 // first leaf in the subtree of the most recent message
-                while (currentMapping.children != null && currentMapping.children.Count > 0)
+                while (true)
                 {
                     if (!visited.Add(currentKey))
                     {
                         break;
+                    }
+
+                    if (currentMapping.children == null || currentMapping.children.Count == 0)
+                    {
+                        return currentKey;
                     }
 
                     var childId = currentMapping.children[0];
@@ -77,11 +82,6 @@ namespace ChatGPTExport.Models
 
                     currentKey = childId;
                     currentMapping = child;
-                }
-
-                if (currentMapping.IsLeaf())
-                {
-                    return currentKey;
                 }
             }
 
