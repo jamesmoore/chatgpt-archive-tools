@@ -47,27 +47,46 @@ namespace ChatGPTExport.Models
             }
 
             var mostRecentMapping = mapping
-                .Where(m => m.Value.message != null)
+                .Where(m => m.Value != null && m.Value.message != null)
                 .OrderByDescending(m => m.Value.message!.GetMessageTimestamp())
                 .FirstOrDefault();
 
-            if (mostRecentMapping.Value.message != null && mostRecentMapping.Value.IsLeaf())
+            if (mostRecentMapping.Value != null && mostRecentMapping.Value.message != null && mostRecentMapping.Value.IsLeaf())
             {
                 return mostRecentMapping.Key;
             }
-            else if (mostRecentMapping.Value.message != null)
+            else if (mostRecentMapping.Value != null && mostRecentMapping.Value.message != null)
             {
+                var currentKey = mostRecentMapping.Key;
+                var currentMapping = mostRecentMapping.Value;
+                var visited = new HashSet<string>();
+
                 // first leaf in the subtree of the most recent message
-                while (mostRecentMapping.Value.children != null && mostRecentMapping.Value.children.Count > 0)
+                while (currentMapping.children != null && currentMapping.children.Count > 0)
                 {
-                    var childId = mostRecentMapping.Value.children[0];
-                    mostRecentMapping = mapping.Single(p => p.Key == childId);
+                    if (!visited.Add(currentKey))
+                    {
+                        break;
+                    }
+
+                    var childId = currentMapping.children[0];
+                    if (!mapping.TryGetValue(childId, out var child) || child == null)
+                    {
+                        break;
+                    }
+
+                    currentKey = childId;
+                    currentMapping = child;
                 }
-                return mostRecentMapping.Key;
+
+                if (currentMapping.IsLeaf())
+                {
+                    return currentKey;
+                }
             }
 
-            var leaves = mapping.Where(p => p.Value.IsLeaf()).ToList();
-            return leaves.Last().Key;
+            var leaves = mapping.Where(p => p.Value != null && p.Value.IsLeaf()).ToList();
+            return leaves.Count == 0 ? null : leaves.Last().Key;
         }
 
         private Dictionary<string, MessageContainer> GetLatestBranch()

@@ -245,6 +245,203 @@ public class ExtensionMethodsTests
     }
 
     [Fact]
+    public void GetLastestConversation_MostRecentInternalNode_SelectsDescendantLeafWithMissingTimestamp()
+    {
+        // Arrange
+        var conversation = new Conversation
+        {
+            mapping = new Dictionary<string, MessageContainer>
+            {
+                ["root"] = new MessageContainer
+                {
+                    id = "root",
+                    children = new List<string> { "recent-internal", "older-leaf" }
+                },
+                ["recent-internal"] = new MessageContainer
+                {
+                    id = "recent-internal",
+                    parent = "root",
+                    children = new List<string> { "missing-ts-leaf" },
+                    message = new Message
+                    {
+                        id = "recent-internal",
+                        update_time = 200
+                    }
+                },
+                ["missing-ts-leaf"] = new MessageContainer
+                {
+                    id = "missing-ts-leaf",
+                    parent = "recent-internal",
+                    message = new Message
+                    {
+                        id = "missing-ts-leaf"
+                    }
+                },
+                ["older-leaf"] = new MessageContainer
+                {
+                    id = "older-leaf",
+                    parent = "root",
+                    message = new Message
+                    {
+                        id = "older-leaf",
+                        update_time = 150
+                    }
+                }
+            }
+        };
+
+        // Act
+        var latestConversation = conversation.GetLastestConversation();
+
+        // Assert
+        Assert.NotNull(latestConversation.mapping);
+        Assert.Contains("missing-ts-leaf", latestConversation.mapping!.Keys);
+        Assert.DoesNotContain("older-leaf", latestConversation.mapping.Keys);
+    }
+
+    [Fact]
+    public void GetLastestConversation_MappingWithNoMessages_FallsBackToLastLeaf()
+    {
+        // Arrange
+        var conversation = new Conversation
+        {
+            mapping = new Dictionary<string, MessageContainer>
+            {
+                ["root"] = new MessageContainer
+                {
+                    id = "root",
+                    children = new List<string> { "leaf-one", "leaf-two" }
+                },
+                ["leaf-one"] = new MessageContainer
+                {
+                    id = "leaf-one",
+                    parent = "root"
+                },
+                ["leaf-two"] = new MessageContainer
+                {
+                    id = "leaf-two",
+                    parent = "root"
+                }
+            }
+        };
+
+        // Act
+        var latestConversation = conversation.GetLastestConversation();
+
+        // Assert
+        Assert.NotNull(latestConversation.mapping);
+        Assert.Contains("leaf-two", latestConversation.mapping!.Keys);
+        Assert.DoesNotContain("leaf-one", latestConversation.mapping.Keys);
+    }
+
+    [Fact]
+    public void GetLastestConversation_MostRecentSubtreeWithMultipleLevels_SelectsDeepestLeaf()
+    {
+        // Arrange
+        var conversation = new Conversation
+        {
+            mapping = new Dictionary<string, MessageContainer>
+            {
+                ["root"] = new MessageContainer
+                {
+                    id = "root",
+                    children = new List<string> { "recent-internal", "older-leaf" }
+                },
+                ["recent-internal"] = new MessageContainer
+                {
+                    id = "recent-internal",
+                    parent = "root",
+                    children = new List<string> { "middle" },
+                    message = new Message
+                    {
+                        id = "recent-internal",
+                        update_time = 300
+                    }
+                },
+                ["middle"] = new MessageContainer
+                {
+                    id = "middle",
+                    parent = "recent-internal",
+                    children = new List<string> { "deep-leaf" },
+                    message = new Message
+                    {
+                        id = "middle"
+                    }
+                },
+                ["deep-leaf"] = new MessageContainer
+                {
+                    id = "deep-leaf",
+                    parent = "middle",
+                    message = new Message
+                    {
+                        id = "deep-leaf"
+                    }
+                },
+                ["older-leaf"] = new MessageContainer
+                {
+                    id = "older-leaf",
+                    parent = "root",
+                    message = new Message
+                    {
+                        id = "older-leaf",
+                        update_time = 250
+                    }
+                }
+            }
+        };
+
+        // Act
+        var latestConversation = conversation.GetLastestConversation();
+
+        // Assert
+        Assert.NotNull(latestConversation.mapping);
+        Assert.Contains("recent-internal", latestConversation.mapping!.Keys);
+        Assert.Contains("middle", latestConversation.mapping.Keys);
+        Assert.Contains("deep-leaf", latestConversation.mapping.Keys);
+        Assert.DoesNotContain("older-leaf", latestConversation.mapping.Keys);
+    }
+
+    [Fact]
+    public void GetLastestConversation_SubtreeCycleWithoutLeaves_ReturnsEmptyMapping()
+    {
+        // Arrange
+        var conversation = new Conversation
+        {
+            mapping = new Dictionary<string, MessageContainer>
+            {
+                ["a"] = new MessageContainer
+                {
+                    id = "a",
+                    children = new List<string> { "b" },
+                    message = new Message
+                    {
+                        id = "a",
+                        update_time = 2
+                    }
+                },
+                ["b"] = new MessageContainer
+                {
+                    id = "b",
+                    parent = "a",
+                    children = new List<string> { "a" },
+                    message = new Message
+                    {
+                        id = "b",
+                        update_time = 1
+                    }
+                }
+            }
+        };
+
+        // Act
+        var latestConversation = conversation.GetLastestConversation();
+
+        // Assert
+        Assert.NotNull(latestConversation.mapping);
+        Assert.Empty(latestConversation.mapping!);
+    }
+
+    [Fact]
     public void GetMessagesWithContent_ConversationWithNullMapping_ReturnsEmpty()
     {
         // Arrange
