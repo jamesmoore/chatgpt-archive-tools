@@ -1,4 +1,4 @@
-FROM node:25-alpine AS frontend
+FROM node:26-alpine AS frontend
 WORKDIR /src
 
 COPY front-react/package*.json front-react/
