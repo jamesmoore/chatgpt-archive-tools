@@ -19,6 +19,11 @@ namespace ChatGPTExport.Decoders
 
             var parts = content.parts?.Where(TextContentFilter).SelectMany(p => DecodeText(p, context)).ToList() ?? [];
 
+            if (parts.Count == 0)
+            {
+                return MarkdownContentResult.Empty();
+            }
+
             var content_references = context.MessageMetadata.content_references;
             if (content_references != null && content_references.Length != 0)
             {
@@ -83,7 +88,7 @@ namespace ChatGPTExport.Decoders
                 }
             }
 
-            var markdownContent = parts.Select(UnwrapWritingBlock).ToList(); 
+            var markdownContent = parts.Select(UnwrapWritingBlock).ToList();
 
             return MarkdownContentResult.FromLines(markdownContent);
         }
