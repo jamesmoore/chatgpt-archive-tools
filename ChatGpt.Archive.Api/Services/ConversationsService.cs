@@ -88,7 +88,8 @@ namespace ChatGpt.Archive.Api.Services
             {
                 return null;
             }
-            var formatted = formatter.First().Format(conversation.GetLastestConversation(), string.Empty, false);
+            var latestConversation = conversation.GetLatestConversation();
+            var formatted = formatter.First().Format(latestConversation, string.Empty, false);
 
             if (formatted != null)
             {

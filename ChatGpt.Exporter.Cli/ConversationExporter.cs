@@ -31,7 +31,7 @@ namespace ChatGpt.Exporter.Cli
 
                 Console.WriteLine($"\tMessages: {conversation.mapping!.Count}\tLeaves: {conversation.mapping.Count(p => p.Value.IsLeaf())}");
 
-                var conversationToExport = exportMode == ExportMode.Complete ? conversation : conversation.GetLastestConversation();
+                var conversationToExport = exportMode == ExportMode.Complete ? conversation : conversation.GetLatestConversation();
                 foreach (var formatter in formatters)
                 {
                     Console.Write($"\t\t{formatter.GetType().Name}");

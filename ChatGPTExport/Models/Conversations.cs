@@ -46,47 +46,61 @@ namespace ChatGPTExport.Models
                 return null;
             }
 
+            var currentLeaf = GetLeafFromNode(current_node);
+            if (currentLeaf != null)
+            {
+                return currentLeaf;
+            }
+
             var mostRecentMapping = mapping
                 .Where(m => m.Value != null && m.Value.message != null)
                 .OrderByDescending(m => m.Value.message!.GetMessageTimestamp())
                 .FirstOrDefault();
 
-            if (mostRecentMapping.Value != null && mostRecentMapping.Value.message != null && mostRecentMapping.Value.IsLeaf())
+            if (mostRecentMapping.Value != null)
             {
-                return mostRecentMapping.Key;
-            }
-            else if (mostRecentMapping.Value != null && mostRecentMapping.Value.message != null)
-            {
-                var currentKey = mostRecentMapping.Key;
-                var currentMapping = mostRecentMapping.Value;
-                var visited = new HashSet<string>();
-
-                // first leaf in the subtree of the most recent message
-                while (true)
+                var mostRecentLeaf = GetLeafFromNode(mostRecentMapping.Key);
+                if (mostRecentLeaf != null)
                 {
-                    if (!visited.Add(currentKey))
-                    {
-                        break;
-                    }
-
-                    if (currentMapping.children == null || currentMapping.children.Count == 0)
-                    {
-                        return currentKey;
-                    }
-
-                    var childId = currentMapping.children[0];
-                    if (!mapping.TryGetValue(childId, out var child) || child == null)
-                    {
-                        break;
-                    }
-
-                    currentKey = childId;
-                    currentMapping = child;
+                    return mostRecentLeaf;
                 }
             }
 
             var leaves = mapping.Where(p => p.Value != null && p.Value.IsLeaf()).ToList();
             return leaves.Count == 0 ? null : leaves.Last().Key;
+        }
+
+        private string? GetLeafFromNode(string? nodeId)
+        {
+            if (mapping == null || string.IsNullOrWhiteSpace(nodeId) || !mapping.TryGetValue(nodeId, out var currentMapping) || currentMapping == null)
+            {
+                return null;
+            }
+
+            var currentKey = nodeId;
+            var visited = new HashSet<string>();
+
+            while (visited.Add(currentKey))
+            {
+                if (currentMapping.IsLeaf())
+                {
+                    return currentKey;
+                }
+
+                var nextChildId = currentMapping.children?
+                    .Where(childId => mapping.TryGetValue(childId, out var child) && child != null)
+                    .OrderByDescending(childId => mapping[childId].message?.GetMessageTimestamp())
+                    .FirstOrDefault();
+
+                if (nextChildId == null || !mapping.TryGetValue(nextChildId, out currentMapping) || currentMapping == null)
+                {
+                    return currentKey;
+                }
+
+                currentKey = nextChildId;
+            }
+
+            return null;
         }
 
         private Dictionary<string, MessageContainer> GetLatestBranch()
@@ -98,16 +112,16 @@ namespace ChatGPTExport.Models
 
             var temp = new List<MessageContainer>();
             var currentId = GetLastLeaf();
-            while (currentId != null)
+            var visited = new HashSet<string>();
+            while (currentId != null && visited.Add(currentId) && this.mapping.TryGetValue(currentId, out var messageContainer))
             {
-                var messageContainer = this.mapping[currentId];
                 temp.Insert(0, messageContainer);
                 currentId = messageContainer.parent;
             }
             return temp.Where(p => p.id != null).ToDictionary(p => p.id!, p => p);
         }
 
-        public Conversation GetLastestConversation()
+        public Conversation GetLatestConversation()
         {
             var clone = (Conversation)this.MemberwiseClone();
             clone.mapping = GetLatestBranch();
