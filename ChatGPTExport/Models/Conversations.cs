@@ -53,8 +53,10 @@ namespace ChatGPTExport.Models
             }
 
             var mostRecentMapping = mapping
-                .Where(m => m.Value != null && m.Value.message != null)
-                .OrderByDescending(m => m.Value.message!.GetMessageTimestamp())
+                .Where(m => m.Value != null
+                    && m.Value.message != null
+                    && m.Value.message!.GetMessageTimestamp().HasValue)
+                .OrderByDescending(m => m.Value!.message!.GetMessageTimestamp())
                 .FirstOrDefault();
 
             if (mostRecentMapping.Value != null)
