@@ -41,38 +41,33 @@ namespace ChatGPTExport.Models
 
         private string? GetLastLeaf()
         {
-            if (mapping == null)
+            if (mapping == null || mapping.Count == 0)
             {
                 return null;
+            }
+
+            var mostRecentMapping = mapping
+                .Where(m => m.Value.message != null)
+                .OrderByDescending(m => m.Value.message!.GetMessageTimestamp())
+                .FirstOrDefault();
+
+            if (mostRecentMapping.Value.message != null && mostRecentMapping.Value.IsLeaf())
+            {
+                return mostRecentMapping.Key;
+            }
+            else if (mostRecentMapping.Value.message != null)
+            {
+                // first leaf in the subtree of the most recent message
+                while (mostRecentMapping.Value.children != null && mostRecentMapping.Value.children.Count > 0)
+                {
+                    var childId = mostRecentMapping.Value.children[0];
+                    mostRecentMapping = mapping.Single(p => p.Key == childId);
+                }
+                return mostRecentMapping.Key;
             }
 
             var leaves = mapping.Where(p => p.Value.IsLeaf()).ToList();
-
-            if (leaves.Count == 0)
-            {
-                return null;
-            }
-
-            var messageTimestamps = leaves.Select(p => new
-            {
-                messageId = p.Key,
-                timestamp = p.Value.message?.GetMessageTimestamp()
-            }
-            ).ToList();
-
-            var allHaveTimestamp = messageTimestamps.All(p => p.timestamp.HasValue);
-            if (!allHaveTimestamp)
-            {
-                Console.WriteLine("Warning: Not all messages have update_time/create_time.");
-            }
-
-            var withTimestamps = messageTimestamps.Where(p => p.timestamp.HasValue).ToList();
-            if (withTimestamps.Count == 0)
-            {
-                return leaves.Last().Key;
-            }
-
-            return withTimestamps.OrderBy(p => p.timestamp!).Last().messageId;
+            return leaves.Last().Key;
         }
 
         private Dictionary<string, MessageContainer> GetLatestBranch()
