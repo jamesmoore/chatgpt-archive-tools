@@ -10,14 +10,14 @@ namespace ChatGPTExport.Visitor
             if (MessageIsValid(message))
             {
                 MessageContext context = new(
-                    message.author,
+                    message.author!,
                     message.GetCreateTime(),
                     message.GetUpdateTime(),
                     message.metadata,
                     message.recipient,
                     conversationContext,
                     showHidden);
-                return message.content.Accept(visitor, context);
+                return message.content!.Accept(visitor, context);
             }
             else
             {
