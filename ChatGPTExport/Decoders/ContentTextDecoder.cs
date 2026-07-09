@@ -24,7 +24,7 @@ namespace ChatGPTExport.Decoders
                 return MarkdownContentResult.Empty();
             }
 
-            var content_references = context.MessageMetadata.content_references;
+            var content_references = context.MessageMetadata?.content_references;
             if (content_references != null && content_references.Length != 0)
             {
                 var textPart = parts[0];
@@ -34,12 +34,6 @@ namespace ChatGPTExport.Decoders
                 var startReferences = content_references.Where(p => p.start_idx == 0 && p.end_idx == 0).Reverse().ToList();
                 var bodyReferences = content_references.Except(startReferences).OrderByDescending(p => p.start_idx).ToList();
                 var reversed = bodyReferences.Concat(startReferences).ToList();
-
-                if (sourcesFootnote != null)
-                {
-                    var footnote = reversed.First();
-                    Debug.Assert(footnote == sourcesFootnote);
-                }
 
                 var footnoteItems = GetFootnoteItems(content_references);
 
@@ -59,10 +53,10 @@ namespace ChatGPTExport.Decoders
                 {
                     var replacement = GetContentReferenceReplacement(contentReference, footnoteIndexByItem, suffix);
 
-                    if (replacement != null)
+                    if (replacement != null && contentReference.start_idx != null && contentReference.end_idx != null)
                     {
-                        var start_idx = reindexedElements.ToUtf16Index(contentReference.start_idx);
-                        var end_idx = reindexedElements.ToUtf16Index(contentReference.end_idx);
+                        var start_idx = reindexedElements.ToUtf16Index(contentReference.start_idx.Value);
+                        var end_idx = reindexedElements.ToUtf16Index(contentReference.end_idx.Value);
                         var firstPartSpan = parts[0].AsSpan();
                         var firstSpan = firstPartSpan[..start_idx];
                         var lastSpan = firstPartSpan[end_idx..];
@@ -234,7 +228,7 @@ namespace ChatGPTExport.Decoders
                 }
             }
             // canvas create/update
-            else if (context.Recipient.StartsWith("canmore"))
+            else if (context.Recipient != null && context.Recipient.StartsWith("canmore"))
             {
                 var conversationContext = context.ConversationContext;
                 if (context.Recipient == "canmore.create_textdoc")

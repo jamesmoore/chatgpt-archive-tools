@@ -6,8 +6,8 @@ namespace ChatGPTExport.Decoders
         Author Author,
         DateTimeOffset? CreatedDate,
         DateTimeOffset? UpdatedDate,
-        MessageMetadata MessageMetadata,
-        string Recipient,
+        MessageMetadata? MessageMetadata,
+        string? Recipient,
         ConversationContext ConversationContext,
         bool ShowHidden
         )

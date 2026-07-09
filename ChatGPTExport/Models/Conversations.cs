@@ -153,7 +153,6 @@ namespace ChatGPTExport.Models
         public ContentBase? content { get; set; }
         public string? status { get; set; }
         public bool? end_turn { get; set; }
-        public decimal weight { get; set; }
         public MessageMetadata? metadata { get; set; }
         public string? recipient { get; set; }
         public string? channel { get; set; }

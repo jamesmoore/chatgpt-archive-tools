@@ -7,17 +7,14 @@ namespace ChatGPTExport.Visitor
     {
         public static T? Accept<T>(this Message message, IContentVisitor<T> visitor, ConversationContext conversationContext, bool showHidden)
         {
-            if (message.content != null &&
-                message.author?.role != null &&
-                message.metadata != null &&
-                message.recipient != null)
+            if (MessageIsValid(message))
             {
                 MessageContext context = new(
-                    message.author, 
-                    message.GetCreateTime(), 
-                    message.GetUpdateTime(), 
-                    message.metadata, 
-                    message.recipient, 
+                    message.author,
+                    message.GetCreateTime(),
+                    message.GetUpdateTime(),
+                    message.metadata,
+                    message.recipient,
                     conversationContext,
                     showHidden);
                 return message.content.Accept(visitor, context);
@@ -26,6 +23,12 @@ namespace ChatGPTExport.Visitor
             {
                 return default;
             }
+        }
+
+        private static bool MessageIsValid(Message message)
+        {
+            return message.content != null &&
+                message.author?.role != null;
         }
 
         private static T Accept<T>(this ContentBase content, IContentVisitor<T> visitor, MessageContext context)
