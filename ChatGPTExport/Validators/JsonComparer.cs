@@ -24,9 +24,15 @@ namespace ChatGPTExport.Validators
             if (node1missing && node2missing)
                 return;
 
-            if (node1missing || node2missing)
+            if (node1missing)
             {
-                diffs.Add($"{path}: One is null/missing, the other is not");
+                diffs.Add($"{path}: Left is null/missing");
+                return;
+            }
+
+            if (node2missing)
+            {
+                diffs.Add($"{path}: Right is null/missing");
                 return;
             }
 

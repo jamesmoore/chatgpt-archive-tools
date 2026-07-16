@@ -47,7 +47,7 @@ namespace ChatGPTExport.Decoders
                             assetString
                         };
 
-                        if (context.MessageMetadata.image_gen_title != null)
+                        if (context.MessageMetadata?.image_gen_title != null)
                         {
                             mediaAssets.Add($"*{context.MessageMetadata.image_gen_title}*  ");
                         }

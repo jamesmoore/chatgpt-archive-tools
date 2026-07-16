@@ -6,6 +6,9 @@ ChatGPT does not offer a clean, built-in way to save or print conversations for 
 
 This tool enables you to browse, search, extract and reformat your conversations from the official ChatGPT export ZIP file. You can export your data via [ChatGPT settings - https://chatgpt.com/#settings/DataControls](https://chatgpt.com/#settings/DataControls).
 
+> [!NOTE]  
+> As of June 2026 images and content references do not come through in the official export. This tool will still work, but you will not see images or references in the exported markdown or html.
+
 ## Features
 * Browse and search your ChatGPT exports in a web UI.
 * Convert ChatGPT exports into smaller, viewable markdown, html and json files

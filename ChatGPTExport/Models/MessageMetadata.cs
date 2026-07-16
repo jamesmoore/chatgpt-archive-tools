@@ -88,8 +88,8 @@ namespace ChatGPTExport.Models
         public class Content_References
         {
             public string? matched_text { get; set; }
-            public int start_idx { get; set; }
-            public int end_idx { get; set; }
+            public int? start_idx { get; set; }
+            public int? end_idx { get; set; }
             public string[]? safe_urls { get; set; }
             public object[]? refs { get; set; }
             public string? alt { get; set; }
